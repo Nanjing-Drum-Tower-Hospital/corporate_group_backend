@@ -9,7 +9,7 @@ import java.util.List;
 @Mapper
 @Repository
 public interface ItemMapper {
-    @Select("SELECT * FROM dbo.item_dictionary WHERE code = #{code}")
+    @Select("SELECT * FROM dbo.item_dictionary WHERE code like #{code}")
     @Results({
             @Result(property = "code", column = "code"),
             @Result(property = "name", column = "name"),

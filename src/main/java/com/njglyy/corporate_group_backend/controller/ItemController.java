@@ -17,7 +17,7 @@ public class ItemController {
             (@RequestParam(value = "code", required = false) String code
             ) {
         System.out.println(123);
-        List<Item> itemList = itemMapper.queryItemByCode(code);
+        List<Item> itemList = itemMapper.queryItemByCode("%"+code+"%");
 
         return new Result(200,null,itemList);
     }
