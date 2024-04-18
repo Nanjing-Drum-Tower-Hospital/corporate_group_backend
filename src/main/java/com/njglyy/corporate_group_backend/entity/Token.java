@@ -10,8 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Token {
-    int id;
-    String code;
+    String username;
     String token;
     LocalDateTime expiration_time;
 

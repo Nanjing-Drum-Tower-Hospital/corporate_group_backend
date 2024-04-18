@@ -3,6 +3,7 @@ package com.njglyy.corporate_group_backend.interceptor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
+import com.njglyy.corporate_group_backend.entity.Token;
 import com.njglyy.corporate_group_backend.mapper.corporateGroup.TokenMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,14 +32,17 @@ import java.util.Map;
 public class LoginInterceptor implements HandlerInterceptor {
     @Autowired
     private TokenMapper tokenMapper;
-    private ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String token = request.getHeader("token");
-        String user = request.getHeader("user");
-        System.out.println(token);
-        System.out.println(321);
-        return false;
+        String tokenString = request.getHeader("token");
+        String username = request.getHeader("username");
+        Token token = tokenMapper.expirationCheck(tokenString,username);
+        if(token!=null){
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 }

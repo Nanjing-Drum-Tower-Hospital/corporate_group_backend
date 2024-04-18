@@ -16,7 +16,7 @@ public class Item {
     private String unitName;
     private double sellingPrice;
     private String manufacturer;
-    private String company;
+    private String companyName;
     private String billItem;
     private String standards;
     private String approvalNo;

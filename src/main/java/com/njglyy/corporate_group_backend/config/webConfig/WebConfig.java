@@ -32,7 +32,7 @@ public class WebConfig implements WebMvcConfigurer {
         //添加拦截器
         registry.addInterceptor(loginInterceptor).addPathPatterns("/**")
                 //放行路径，可以添加多个
-                .excludePathPatterns();
+                .excludePathPatterns("/login");
 //        registry.addInterceptor(userStaffAdminInterceptor).addPathPatterns("/queryUserStaffAdmin");
 
     }

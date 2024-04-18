@@ -17,7 +17,7 @@ public interface ItemMapper {
             @Result(property = "unitName", column = "unit_name"),
             @Result(property = "sellingPrice", column = "selling_price"),
             @Result(property = "manufacturer", column = "manufacturer"),
-            @Result(property = "company", column = "company"),
+            @Result(property = "companyName", column = "company_name"),
             @Result(property = "billItem", column = "bill_item"),
             @Result(property = "standards", column = "standards"),
             @Result(property = "approvalNo", column = "approval_no"),
@@ -38,4 +38,16 @@ public interface ItemMapper {
             @Result(property = "pinyinCode", column = "pinyin_code")
     })
     List<Item> queryItemByCode(@Param("code") String code);
+
+    @Insert("INSERT INTO dbo.item_dictionary" +
+            "set values(#{code},#{name},#{model},#{unitName},#{sellingPrice},#{manufacturer},#{companyName}," +
+            "#{billItem},#{standards},#{approvalNo},#{type},#{expireDate},#{createDate},#{extendCode1}," +
+            "#{extendCode2},#{extendCode3},#{extendCode4},#{extendCode5},#{comment1},#{comment2},#{comment3}," +
+            "#{comment4},#{comment5},#{certificationUrl},#{pinyinCode} ")
+    List<Item> AddItem(String code, String name, String model, String unitName, String sellingPrice,
+                       String manufacturer, String companyName, String billItem, String standards,
+                       String approvalNo, String type, String expireDate, String createDate,
+                       String extendCode1, String extendCode2, String extendCode3, String extendCode4,
+                       String extendCode5, String comment1, String comment2, String comment3,
+                       String comment4, String comment5, String certificationUrl, String pinyinCode);
 }
