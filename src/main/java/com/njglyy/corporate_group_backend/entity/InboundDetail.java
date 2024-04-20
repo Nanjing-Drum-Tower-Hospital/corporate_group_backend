@@ -5,20 +5,23 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Item {
+public class InboundDetail {
     private int id;
+    private int orderNo;
+    private String remark;
+    private int itemId;
+    private String machine_no;
     private String code;
     private String name;
     private String model;
     private String unitName;
     private double sellingPrice;
-    private int manufacturerId;
-    private int supplierId;
+    private String manufacturer;
+    private String supplier;
     private String billItem;
     private String standards;
     private String approvalNo;
