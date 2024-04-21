@@ -18,7 +18,6 @@ public class Item {
     private String unitName;
     private double sellingPrice;
     private int manufacturerId;
-    private int supplierId;
     private String billItem;
     private String standards;
     private String approvalNo;

@@ -1,6 +1,7 @@
 package com.njglyy.corporate_group_backend.controller;
 
 import com.njglyy.corporate_group_backend.entity.Inbound;
+import com.njglyy.corporate_group_backend.entity.InboundDetail;
 import com.njglyy.corporate_group_backend.entity.Item;
 import com.njglyy.corporate_group_backend.entity.Result;
 import com.njglyy.corporate_group_backend.mapper.corporateGroup.InboundMapper;
@@ -16,9 +17,17 @@ public class InboundController {
     @Autowired
     private InboundMapper inboundMapper;
     @RequestMapping(value = "/queryInboundList", method = RequestMethod.GET)
-    public Result queryItemList
+    public Result queryInboundList
             () {
-        List<Inbound> inboundList = inboundMapper.queryInbound();
-        return new Result(200,null,inboundList);
+        List<InboundDetail> inboundDetailList = inboundMapper.queryInbound();
+        return new Result(200,null,inboundDetailList);
+    }
+
+    @RequestMapping(value = "/queryInboundDetail", method = RequestMethod.GET)
+    public Result queryInboundDetail
+            () {
+        List<InboundDetail> inboundDetailList = inboundMapper.queryInboundDetail();
+        System.out.println(inboundDetailList);
+        return new Result(200,null,inboundDetailList);
     }
 }

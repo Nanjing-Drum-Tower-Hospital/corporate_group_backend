@@ -1,5 +1,6 @@
 package com.njglyy.corporate_group_backend.controller;
 import com.njglyy.corporate_group_backend.entity.Item;
+import com.njglyy.corporate_group_backend.entity.ItemDetail;
 import com.njglyy.corporate_group_backend.entity.Result;
 import com.njglyy.corporate_group_backend.entity.User;
 import com.njglyy.corporate_group_backend.mapper.corporateGroup.ItemMapper;
@@ -19,7 +20,7 @@ public class ItemController {
             (@RequestParam(value = "code", required = false) String code
             ) {
 
-        List<Item> itemList = itemMapper.queryItemByCode("%"+code+"%");
+        List<ItemDetail> itemList = itemMapper.queryItemByCode("%"+code+"%");
 
         return new Result(200,null,itemList);
     }
@@ -34,7 +35,7 @@ public class ItemController {
             LocalDate today = LocalDate.now();
             if(item.getId()!=0){
                 itemMapper.updateItem( item.getCode(),item.getName(), item.getModel(), item.getUnitName(), item.getSellingPrice(),
-                        item.getManufacturerId(), item.getSupplierId(), item.getBillItem(), item.getStandards(),
+                        item.getManufacturerId(),  item.getBillItem(), item.getStandards(),
                         item.getApprovalNo(), item.getType(), item.getExpireDate(), today,
                         null, null, null, null, null, null,
                         null, null, null, null,
@@ -44,7 +45,7 @@ public class ItemController {
 
 
             itemMapper.addItem(item.getCode(), item.getName(), item.getModel(), item.getUnitName(), item.getSellingPrice(),
-                    item.getManufacturerId(), item.getSupplierId(), item.getBillItem(), item.getStandards(),
+                    item.getManufacturerId(),  item.getBillItem(), item.getStandards(),
                     item.getApprovalNo(), item.getType(), item.getExpireDate(), today,
                     null, null, null, null, null, null,
                     null, null, null, null,
@@ -52,10 +53,9 @@ public class ItemController {
 
             return new Result(200, "添加成功！", null);
         } catch (Exception e) {
-            // Log the exception here; depending on your logging framework you might use:
-            // e.g., Logger.error("Failed to add item", e);
-            System.out.println("Error adding item: " + e.getMessage());
-            return new Result(500, "Error adding item: " + e.getMessage(), null);
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            return new Result(500, "Error deleting item: " + e.getMessage(), null);
         }
     }
 
@@ -67,9 +67,8 @@ public class ItemController {
             itemMapper.deleteItem(id);
             return new Result(200, "删除成功！", null);
         } catch (Exception e) {
-            // Log the exception here; depending on your logging framework you might use:
-            // e.g., Logger.error("Failed to delete item", e);
-            System.out.println("Error deleting item: " + e.getMessage());
+            e.printStackTrace();
+            System.out.println(e.getMessage());
             return new Result(500, "Error deleting item: " + e.getMessage(), null);
         }
     }
