@@ -4,15 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Inbound {
-    private int id;
-    private int orderNo;
-    private int supplierId;
-    private String remark;
-
+    private InboundInfo inboundInfo;
+    private InboundItem inboundItem;
+    private Supplier supplier;
+    private Item item;
 }

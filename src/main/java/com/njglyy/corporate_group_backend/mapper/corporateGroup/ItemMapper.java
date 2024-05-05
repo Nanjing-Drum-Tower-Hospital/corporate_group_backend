@@ -1,7 +1,6 @@
 package com.njglyy.corporate_group_backend.mapper.corporateGroup;
 
 import com.njglyy.corporate_group_backend.entity.Item;
-import com.njglyy.corporate_group_backend.entity.ItemDetail;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
@@ -17,36 +16,36 @@ public interface ItemMapper {
             "item_dictionary.manufacturer_id=manufacturer_dictionary.id and" +
             " code like #{code}")
     @Results({
-            @Result(property = "item.id", column = "id"),
-            @Result(property = "item.code", column = "code"),
-            @Result(property = "item.name", column = "name"),
-            @Result(property = "item.model", column = "model"),
-            @Result(property = "item.unitName", column = "unit_name"),
-            @Result(property = "item.sellingPrice", column = "selling_price"),
-            @Result(property = "item.manufacturerId", column = "manufacturer_id"),
-            @Result(property = "item.billItem", column = "bill_item"),
-            @Result(property = "item.standards", column = "standards"),
-            @Result(property = "item.approvalNo", column = "approval_no"),
-            @Result(property = "item.type", column = "type"),
-            @Result(property = "item.expireDate", column = "expire_date"),
-            @Result(property = "item.createDate", column = "create_date"),
-            @Result(property = "item.extendCode1", column = "extend_code1"),
-            @Result(property = "item.extendCode2", column = "extend_code2"),
-            @Result(property = "item.extendCode3", column = "extend_code3"),
-            @Result(property = "item.extendCode4", column = "extend_code4"),
-            @Result(property = "item.extendCode5", column = "extend_code5"),
-            @Result(property = "item.comment1", column = "comment1"),
-            @Result(property = "item.comment2", column = "comment2"),
-            @Result(property = "item.comment3", column = "comment3"),
-            @Result(property = "item.comment4", column = "comment4"),
-            @Result(property = "item.comment5", column = "comment5"),
-            @Result(property = "item.certificationUrl", column = "certification_url"),
-            @Result(property = "item.pinyinCode", column = "pinyin_code"),
+            @Result(property = "itemDetail.id", column = "id"),
+            @Result(property = "itemDetail.code", column = "code"),
+            @Result(property = "itemDetail.name", column = "name"),
+            @Result(property = "itemDetail.model", column = "model"),
+            @Result(property = "itemDetail.unitName", column = "unit_name"),
+            @Result(property = "itemDetail.sellingPrice", column = "selling_price"),
+            @Result(property = "itemDetail.manufacturerId", column = "manufacturer_id"),
+            @Result(property = "itemDetail.billItem", column = "bill_item"),
+            @Result(property = "itemDetail.standards", column = "standards"),
+            @Result(property = "itemDetail.approvalNo", column = "approval_no"),
+            @Result(property = "itemDetail.type", column = "type"),
+            @Result(property = "itemDetail.expireDate", column = "expire_date"),
+            @Result(property = "itemDetail.createDate", column = "create_date"),
+            @Result(property = "itemDetail.extendCode1", column = "extend_code1"),
+            @Result(property = "itemDetail.extendCode2", column = "extend_code2"),
+            @Result(property = "itemDetail.extendCode3", column = "extend_code3"),
+            @Result(property = "itemDetail.extendCode4", column = "extend_code4"),
+            @Result(property = "itemDetail.extendCode5", column = "extend_code5"),
+            @Result(property = "itemDetail.comment1", column = "comment1"),
+            @Result(property = "itemDetail.comment2", column = "comment2"),
+            @Result(property = "itemDetail.comment3", column = "comment3"),
+            @Result(property = "itemDetail.comment4", column = "comment4"),
+            @Result(property = "itemDetail.comment5", column = "comment5"),
+            @Result(property = "itemDetail.certificationUrl", column = "certification_url"),
+            @Result(property = "itemDetail.pinyinCode", column = "pinyin_code"),
             @Result(property = "manufacturer.id", column = "manufacturer_dictionary_id"),
             @Result(property = "manufacturer.manufacturerName", column = "manufacturer_name"),
             @Result(property = "manufacturer.pinyinCode", column = "manufacturer_dictionary_pinyin_code"),
     })
-    List<ItemDetail> queryItemByCode(@Param("code") String code);
+    List<Item> queryItemByCode(@Param("code") String code);
 
     @Insert("INSERT INTO dbo.item_dictionary " +
             " values(#{code},#{name},#{model},#{unitName},#{sellingPrice},#{manufacturerId}," +

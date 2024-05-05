@@ -1,11 +1,8 @@
 package com.njglyy.corporate_group_backend.controller;
 
 import com.njglyy.corporate_group_backend.entity.Inbound;
-import com.njglyy.corporate_group_backend.entity.InboundDetail;
-import com.njglyy.corporate_group_backend.entity.Item;
 import com.njglyy.corporate_group_backend.entity.Result;
 import com.njglyy.corporate_group_backend.mapper.corporateGroup.InboundMapper;
-import com.njglyy.corporate_group_backend.mapper.corporateGroup.ItemMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,14 +16,14 @@ public class InboundController {
     @RequestMapping(value = "/queryInboundList", method = RequestMethod.GET)
     public Result queryInboundList
             () {
-        List<InboundDetail> inboundDetailList = inboundMapper.queryInbound();
+        List<Inbound> inboundDetailList = inboundMapper.queryInbound();
         return new Result(200,null,inboundDetailList);
     }
 
     @RequestMapping(value = "/queryInboundDetail", method = RequestMethod.GET)
     public Result queryInboundDetail
             () {
-        List<InboundDetail> inboundDetailList = inboundMapper.queryInboundDetail();
+        List<Inbound> inboundDetailList = inboundMapper.queryInboundDetail();
         System.out.println(inboundDetailList);
         return new Result(200,null,inboundDetailList);
     }

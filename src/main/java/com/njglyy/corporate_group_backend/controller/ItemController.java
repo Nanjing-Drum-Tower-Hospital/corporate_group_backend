@@ -1,8 +1,7 @@
 package com.njglyy.corporate_group_backend.controller;
-import com.njglyy.corporate_group_backend.entity.Item;
 import com.njglyy.corporate_group_backend.entity.ItemDetail;
+import com.njglyy.corporate_group_backend.entity.Item;
 import com.njglyy.corporate_group_backend.entity.Result;
-import com.njglyy.corporate_group_backend.entity.User;
 import com.njglyy.corporate_group_backend.mapper.corporateGroup.ItemMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +19,7 @@ public class ItemController {
             (@RequestParam(value = "code", required = false) String code
             ) {
 
-        List<ItemDetail> itemList = itemMapper.queryItemByCode("%"+code+"%");
+        List<Item> itemList = itemMapper.queryItemByCode("%"+code+"%");
 
         return new Result(200,null,itemList);
     }
@@ -28,28 +27,28 @@ public class ItemController {
 
     @RequestMapping(value = "/addOrUpdateItem", method = RequestMethod.POST)
     public Result addOrUpdateItem
-            (@RequestBody Item item
+            (@RequestBody ItemDetail itemDetail
             ) {
         try {
-            System.out.println(item);
+            System.out.println(itemDetail);
             LocalDate today = LocalDate.now();
-            if(item.getId()!=0){
-                itemMapper.updateItem( item.getCode(),item.getName(), item.getModel(), item.getUnitName(), item.getSellingPrice(),
-                        item.getManufacturerId(),  item.getBillItem(), item.getStandards(),
-                        item.getApprovalNo(), item.getType(), item.getExpireDate(), today,
+            if(itemDetail.getId()!=0){
+                itemMapper.updateItem( itemDetail.getCode(),itemDetail.getName(), itemDetail.getModel(), itemDetail.getUnitName(), itemDetail.getSellingPrice(),
+                        itemDetail.getManufacturerId(),  itemDetail.getBillItem(), itemDetail.getStandards(),
+                        itemDetail.getApprovalNo(), itemDetail.getType(), itemDetail.getExpireDate(), today,
                         null, null, null, null, null, null,
                         null, null, null, null,
-                        item.getCertificationUrl(),item.getId());
+                        itemDetail.getCertificationUrl(),itemDetail.getId());
                 return new Result(200, "修改成功！", null);
             }
 
 
-            itemMapper.addItem(item.getCode(), item.getName(), item.getModel(), item.getUnitName(), item.getSellingPrice(),
-                    item.getManufacturerId(),  item.getBillItem(), item.getStandards(),
-                    item.getApprovalNo(), item.getType(), item.getExpireDate(), today,
+            itemMapper.addItem(itemDetail.getCode(), itemDetail.getName(), itemDetail.getModel(), itemDetail.getUnitName(), itemDetail.getSellingPrice(),
+                    itemDetail.getManufacturerId(),  itemDetail.getBillItem(), itemDetail.getStandards(),
+                    itemDetail.getApprovalNo(), itemDetail.getType(), itemDetail.getExpireDate(), today,
                     null, null, null, null, null, null,
                     null, null, null, null,
-                    item.getCertificationUrl());
+                    itemDetail.getCertificationUrl());
 
             return new Result(200, "添加成功！", null);
         } catch (Exception e) {

@@ -11,6 +11,6 @@ public class InboundItem {
     private int id;
     private int orderNo;
     private int itemId;
-    private int machineNo;
+    private String machineNo;
 
 }
