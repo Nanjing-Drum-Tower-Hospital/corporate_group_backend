@@ -22,8 +22,8 @@ public class InboundController {
 
     @RequestMapping(value = "/queryInboundDetail", method = RequestMethod.GET)
     public Result queryInboundDetail
-            () {
-        List<Inbound> inboundDetailList = inboundMapper.queryInboundDetail();
+            (@RequestParam(value = "orderNo", required = false) String orderNo) {
+        List<Inbound> inboundDetailList = inboundMapper.queryInboundDetail(orderNo);
         System.out.println(inboundDetailList);
         return new Result(200,null,inboundDetailList);
     }

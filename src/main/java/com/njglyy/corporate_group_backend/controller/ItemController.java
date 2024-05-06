@@ -1,9 +1,11 @@
 package com.njglyy.corporate_group_backend.controller;
 import com.njglyy.corporate_group_backend.entity.ItemDetail;
 import com.njglyy.corporate_group_backend.entity.Item;
+import com.njglyy.corporate_group_backend.entity.Manufacturer;
 import com.njglyy.corporate_group_backend.entity.Result;
 import com.njglyy.corporate_group_backend.mapper.corporateGroup.ItemMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -16,13 +18,67 @@ public class ItemController {
     private ItemMapper itemMapper;
     @RequestMapping(value = "/queryItemList", method = RequestMethod.GET)
     public Result queryItemList
-            (@RequestParam(value = "code", required = false) String code
+            (@RequestParam(value = "code", required = false) String code,
+             @RequestParam(value = "beginDate", required = false)
+             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate beginDate,
+             @RequestParam(value = "endDate", required = false)
+             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+             @RequestParam(value = "currentPage", required = false) int currentPage,
+             @RequestParam(value = "pageSize", required = false) int pageSize
+
             ) {
 
-        List<Item> itemList = itemMapper.queryItemByCode("%"+code+"%");
+        String codeSQL="";
+        String beginDateSQL="";
+        String endDateSQL="";
+        if(code!=null){
+            codeSQL="and code like '"+code+"%' ";
+        }
+        if(beginDate!=null){
+            beginDateSQL="and item_dictionary.create_date >= '"+beginDate+"' ";
+        }
+        if(endDate!=null){
+            endDateSQL="and item_dictionary.create_date <= '"+endDate+"' ";
+        }
+
+        int offset = (currentPage - 1) * pageSize;
+        List<Item> itemList = itemMapper.queryItemsByCondition(codeSQL, beginDateSQL, endDateSQL, offset, pageSize);
+
 
         return new Result(200,null,itemList);
     }
+
+    @RequestMapping(value = "/queryItemsCount", method = RequestMethod.GET)
+    public Result queryItemsCountByCondition
+            (@RequestParam(value = "code", required = false) String code,
+             @RequestParam(value = "beginDate", required = false)
+             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate beginDate,
+             @RequestParam(value = "endDate", required = false)
+             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+             @RequestParam(value = "currentPage", required = false) int currentPage,
+             @RequestParam(value = "pageSize", required = false) int pageSize
+
+            ) {
+
+        String codeSQL="";
+        String beginDateSQL="";
+        String endDateSQL="";
+        if(code!=null){
+            codeSQL="and code like '"+code+"%' ";
+        }
+        if(beginDate!=null){
+            beginDateSQL="and item_dictionary.create_date >= '"+beginDate+"' ";
+        }
+        if(endDate!=null){
+            endDateSQL="and item_dictionary.create_date <= '"+endDate+"' ";
+        }
+
+        int itemsCount = itemMapper.queryItemsCountByCondition(codeSQL, beginDateSQL, endDateSQL);
+
+        return new Result(200,null,itemsCount);
+    }
+
+
 
 
     @RequestMapping(value = "/addOrUpdateItem", method = RequestMethod.POST)
@@ -71,5 +127,20 @@ public class ItemController {
             return new Result(500, "Error deleting item: " + e.getMessage(), null);
         }
     }
+
+
+    @RequestMapping(value = "/queryManufacturerList", method = RequestMethod.GET)
+    public Result queryManufacturerList
+            () {
+        try {
+            List<Manufacturer> manufacturerList = itemMapper.queryManufacturerList();
+            return new Result(200, null, manufacturerList);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            return new Result(500, "Error querying manufacturer list: " + e.getMessage(), null);
+        }
+    }
+
 
 }

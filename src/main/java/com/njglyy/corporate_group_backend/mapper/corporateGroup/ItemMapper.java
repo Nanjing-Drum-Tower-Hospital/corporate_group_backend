@@ -1,6 +1,7 @@
 package com.njglyy.corporate_group_backend.mapper.corporateGroup;
 
 import com.njglyy.corporate_group_backend.entity.Item;
+import com.njglyy.corporate_group_backend.entity.Manufacturer;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
@@ -10,11 +11,15 @@ import java.util.List;
 @Mapper
 @Repository
 public interface ItemMapper {
-    @Select("SELECT item_dictionary.*,manufacturer_dictionary.id as manufacturer_dictionary_id,manufacturer_dictionary.manufacturer_name," +
-            "manufacturer_dictionary.pinyin_code as manufacturer_dictionary_pinyin_code   " +
-            "FROM dbo.item_dictionary, manufacturer_dictionary WHERE " +
-            "item_dictionary.manufacturer_id=manufacturer_dictionary.id and" +
-            " code like #{code}")
+    @Select("SELECT item_dictionary.*, manufacturer_dictionary.id as manufacturer_dictionary_id, manufacturer_dictionary.manufacturer_name, " +
+            "manufacturer_dictionary.pinyin_code as manufacturer_dictionary_pinyin_code " +
+            "FROM dbo.item_dictionary, manufacturer_dictionary " +
+            "WHERE item_dictionary.manufacturer_id = manufacturer_dictionary.id " +
+            "${codeSQL} " +
+            "${beginDateSQL} " +
+            "${endDateSQL} " +
+            "ORDER BY item_dictionary.id " +
+            "OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY")
     @Results({
             @Result(property = "itemDetail.id", column = "id"),
             @Result(property = "itemDetail.code", column = "code"),
@@ -45,7 +50,16 @@ public interface ItemMapper {
             @Result(property = "manufacturer.manufacturerName", column = "manufacturer_name"),
             @Result(property = "manufacturer.pinyinCode", column = "manufacturer_dictionary_pinyin_code"),
     })
-    List<Item> queryItemByCode(@Param("code") String code);
+    List<Item> queryItemsByCondition(String codeSQL, String beginDateSQL, String endDateSQL, int offset, int pageSize);
+
+
+    @Select("SELECT COUNT(*) " +
+            "FROM dbo.item_dictionary, manufacturer_dictionary " +
+            "WHERE item_dictionary.manufacturer_id = manufacturer_dictionary.id " +
+            "${codeSQL} " +
+            "${beginDateSQL} " +
+            "${endDateSQL}")
+    int queryItemsCountByCondition(String codeSQL, String beginDateSQL, String endDateSQL);
 
     @Insert("INSERT INTO dbo.item_dictionary " +
             " values(#{code},#{name},#{model},#{unitName},#{sellingPrice},#{manufacturerId}," +
@@ -79,6 +93,17 @@ public interface ItemMapper {
     @Delete("delete from dbo.item_dictionary  " +
             " where id = #{id}")
     void deleteItem( int id);
+
+
+
+    @Select("select * from manufacturer_dictionary")
+    @Results({
+            @Result(property = "id", column = "id"),
+            @Result(property = "manufacturerName", column = "manufacturer_name"),
+            @Result(property = "pinyinCode", column = "pinyin_code")
+    })
+    List<Manufacturer> queryManufacturerList();
+
 
 
 }

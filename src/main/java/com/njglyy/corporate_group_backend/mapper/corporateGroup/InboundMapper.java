@@ -68,7 +68,8 @@ public interface InboundMapper {
             "join supplier_dictionary on inbound_list.supplier_id = supplier_dictionary.id \n" +
             "join inbound_detail_list on inbound_list.order_no = inbound_detail_list.order_no \n" +
             "join item_dictionary on inbound_detail_list.item_id = item_dictionary.id " +
-            "join manufacturer_dictionary on item_dictionary.manufacturer_id=manufacturer_dictionary.id")
+            "join manufacturer_dictionary on item_dictionary.manufacturer_id=manufacturer_dictionary.id" +
+            "where inbound_list.order_no=#{orderNo}")
     @Results({
             @Result(property = "inboundInfo.id", column = "id"),
             @Result(property = "inboundInfo.orderNo", column = "order_no"),
@@ -110,7 +111,7 @@ public interface InboundMapper {
             @Result(property = "item.manufacturer.manufacturerName", column = "manufacturer_dictionary_manufacturer_name"),
             @Result(property = "item.manufacturer.pinyinCode", column = "manufacturer_dictionary_pinyin_code"),
     })
-    List<Inbound> queryInboundDetail();
+    List<Inbound> queryInboundDetail(String orderNo);
 
 
 
