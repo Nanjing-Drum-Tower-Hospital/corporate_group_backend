@@ -1,9 +1,12 @@
 package com.njglyy.corporate_group_backend.mapper.corporateGroup;
 
 import com.njglyy.corporate_group_backend.entity.Inbound;
+import com.njglyy.corporate_group_backend.entity.Manufacturer;
+import com.njglyy.corporate_group_backend.entity.Supplier;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Mapper
@@ -20,6 +23,7 @@ public interface InboundMapper {
     @Results({
             @Result(property = "inboundInfo.id", column = "id"),
             @Result(property = "inboundInfo.orderNo", column = "order_no"),
+            @Result(property = "inboundInfo.arrivalDate", column = "arrival_date"),
             @Result(property = "inboundInfo.supplierId", column = "supplier_id"),
             @Result(property = "inboundInfo.remark", column = "remark"),
             @Result(property = "supplier.id", column = "supplier_dictionary_id"),
@@ -67,12 +71,13 @@ public interface InboundMapper {
             "from inbound_list \n" +
             "join supplier_dictionary on inbound_list.supplier_id = supplier_dictionary.id \n" +
             "join inbound_detail_list on inbound_list.order_no = inbound_detail_list.order_no \n" +
-            "join item_dictionary on inbound_detail_list.item_id = item_dictionary.id " +
-            "join manufacturer_dictionary on item_dictionary.manufacturer_id=manufacturer_dictionary.id" +
+            "join item_dictionary on inbound_detail_list.item_id = item_dictionary.id \n" +
+            "join manufacturer_dictionary on item_dictionary.manufacturer_id=manufacturer_dictionary.id \n" +
             "where inbound_list.order_no=#{orderNo}")
     @Results({
             @Result(property = "inboundInfo.id", column = "id"),
             @Result(property = "inboundInfo.orderNo", column = "order_no"),
+            @Result(property = "inboundInfo.arrivalDate", column = "arrival_date"),
             @Result(property = "inboundInfo.supplierId", column = "supplier_id"),
             @Result(property = "inboundInfo.remark", column = "remark"),
             @Result(property = "supplier.id", column = "supplier_dictionary_id"),
@@ -113,6 +118,26 @@ public interface InboundMapper {
     })
     List<Inbound> queryInboundDetail(String orderNo);
 
+    @Insert("INSERT INTO dbo.inbound_list " +
+            " values(#{orderNo}, #{arrivalDate}, #{supplierId}, #{remark})")
+    void addInbound(String orderNo, LocalDate arrivalDate, int supplierId, String remark);
 
+
+
+    @Update("UPDATE dbo.inbound_list " +
+            " set order_no = #{orderNo},arrival_date=  #{arrivalDate},supplier_id = #{supplierId},remark = #{remark}" +
+            "where id= #{id}")
+    void updateInbound(String orderNo, LocalDate arrivalDate, int supplierId, String remark, int id);
+
+
+
+
+    @Select("select * from supplier_dictionary")
+    @Results({
+            @Result(property = "id", column = "id"),
+            @Result(property = "supplierName", column = "supplier_name"),
+            @Result(property = "pinyinCode", column = "pinyin_code")
+    })
+    List<Supplier> querySupplierList();
 
 }
