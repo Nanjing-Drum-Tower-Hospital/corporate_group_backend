@@ -12,5 +12,6 @@ public class InboundItem {
     private int orderNo;
     private int itemId;
     private String machineNo;
+    private int machineNoCount;
 
 }
