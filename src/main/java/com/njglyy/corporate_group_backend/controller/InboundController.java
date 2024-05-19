@@ -79,4 +79,25 @@ public class InboundController {
         }
     }
 
+
+    @RequestMapping(value = "/addOrUpdateInboundDetail", method = RequestMethod.POST)
+    public Result addOrUpdateInboundDetail
+            (@RequestBody InboundItem inboundItem
+            ) {
+        try {
+            System.out.println(inboundItem);
+
+
+
+            inboundMapper.addInboundDetail( inboundItem.getOrderNo(), inboundItem.getItemId(), inboundItem.getMachineNo()
+                    );
+
+            return new Result(200, "添加成功！", null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            return new Result(500, "Error deleting item: " + e.getMessage(), null);
+        }
+    }
+
 }

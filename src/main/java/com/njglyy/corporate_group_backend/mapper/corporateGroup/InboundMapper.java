@@ -12,6 +12,11 @@ import java.util.List;
 @Mapper
 @Repository
 public interface InboundMapper {
+    @Insert("INSERT INTO dbo.inbound_detail_list " +
+            " values(#{orderNo}, #{itemId}, #{machineNo})")
+    void addInboundDetail(int orderNo, int itemId, String machineNo);
+
+
 
     @Select("select inbound_list.* , \n" +
             "supplier_dictionary.id as supplier_dictionary_id, \n" +
