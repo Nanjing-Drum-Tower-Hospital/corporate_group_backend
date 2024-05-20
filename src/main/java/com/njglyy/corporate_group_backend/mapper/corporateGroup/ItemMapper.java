@@ -88,6 +88,41 @@ public interface ItemMapper {
     })
     ItemDetail queryItemByCode(String code);
 
+
+    @Select("SELECT * " +
+            "FROM dbo.item_dictionary " +
+            "where " +
+            "item_dictionary.code like #{input} or item_dictionary.name like #{input}")
+    @Results({
+            @Result(property = "id", column = "id"),
+            @Result(property = "code", column = "code"),
+            @Result(property = "name", column = "name"),
+            @Result(property = "model", column = "model"),
+            @Result(property = "unitName", column = "unit_name"),
+            @Result(property = "sellingPrice", column = "selling_price"),
+            @Result(property = "manufacturerId", column = "manufacturer_id"),
+            @Result(property = "billItem", column = "bill_item"),
+            @Result(property = "standards", column = "standards"),
+            @Result(property = "approvalNo", column = "approval_no"),
+            @Result(property = "type", column = "type"),
+            @Result(property = "expireDate", column = "expire_date"),
+            @Result(property = "createDate", column = "create_date"),
+            @Result(property = "extendCode1", column = "extend_code1"),
+            @Result(property = "extendCode2", column = "extend_code2"),
+            @Result(property = "extendCode3", column = "extend_code3"),
+            @Result(property = "extendCode4", column = "extend_code4"),
+            @Result(property = "extendCode5", column = "extend_code5"),
+            @Result(property = "comment1", column = "comment1"),
+            @Result(property = "comment2", column = "comment2"),
+            @Result(property = "comment3", column = "comment3"),
+            @Result(property = "comment4", column = "comment4"),
+            @Result(property = "comment5", column = "comment5"),
+            @Result(property = "certificationUrl", column = "certification_url"),
+            @Result(property = "pinyinCode", column = "pinyin_code")
+
+    })
+    List<ItemDetail> queryItemByCodeOrName(String input);
+
     @Select("SELECT COUNT(*) " +
             "FROM dbo.item_dictionary, manufacturer_dictionary " +
             "WHERE item_dictionary.manufacturer_id = manufacturer_dictionary.id " +

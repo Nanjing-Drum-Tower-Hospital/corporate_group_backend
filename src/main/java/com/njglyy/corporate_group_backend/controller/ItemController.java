@@ -16,6 +16,18 @@ import java.util.List;
 public class ItemController {
     @Autowired
     private ItemMapper itemMapper;
+    @RequestMapping(value = "/queryItemByCodeOrName", method = RequestMethod.GET)
+    public Result queryItemByCodeOrName
+            (@RequestParam(value = "input", required = false) String input
+            ) {
+        System.out.println(input);
+        String inputStr = "%"+input+"%";
+
+        List<ItemDetail> itemDetailList = itemMapper.queryItemByCodeOrName(inputStr);
+        return new Result(200,null,itemDetailList);
+    }
+
+
     @RequestMapping(value = "/queryItemList", method = RequestMethod.GET)
     public Result queryItemList
             (@RequestParam(value = "code", required = false) String code,
