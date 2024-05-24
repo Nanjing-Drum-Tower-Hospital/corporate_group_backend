@@ -1,6 +1,7 @@
 package com.njglyy.corporate_group_backend.mapper.corporateGroup;
 
 import com.njglyy.corporate_group_backend.entity.Inbound;
+import com.njglyy.corporate_group_backend.entity.InboundItem;
 import com.njglyy.corporate_group_backend.entity.Manufacturer;
 import com.njglyy.corporate_group_backend.entity.Supplier;
 import org.apache.ibatis.annotations.*;
@@ -12,9 +13,57 @@ import java.util.List;
 @Mapper
 @Repository
 public interface InboundMapper {
+
+    @Delete("DELETE FROM inbound_detail_list " +
+            "WHERE order_no = #{orderNo} " +
+            "AND item_id = #{itemId} ")
+    void deleteInboundItemListByOrderNoAndItemId(@Param("orderNo") String orderNo,
+                                                                 @Param("itemId") int itemId);
+
+    @Delete("DELETE FROM inbound_detail_list " +
+            "WHERE order_no = #{orderNo} " +
+            "AND item_id = #{itemId} " +
+            "AND machine_no NOT IN (${machineNumbers})")
+    void deleteInboundDetailsByOrderNoAndItemIdAndMachineNoNotIn(@Param("orderNo") String orderNo,
+                                                                 @Param("itemId") int itemId,
+                                                                 @Param("machineNumbers") String machineNumbers);
+
+
+    @Select("SELECT * FROM inbound_detail_list " +
+            "WHERE order_no = #{orderNo} " +
+            "AND item_id = #{itemId} " +
+            "AND machine_no = #{machineNo}")
+    @Results({
+            @Result(property = "id", column = "id"),
+            @Result(property = "orderNo", column = "order_no"),
+            @Result(property = "itemId", column = "item_id"),
+            @Result(property = "machineNo", column = "machine_no"),
+
+    })
+    List<InboundItem> queryInboundDetailsByOrderNoAndItemIdAndMachineNo(@Param("orderNo") String orderNo,
+                                                                 @Param("itemId") int itemId,
+                                                                 @Param("machineNo") String machineNo);
+
+
+
+    @Select("select * "+
+            "from " +
+            "inbound_detail_list \n" +
+            "where order_no = #{orderNo} and item_id = #{itemId} \n" )
+    @Results({
+            @Result(property = "id", column = "id"),
+            @Result(property = "orderNo", column = "order_no"),
+            @Result(property = "itemId", column = "item_id"),
+            @Result(property = "machineNo", column = "machine_no"),
+
+    })
+    List<InboundItem> queryInboundItemListByOrderNoAndItemId(String orderNo, int itemId);
+
+
+
     @Insert("INSERT INTO dbo.inbound_detail_list " +
             " values(#{orderNo}, #{itemId}, #{machineNo})")
-    void addInboundDetail(int orderNo, int itemId, String machineNo);
+    void addInboundDetail(String orderNo, int itemId, String machineNo);
 
 
 
@@ -24,7 +73,9 @@ public interface InboundMapper {
             "supplier_dictionary.pinyin_code as supplier_dictionary_pinyin_code " +
             "from " +
             "inbound_list,supplier_dictionary \n" +
-            "where inbound_list.supplier_id=supplier_dictionary.id \n" )
+            "where inbound_list.supplier_id=supplier_dictionary.id " +
+            "ORDER BY inbound_list.id " +
+            "OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY \n" )
     @Results({
             @Result(property = "inboundInfo.id", column = "id"),
             @Result(property = "inboundInfo.orderNo", column = "order_no"),
@@ -35,7 +86,17 @@ public interface InboundMapper {
             @Result(property = "supplier.supplierName", column = "supplier_dictionary_supplier_name"),
             @Result(property = "supplier.pinyinCode", column = "supplier_dictionary_pinyin_code"),
     })
-    List<Inbound> queryInbound();
+    List<Inbound> queryInboundList(int offset, int pageSize);
+
+
+
+    @Select("select COUNT(*) "+
+            "from " +
+            "inbound_list,supplier_dictionary \n" +
+            "where inbound_list.supplier_id=supplier_dictionary.id " +
+            " \n" )
+
+    int queryInboundCount(int offset, int pageSize);
 
 
     @Select("SELECT \n" +
@@ -94,7 +155,9 @@ public interface InboundMapper {
             "    item_dictionary.comment5, item_dictionary.certification_url, item_dictionary.pinyin_code,\n" +
             "    supplier_dictionary.id, supplier_dictionary.supplier_name, supplier_dictionary.pinyin_code,\n" +
             "    manufacturer_dictionary.id, manufacturer_dictionary.manufacturer_name, \n" +
-            "    manufacturer_dictionary.pinyin_code;\n")
+            "    manufacturer_dictionary.pinyin_code " +
+            "ORDER BY item_dictionary.id " +
+            "OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY")
     @Results({
             @Result(property = "inboundInfo.id", column = "id"),
             @Result(property = "inboundInfo.orderNo", column = "order_no"),
@@ -137,8 +200,18 @@ public interface InboundMapper {
             @Result(property = "item.manufacturer.manufacturerName", column = "manufacturer_dictionary_manufacturer_name"),
             @Result(property = "item.manufacturer.pinyinCode", column = "manufacturer_dictionary_pinyin_code"),
     })
-    List<Inbound> queryInboundDetailCount(String orderNo);
+    List<Inbound> queryInboundDetailMachineNoCount(String orderNo, int offset, int pageSize);
 
+
+
+    @Select("SELECT COUNT(*) AS count_twice\n" +
+            "FROM (\n" +
+            "    SELECT COUNT(machine_no) AS count_once\n" +
+            "    FROM inbound_detail_list\n" +
+            "    WHERE order_no = #{orderNo}\n" +
+            "    GROUP BY item_id\n" +
+            ") AS subquery_alias;")
+    int countInboundDetailMachineNoCount(String orderNo, int offset, int pageSize);
 
     @Select("select inbound_list.*, \n" +
             "supplier_dictionary.id as supplier_dictionary_id, \n" +
