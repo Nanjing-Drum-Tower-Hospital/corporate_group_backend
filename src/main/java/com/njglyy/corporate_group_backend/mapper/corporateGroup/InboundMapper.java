@@ -317,6 +317,13 @@ public interface InboundMapper {
     void updateInbound(String orderNo, LocalDate arrivalDate, int supplierId, String remark, int id);
 
     @Select("select * from inbound_list where id= #{id}")
+    @Results({
+            @Result(property = "id", column = "id"),
+            @Result(property = "orderNo", column = "order_no"),
+            @Result(property = "arrivalDate", column = "arrival_date"),
+            @Result(property = "supplierId", column = "supplier_id"),
+            @Result(property = "remark", column = "remark")
+    })
     InboundInfo queryInboundById(int id);
 
     @Update("UPDATE dbo.inbound_detail_list " +

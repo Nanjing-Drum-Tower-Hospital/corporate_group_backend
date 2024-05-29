@@ -124,14 +124,14 @@ public class InboundController {
             ) {
         try {
             System.out.println(inboundInfo);
-
+            System.out.println(inboundInfo.getId());
             if (inboundInfo.getId() != 0) {
                 InboundInfo originalInboundInfo = inboundMapper.queryInboundById(inboundInfo.getId());
                 inboundMapper.updateInbound(inboundInfo.getOrderNo(), inboundInfo.getArrivalDate(),
                         inboundInfo.getSupplierId(), inboundInfo.getRemark(),
                         inboundInfo.getId());
                 System.out.println("originalInboundInfo");
-                System.out.println(originalInboundInfo.getOrderNo());
+                System.out.println(originalInboundInfo);
                 System.out.println("inboundInfo");
                 System.out.println(inboundInfo.getOrderNo());
                 inboundMapper.updateInboundDetailListByOrderNo(originalInboundInfo.getOrderNo(),inboundInfo.getOrderNo());
