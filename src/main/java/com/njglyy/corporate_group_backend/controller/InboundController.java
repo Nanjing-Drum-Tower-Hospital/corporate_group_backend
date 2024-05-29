@@ -14,14 +14,26 @@ import java.util.stream.Collectors;
 public class InboundController {
     @Autowired
     private InboundMapper inboundMapper;
+
+    @RequestMapping(value = "/deleteInbound", method = RequestMethod.GET)
+    public Result deleteInbound
+            (@RequestParam(value = "orderNo", required = false) String orderNo
+            ) {
+
+        inboundMapper.deleteInboundItemListByOrderNo(orderNo);
+        inboundMapper.deleteInboundListByOrderNo(orderNo);
+        return new Result(200, "删除成功！", null);
+    }
+
+
     @RequestMapping(value = "/deleteInboundItemListByOrderNoAndItemId", method = RequestMethod.GET)
     public Result deleteInboundItemListByOrderNoAndItemId
             (@RequestParam(value = "orderNo", required = false) String orderNo,
              @RequestParam(value = "itemId", required = false) int itemId
             ) {
 
-        inboundMapper.deleteInboundItemListByOrderNoAndItemId(orderNo,itemId);
-        return new Result(200,"删除成功！",null);
+        inboundMapper.deleteInboundItemListByOrderNoAndItemId(orderNo, itemId);
+        return new Result(200, "删除成功！", null);
     }
 
 
@@ -31,10 +43,9 @@ public class InboundController {
              @RequestParam(value = "itemId", required = false) int itemId
             ) {
 
-        List<InboundItem> InboundItemList = inboundMapper.queryInboundItemListByOrderNoAndItemId(orderNo,itemId);
-        return new Result(200,null,InboundItemList);
+        List<InboundItem> InboundItemList = inboundMapper.queryInboundItemListByOrderNoAndItemId(orderNo, itemId);
+        return new Result(200, null, InboundItemList);
     }
-
 
 
     @RequestMapping(value = "/queryInboundList", method = RequestMethod.GET)
@@ -43,7 +54,7 @@ public class InboundController {
              @RequestParam(value = "pageSize", required = false) int pageSize) {
         int offset = (currentPage - 1) * pageSize;
         List<Inbound> inboundList = inboundMapper.queryInboundList(offset, pageSize);
-        return new Result(200,null,inboundList);
+        return new Result(200, null, inboundList);
     }
 
 
@@ -53,7 +64,7 @@ public class InboundController {
              @RequestParam(value = "pageSize", required = false) int pageSize) {
         int offset = (currentPage - 1) * pageSize;
         int inboundsCount = inboundMapper.queryInboundCount(offset, pageSize);
-        return new Result(200,null,inboundsCount);
+        return new Result(200, null, inboundsCount);
     }
 
     @RequestMapping(value = "/queryInboundDetail", method = RequestMethod.GET)
@@ -62,7 +73,7 @@ public class InboundController {
         System.out.println(orderNo);
         List<Inbound> inboundDetailList = inboundMapper.queryInboundDetail(orderNo);
         System.out.println(inboundDetailList);
-        return new Result(200,null,inboundDetailList);
+        return new Result(200, null, inboundDetailList);
     }
 
     @RequestMapping(value = "/queryInboundDetailMachineNoCount", method = RequestMethod.GET)
@@ -74,7 +85,7 @@ public class InboundController {
         int offset = (currentPage - 1) * pageSize;
         List<Inbound> inboundDetailMachineNoCountList = inboundMapper.queryInboundDetailMachineNoCount(orderNo, offset, pageSize);
         System.out.println(inboundDetailMachineNoCountList);
-        return new Result(200,null,inboundDetailMachineNoCountList);
+        return new Result(200, null, inboundDetailMachineNoCountList);
     }
 
 
@@ -89,7 +100,7 @@ public class InboundController {
         int offset = (currentPage - 1) * pageSize;
         int inboundDetailsCount = inboundMapper.countInboundDetailMachineNoCount(orderNo, offset, pageSize);
         System.out.println(inboundDetailsCount);
-        return new Result(200,null,inboundDetailsCount);
+        return new Result(200, null, inboundDetailsCount);
     }
 
 
@@ -114,15 +125,21 @@ public class InboundController {
         try {
             System.out.println(inboundInfo);
 
-            if(inboundInfo.getId()!=0){
-                inboundMapper.updateInbound( inboundInfo.getOrderNo(),inboundInfo.getArrivalDate(),
-                        inboundInfo.getSupplierId(),inboundInfo.getRemark(),
+            if (inboundInfo.getId() != 0) {
+                InboundInfo originalInboundInfo = inboundMapper.queryInboundById(inboundInfo.getId());
+                inboundMapper.updateInbound(inboundInfo.getOrderNo(), inboundInfo.getArrivalDate(),
+                        inboundInfo.getSupplierId(), inboundInfo.getRemark(),
                         inboundInfo.getId());
+                System.out.println("originalInboundInfo");
+                System.out.println(originalInboundInfo.getOrderNo());
+                System.out.println("inboundInfo");
+                System.out.println(inboundInfo.getOrderNo());
+                inboundMapper.updateInboundDetailListByOrderNo(originalInboundInfo.getOrderNo(),inboundInfo.getOrderNo());
                 return new Result(200, "修改成功！", null);
             }
 
 
-            inboundMapper.addInbound( inboundInfo.getOrderNo(), inboundInfo.getArrivalDate(), inboundInfo.getSupplierId(),
+            inboundMapper.addInbound(inboundInfo.getOrderNo(), inboundInfo.getArrivalDate(), inboundInfo.getSupplierId(),
                     inboundInfo.getRemark());
 
             return new Result(200, "添加成功！", null);
@@ -141,7 +158,7 @@ public class InboundController {
              @RequestParam(required = false, defaultValue = "") List<String> machineNumbers
             ) {
         try {
-            if(machineNumbers.size() == 0){
+            if (machineNumbers.size() == 0) {
                 return new Result(300, "无添加信息！", null);
             }
             System.out.println(orderNo);
@@ -156,12 +173,11 @@ public class InboundController {
             inboundMapper.deleteInboundDetailsByOrderNoAndItemIdAndMachineNoNotIn(orderNo, itemId, machineNumbersString);
 
 
-
-            for(String machineNumber: machineNumbers){
+            for (String machineNumber : machineNumbers) {
                 List<InboundItem> inboundItemList = inboundMapper.queryInboundDetailsByOrderNoAndItemIdAndMachineNo(orderNo, itemId, machineNumber);
                 System.out.println(inboundItemList);
-                if(inboundItemList.size() == 0){
-                    inboundMapper.addInboundDetail( orderNo, itemId, machineNumber);
+                if (inboundItemList.size() == 0) {
+                    inboundMapper.addInboundDetail(orderNo, itemId, machineNumber);
                 }
 
             }

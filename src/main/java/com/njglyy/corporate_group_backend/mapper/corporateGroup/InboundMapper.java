@@ -1,10 +1,8 @@
 package com.njglyy.corporate_group_backend.mapper.corporateGroup;
 
-import com.njglyy.corporate_group_backend.entity.Inbound;
-import com.njglyy.corporate_group_backend.entity.InboundItem;
-import com.njglyy.corporate_group_backend.entity.Manufacturer;
-import com.njglyy.corporate_group_backend.entity.Supplier;
+import com.njglyy.corporate_group_backend.entity.*;
 import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Result;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -13,6 +11,14 @@ import java.util.List;
 @Mapper
 @Repository
 public interface InboundMapper {
+    @Delete("DELETE FROM inbound_list " +
+            "WHERE order_no = #{orderNo} ")
+    void deleteInboundListByOrderNo(@Param("orderNo") String orderNo);
+
+
+    @Delete("DELETE FROM inbound_detail_list " +
+            "WHERE order_no = #{orderNo} ")
+    void deleteInboundItemListByOrderNo(@Param("orderNo") String orderNo);
 
     @Delete("DELETE FROM inbound_detail_list " +
             "WHERE order_no = #{orderNo} " +
@@ -310,8 +316,13 @@ public interface InboundMapper {
             "where id= #{id}")
     void updateInbound(String orderNo, LocalDate arrivalDate, int supplierId, String remark, int id);
 
+    @Select("select * from inbound_list where id= #{id}")
+    InboundInfo queryInboundById(int id);
 
-
+    @Update("UPDATE dbo.inbound_detail_list " +
+            " set order_no = #{newOrderNo} " +
+            "where order_no= #{oldOrderNo}")
+    void updateInboundDetailListByOrderNo(String oldOrderNo,String newOrderNo);
 
     @Select("select * from supplier_dictionary")
     @Results({
