@@ -61,19 +61,19 @@ public class ItemController {
     }
 
 
-    @RequestMapping(value = "/queryItemByCode", method = RequestMethod.GET)
-    public Result queryItemByCode
-            (@RequestParam(value = "code", required = false) String code
-            ) {
-
-
-        ItemDetail itemDetail = itemMapper.queryItemByCode(code);
-        System.out.println("code");
-        System.out.println(itemDetail);
-        System.out.println("code");
-
-        return new Result(200,null,itemDetail);
-    }
+//    @RequestMapping(value = "/queryItemByCode", method = RequestMethod.GET)
+//    public Result queryItemByCode
+//            (@RequestParam(value = "code", required = false) String code
+//            ) {
+//
+//
+//        ItemDetail itemDetail = itemMapper.queryItemByCode(code);
+//        System.out.println("code");
+//        System.out.println(itemDetail);
+//        System.out.println("code");
+//
+//        return new Result(200,null,itemDetail);
+//    }
 
     @RequestMapping(value = "/queryItemsCount", method = RequestMethod.GET)
     public Result queryItemsCountByCondition

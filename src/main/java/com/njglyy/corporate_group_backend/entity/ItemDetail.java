@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
@@ -15,6 +16,7 @@ public class ItemDetail {
     private String name;
     private String model;
     private String unitName;
+
     private double sellingPrice;
     private int manufacturerId;
     private String billItem;
@@ -25,4 +27,14 @@ public class ItemDetail {
     private LocalDate createDate;
     private String certificationUrl;
     private String pinyinCode;
+
+    public BigDecimal getSellingPriceBeforeTax() {
+        BigDecimal sellingPriceBD = BigDecimal.valueOf(sellingPrice);
+        return sellingPriceBD.divide(BigDecimal.valueOf(1.13), 10, BigDecimal.ROUND_HALF_UP);
+    }
+
+    public BigDecimal getTax() {
+        BigDecimal sellingPriceBD = BigDecimal.valueOf(sellingPrice);
+        return sellingPriceBD.subtract(getSellingPriceBeforeTax());
+    }
 }
