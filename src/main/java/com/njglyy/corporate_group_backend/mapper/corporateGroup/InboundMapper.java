@@ -80,12 +80,11 @@ public interface InboundMapper {
             "from " +
             "inbound_list,supplier_dictionary \n" +
             "where inbound_list.supplier_id=supplier_dictionary.id " +
-            "ORDER BY inbound_list.id " +
+            "ORDER BY inbound_list.inbound_no desc " +
             "OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY \n" )
     @Results({
-            @Result(property = "inboundInfo.id", column = "id"),
-            @Result(property = "inboundInfo.orderNo", column = "order_no"),
-            @Result(property = "inboundInfo.arrivalDate", column = "arrival_date"),
+            @Result(property = "inboundInfo.inboundNo", column = "inbound_no"),
+            @Result(property = "inboundInfo.inboundDate", column = "inbound_date"),
             @Result(property = "inboundInfo.supplierId", column = "supplier_id"),
             @Result(property = "inboundInfo.remark", column = "remark"),
             @Result(property = "supplier.id", column = "supplier_dictionary_id"),

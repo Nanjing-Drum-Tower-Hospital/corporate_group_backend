@@ -10,9 +10,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class InboundInfo {
-    private int id;
-    private String orderNo;
-    private LocalDate arrivalDate;
+    private String inboundNo;
+    private LocalDate inboundDate;
     private int supplierId;
     private String remark;
 

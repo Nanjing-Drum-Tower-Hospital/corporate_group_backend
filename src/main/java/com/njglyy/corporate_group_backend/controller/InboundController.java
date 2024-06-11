@@ -122,32 +122,48 @@ public class InboundController {
     public Result addOrUpdateInbound
             (@RequestBody InboundInfo inboundInfo
             ) {
-        try {
-            System.out.println(inboundInfo);
-            System.out.println(inboundInfo.getId());
-            if (inboundInfo.getId() != 0) {
-                InboundInfo originalInboundInfo = inboundMapper.queryInboundById(inboundInfo.getId());
-                inboundMapper.updateInbound(inboundInfo.getOrderNo(), inboundInfo.getArrivalDate(),
-                        inboundInfo.getSupplierId(), inboundInfo.getRemark(),
-                        inboundInfo.getId());
-                System.out.println("originalInboundInfo");
-                System.out.println(originalInboundInfo);
-                System.out.println("inboundInfo");
-                System.out.println(inboundInfo.getOrderNo());
-                inboundMapper.updateInboundDetailListByOrderNo(originalInboundInfo.getOrderNo(),inboundInfo.getOrderNo());
-                return new Result(200, "修改成功！", null);
-            }
+        System.out.println(inboundInfo);
+        List<Inbound> topInboundList= inboundMapper.queryInboundList(0, 1);
+        String inboundNoString =topInboundList.get(0).getInboundInfo().getInboundNo();
+        System.out.println(topInboundList.get(0).getInboundInfo().getInboundNo());
+        String leftInboundNoString= inboundNoString.substring(0,6);
+        System.out.println(leftInboundNoString);
+        String rightInboundNoString= inboundNoString.substring(6,11);
+        System.out.println(rightInboundNoString);
+        int rightInboundNo = Integer.parseInt(rightInboundNoString);
+        System.out.println(rightInboundNo); // This will print 1
 
 
-            inboundMapper.addInbound(inboundInfo.getOrderNo(), inboundInfo.getArrivalDate(), inboundInfo.getSupplierId(),
-                    inboundInfo.getRemark());
 
-            return new Result(200, "添加成功！", null);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-            return new Result(500, "Error deleting item: " + e.getMessage(), null);
-        }
+
+
+//        try {
+//            System.out.println(inboundInfo);
+//            System.out.println(inboundInfo.getId());
+//            if (inboundInfo.getId() != 0) {
+//                InboundInfo originalInboundInfo = inboundMapper.queryInboundById(inboundInfo.getId());
+//                inboundMapper.updateInbound(inboundInfo.getOrderNo(), inboundInfo.getArrivalDate(),
+//                        inboundInfo.getSupplierId(), inboundInfo.getRemark(),
+//                        inboundInfo.getId());
+//                System.out.println("originalInboundInfo");
+//                System.out.println(originalInboundInfo);
+//                System.out.println("inboundInfo");
+//                System.out.println(inboundInfo.getOrderNo());
+//                inboundMapper.updateInboundDetailListByOrderNo(originalInboundInfo.getOrderNo(),inboundInfo.getOrderNo());
+//                return new Result(200, "修改成功！", null);
+//            }
+//
+//
+//            inboundMapper.addInbound(inboundInfo.getOrderNo(), inboundInfo.getArrivalDate(), inboundInfo.getSupplierId(),
+//                    inboundInfo.getRemark());
+//
+//            return new Result(200, "添加成功！", null);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            System.out.println(e.getMessage());
+//            return new Result(500, "Error deleting item: " + e.getMessage(), null);
+//        }
+        return null;
     }
 
 
