@@ -16,25 +16,33 @@ public interface OutboundMapper {
     @Select("select * \n"+
             "from " +
             "outbound_list \n" +
-            "ORDER BY outbound_list.id " +
+            "ORDER BY outbound_list.outbound_no  " +
             "OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY \n" )
     @Results({
-            @Result(property = "outboundInfo.id", column = "id"),
-            @Result(property = "outboundInfo.orderNo", column = "order_no"),
+            @Result(property = "outboundInfo.outboundNo", column = "outbound_no"),
             @Result(property = "outboundInfo.outboundDate", column = "outbound_date"),
             @Result(property = "outboundInfo.remark", column = "remark"),
+            @Result(property = "outboundInfo.accountingReversal", column = "accounting_reversal"),
     })
     List<Outbound> queryOutboundList(int offset, int pageSize);
 
 
     @Insert("INSERT INTO dbo.outbound_list " +
-            " values(#{orderNo}, #{OutboundDate},  #{remark})")
-    void addOutbound(String orderNo, LocalDate OutboundDate,  String remark);
+            " values(#{outboundNo}, #{outboundDate},  #{remark},#{accountingReversal})")
+    void addOutbound(String outboundNo, LocalDate outboundDate,  String remark, int accountingReversal);
+
 
     @Update("UPDATE dbo.outbound_list " +
-            " set order_no = #{orderNo},outbound_date=  #{outboundDate},remark = #{remark}" +
-            "where id= #{id}")
-    void updateOutbound(String orderNo, LocalDate outboundDate, String remark, int id);
+            " set remark = #{remark}, accounting_reversal=#{accountingReversal} " +
+            "where outbound_no= #{outboundNo}")
+    void updateOutbound(String outboundNo, String remark, int accountingReversal);
+
+
+
+
+
+
+
     @Select("select * from outbound_list where id= #{id}")
     @Results({
             @Result(property = "id", column = "id"),
@@ -43,6 +51,9 @@ public interface OutboundMapper {
             @Result(property = "remark", column = "remark")
     })
     OutboundInfo queryOutboundById(int id);
+
+
+
 
     @Update("UPDATE dbo.outbound_detail_list " +
             " set order_no = #{newOrderNo} " +

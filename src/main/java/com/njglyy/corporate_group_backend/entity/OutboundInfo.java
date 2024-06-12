@@ -10,9 +10,9 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OutboundInfo {
-    private int id;
-    private String orderNo;
+    private String outboundNo;
     private LocalDate outboundDate;
     private String remark;
+    private int accountingReversal;
 
 }
