@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -14,5 +15,5 @@ public class InboundInfo {
     private LocalDate inboundDate;
     private int supplierId;
     private String remark;
-
+    private int accountingReversal;
 }

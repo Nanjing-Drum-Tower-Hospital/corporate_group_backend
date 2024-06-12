@@ -6,47 +6,48 @@ import org.apache.ibatis.annotations.Result;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
 @Repository
 public interface InboundMapper {
     @Delete("DELETE FROM inbound_list " +
-            "WHERE order_no = #{orderNo} ")
-    void deleteInboundListByOrderNo(@Param("orderNo") String orderNo);
+            "WHERE inbound_no = #{inboundNo} ")
+    void deleteInboundListByInboundNo(@Param("inboundNo") String inboundNo);
 
 
     @Delete("DELETE FROM inbound_detail_list " +
-            "WHERE order_no = #{orderNo} ")
-    void deleteInboundItemListByOrderNo(@Param("orderNo") String orderNo);
+            "WHERE inbound_no = #{inboundNo} ")
+    void deleteInboundItemListByInboundNo(@Param("inboundNo") String inboundNo);
 
     @Delete("DELETE FROM inbound_detail_list " +
-            "WHERE order_no = #{orderNo} " +
+            "WHERE inbound_no = #{inboundNo} " +
             "AND item_id = #{itemId} ")
-    void deleteInboundItemListByOrderNoAndItemId(@Param("orderNo") String orderNo,
+    void deleteInboundItemListByInboundNoAndItemId(@Param("inboundNo") String inboundNo,
                                                                  @Param("itemId") int itemId);
 
     @Delete("DELETE FROM inbound_detail_list " +
-            "WHERE order_no = #{orderNo} " +
+            "WHERE inbound_no = #{inboundNo} " +
             "AND item_id = #{itemId} " +
             "AND machine_no NOT IN (${machineNumbers})")
-    void deleteInboundDetailsByOrderNoAndItemIdAndMachineNoNotIn(@Param("orderNo") String orderNo,
+    void deleteInboundDetailsByInboundNoAndItemIdAndMachineNoNotIn(@Param("inboundNo") String inboundNo,
                                                                  @Param("itemId") int itemId,
                                                                  @Param("machineNumbers") String machineNumbers);
 
 
     @Select("SELECT * FROM inbound_detail_list " +
-            "WHERE order_no = #{orderNo} " +
+            "WHERE inbound_no = #{inboundNo} " +
             "AND item_id = #{itemId} " +
             "AND machine_no = #{machineNo}")
     @Results({
             @Result(property = "id", column = "id"),
-            @Result(property = "orderNo", column = "order_no"),
+            @Result(property = "inboundNo", column = "inbound_no"),
             @Result(property = "itemId", column = "item_id"),
             @Result(property = "machineNo", column = "machine_no"),
 
     })
-    List<InboundItem> queryInboundDetailsByOrderNoAndItemIdAndMachineNo(@Param("orderNo") String orderNo,
+    List<InboundItem> queryInboundDetailsByInboundNoAndItemIdAndMachineNo(@Param("inboundNo") String inboundNo,
                                                                  @Param("itemId") int itemId,
                                                                  @Param("machineNo") String machineNo);
 
@@ -55,21 +56,21 @@ public interface InboundMapper {
     @Select("select * "+
             "from " +
             "inbound_detail_list \n" +
-            "where order_no = #{orderNo} and item_id = #{itemId} \n" )
+            "where inbound_no = #{inboundNo} and item_id = #{itemId} \n" )
     @Results({
             @Result(property = "id", column = "id"),
-            @Result(property = "orderNo", column = "order_no"),
+            @Result(property = "inboundNo", column = "inbound_no"),
             @Result(property = "itemId", column = "item_id"),
             @Result(property = "machineNo", column = "machine_no"),
 
     })
-    List<InboundItem> queryInboundItemListByOrderNoAndItemId(String orderNo, int itemId);
+    List<InboundItem> queryInboundItemListByInboundNoAndItemId(String inboundNo, int itemId);
 
 
 
     @Insert("INSERT INTO dbo.inbound_detail_list " +
-            " values(#{orderNo}, #{itemId}, #{machineNo})")
-    void addInboundDetail(String orderNo, int itemId, String machineNo);
+            " values(#{inboundNo}, #{itemId}, #{machineNo})")
+    void addInboundDetail(String inboundNo, int itemId, String machineNo);
 
 
 
@@ -109,7 +110,7 @@ public interface InboundMapper {
             "    supplier_dictionary.id AS supplier_dictionary_id,\n" +
             "    supplier_dictionary.supplier_name AS supplier_dictionary_supplier_name,\n" +
             "    supplier_dictionary.pinyin_code AS supplier_dictionary_pinyin_code,\n" +
-            "    inbound_detail_list.order_no AS inbound_detail_list_order_no,\n" +
+            "    inbound_detail_list.inbound_no AS inbound_detail_list_inbound_no,\n" +
             "    inbound_detail_list.item_id AS inbound_detail_list_item_id,\n" +
             "    COUNT(inbound_detail_list.machine_no) AS inbound_detail_list_machine_no_count,\n" +
             "    item_dictionary.id AS item_dictionary_id,\n" +
@@ -142,13 +143,13 @@ public interface InboundMapper {
             "    manufacturer_dictionary.pinyin_code AS manufacturer_dictionary_pinyin_code\n" +
             "FROM inbound_list \n" +
             "JOIN supplier_dictionary ON inbound_list.supplier_id = supplier_dictionary.id \n" +
-            "JOIN inbound_detail_list ON inbound_list.order_no = inbound_detail_list.order_no \n" +
+            "JOIN inbound_detail_list ON inbound_list.inbound_no = inbound_detail_list.inbound_no \n" +
             "JOIN item_dictionary ON inbound_detail_list.item_id = item_dictionary.id \n" +
             "JOIN manufacturer_dictionary ON item_dictionary.manufacturer_id = manufacturer_dictionary.id \n" +
-            "WHERE inbound_list.order_no = #{orderNo} \n" +
+            "WHERE inbound_list.inbound_no = #{inboundNo} \n" +
             "GROUP BY \n" +
-            "    inbound_list.id, inbound_list.order_no,inbound_list.arrival_date, inbound_list.supplier_id," +
-            "    inbound_list.remark, inbound_detail_list.order_no, \n" +
+            "    inbound_list.inbound_no,inbound_list.inbound_date, inbound_list.supplier_id," +
+            "    inbound_list.remark, inbound_list.accounting_reversal, inbound_detail_list.inbound_no, \n" +
             "    inbound_detail_list.item_id, item_dictionary.id, item_dictionary.code, \n" +
             "    item_dictionary.name, item_dictionary.model, item_dictionary.unit_name,\n" +
             "    item_dictionary.selling_price, item_dictionary.manufacturer_id,\n" +
@@ -164,16 +165,16 @@ public interface InboundMapper {
             "ORDER BY item_dictionary.id " +
             "OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY")
     @Results({
-            @Result(property = "inboundInfo.id", column = "id"),
-            @Result(property = "inboundInfo.orderNo", column = "order_no"),
-            @Result(property = "inboundInfo.arrivalDate", column = "arrival_date"),
+            @Result(property = "inboundInfo.inboundNo", column = "inbound_no"),
+            @Result(property = "inboundInfo.inboundDate", column = "inbound_date"),
             @Result(property = "inboundInfo.supplierId", column = "supplier_id"),
             @Result(property = "inboundInfo.remark", column = "remark"),
+            @Result(property = "inboundInfo.accountingReversal", column = "accounting_reversal"),
             @Result(property = "supplier.id", column = "supplier_dictionary_id"),
             @Result(property = "supplier.supplierName", column = "supplier_dictionary_supplier_name"),
             @Result(property = "supplier.pinyinCode", column = "supplier_dictionary_pinyin_code"),
             @Result(property = "inboundItem.id", column = "inbound_detail_list_id"),
-            @Result(property = "inboundItem.orderNo", column = "inbound_detail_list_order_no"),
+            @Result(property = "inboundItem.inboundNo", column = "inbound_detail_list_inbound_no"),
             @Result(property = "inboundItem.itemId", column = "inbound_detail_list_item_id"),
             @Result(property = "inboundItem.machineNoCount", column = "inbound_detail_list_machine_no_count"),
             @Result(property = "item.itemDetail.id", column = "item_dictionary_id"),
@@ -205,7 +206,7 @@ public interface InboundMapper {
             @Result(property = "item.manufacturer.manufacturerName", column = "manufacturer_dictionary_manufacturer_name"),
             @Result(property = "item.manufacturer.pinyinCode", column = "manufacturer_dictionary_pinyin_code"),
     })
-    List<Inbound> queryInboundDetailMachineNoCount(String orderNo, int offset, int pageSize);
+    List<Inbound> queryInboundDetailMachineNoCount(String inboundNo, int offset, int pageSize);
 
 
 
@@ -213,10 +214,10 @@ public interface InboundMapper {
             "FROM (\n" +
             "    SELECT COUNT(machine_no) AS count_once\n" +
             "    FROM inbound_detail_list\n" +
-            "    WHERE order_no = #{orderNo}\n" +
+            "    WHERE inbound_no = #{inboundNo}\n" +
             "    GROUP BY item_id\n" +
             ") AS subquery_alias;")
-    int countInboundDetailMachineNoCount(String orderNo, int offset, int pageSize);
+    int countInboundDetailMachineNoCount(String inboundNo, int offset, int pageSize);
 
     @Select("select inbound_list.*, \n" +
             "supplier_dictionary.id as supplier_dictionary_id, \n" +
@@ -305,15 +306,15 @@ public interface InboundMapper {
     List<Inbound> queryInboundDetail(String orderNo);
 
     @Insert("INSERT INTO dbo.inbound_list " +
-            " values(#{orderNo}, #{arrivalDate}, #{supplierId}, #{remark})")
-    void addInbound(String orderNo, LocalDate arrivalDate, int supplierId, String remark);
+            " values(#{inboundNo}, #{inboundDate}, #{supplierId}, #{remark},#{accountingReversal})")
+    void addInbound(String inboundNo, LocalDate inboundDate, int supplierId, String remark, int accountingReversal);
 
 
 
     @Update("UPDATE dbo.inbound_list " +
-            " set order_no = #{orderNo},arrival_date=  #{arrivalDate},supplier_id = #{supplierId},remark = #{remark}" +
-            "where id= #{id}")
-    void updateInbound(String orderNo, LocalDate arrivalDate, int supplierId, String remark, int id);
+            " set supplier_id = #{supplierId},remark = #{remark}, accounting_reversal=#{accountingReversal} " +
+            "where inbound_no= #{inboundNo}")
+    void updateInbound(String inboundNo, int supplierId, String remark,int accountingReversal);
 
     @Select("select * from inbound_list where id= #{id}")
     @Results({

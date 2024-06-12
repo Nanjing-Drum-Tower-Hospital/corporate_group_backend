@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,33 +19,33 @@ public class InboundController {
 
     @RequestMapping(value = "/deleteInbound", method = RequestMethod.GET)
     public Result deleteInbound
-            (@RequestParam(value = "orderNo", required = false) String orderNo
+            (@RequestParam(value = "inboundNo", required = false) String inboundNo
             ) {
 
-        inboundMapper.deleteInboundItemListByOrderNo(orderNo);
-        inboundMapper.deleteInboundListByOrderNo(orderNo);
+        inboundMapper.deleteInboundItemListByInboundNo(inboundNo);
+        inboundMapper.deleteInboundListByInboundNo(inboundNo);
         return new Result(200, "删除成功！", null);
     }
 
 
-    @RequestMapping(value = "/deleteInboundItemListByOrderNoAndItemId", method = RequestMethod.GET)
-    public Result deleteInboundItemListByOrderNoAndItemId
-            (@RequestParam(value = "orderNo", required = false) String orderNo,
+    @RequestMapping(value = "/deleteInboundItemListByInboundNoAndItemId", method = RequestMethod.GET)
+    public Result deleteInboundItemListByInboundNoAndItemId
+            (@RequestParam(value = "inboundNo", required = false) String inboundNo,
              @RequestParam(value = "itemId", required = false) int itemId
             ) {
 
-        inboundMapper.deleteInboundItemListByOrderNoAndItemId(orderNo, itemId);
+        inboundMapper.deleteInboundItemListByInboundNoAndItemId(inboundNo, itemId);
         return new Result(200, "删除成功！", null);
     }
 
 
-    @RequestMapping(value = "/queryInboundItemListByOrderNoAndItemId", method = RequestMethod.GET)
-    public Result queryInboundItemListByOrderNoAndItemId
-            (@RequestParam(value = "orderNo", required = false) String orderNo,
+    @RequestMapping(value = "/queryInboundItemListByInboundNoAndItemId", method = RequestMethod.GET)
+    public Result queryInboundItemListByInboundNoAndItemId
+            (@RequestParam(value = "inboundNo", required = false) String inboundNo,
              @RequestParam(value = "itemId", required = false) int itemId
             ) {
 
-        List<InboundItem> InboundItemList = inboundMapper.queryInboundItemListByOrderNoAndItemId(orderNo, itemId);
+        List<InboundItem> InboundItemList = inboundMapper.queryInboundItemListByInboundNoAndItemId(inboundNo, itemId);
         return new Result(200, null, InboundItemList);
     }
 
@@ -67,23 +69,23 @@ public class InboundController {
         return new Result(200, null, inboundsCount);
     }
 
-    @RequestMapping(value = "/queryInboundDetail", method = RequestMethod.GET)
-    public Result queryInboundDetail
-            (@RequestParam(value = "orderNo", required = false) String orderNo) {
-        System.out.println(orderNo);
-        List<Inbound> inboundDetailList = inboundMapper.queryInboundDetail(orderNo);
-        System.out.println(inboundDetailList);
-        return new Result(200, null, inboundDetailList);
-    }
+//    @RequestMapping(value = "/queryInboundDetail", method = RequestMethod.GET)
+//    public Result queryInboundDetail
+//            (@RequestParam(value = "orderNo", required = false) String orderNo) {
+//        System.out.println(orderNo);
+//        List<Inbound> inboundDetailList = inboundMapper.queryInboundDetail(orderNo);
+//        System.out.println(inboundDetailList);
+//        return new Result(200, null, inboundDetailList);
+//    }
 
     @RequestMapping(value = "/queryInboundDetailMachineNoCount", method = RequestMethod.GET)
     public Result queryInboundDetailMachineNoCount
-            (@RequestParam(value = "orderNo", required = false) String orderNo,
+            (@RequestParam(value = "inboundNo", required = false) String inboundNo,
              @RequestParam(value = "currentPage", required = false) int currentPage,
              @RequestParam(value = "pageSize", required = false) int pageSize) {
-        System.out.println(orderNo);
+        System.out.println(inboundNo);
         int offset = (currentPage - 1) * pageSize;
-        List<Inbound> inboundDetailMachineNoCountList = inboundMapper.queryInboundDetailMachineNoCount(orderNo, offset, pageSize);
+        List<Inbound> inboundDetailMachineNoCountList = inboundMapper.queryInboundDetailMachineNoCount(inboundNo, offset, pageSize);
         System.out.println(inboundDetailMachineNoCountList);
         return new Result(200, null, inboundDetailMachineNoCountList);
     }
@@ -91,14 +93,14 @@ public class InboundController {
 
     @RequestMapping(value = "/countInboundDetailMachineNoCount", method = RequestMethod.GET)
     public Result countInboundDetailMachineNoCount
-            (@RequestParam(value = "orderNo", required = false) String orderNo,
+            (@RequestParam(value = "inboundNo", required = false) String inboundNo,
              @RequestParam(value = "currentPage", required = false) int currentPage,
              @RequestParam(value = "pageSize", required = false) int pageSize) {
-        System.out.println(orderNo);
+        System.out.println(inboundNo);
         System.out.println(currentPage);
         System.out.println(pageSize);
         int offset = (currentPage - 1) * pageSize;
-        int inboundDetailsCount = inboundMapper.countInboundDetailMachineNoCount(orderNo, offset, pageSize);
+        int inboundDetailsCount = inboundMapper.countInboundDetailMachineNoCount(inboundNo, offset, pageSize);
         System.out.println(inboundDetailsCount);
         return new Result(200, null, inboundDetailsCount);
     }
@@ -122,54 +124,41 @@ public class InboundController {
     public Result addOrUpdateInbound
             (@RequestBody InboundInfo inboundInfo
             ) {
-        System.out.println(inboundInfo);
-        List<Inbound> topInboundList= inboundMapper.queryInboundList(0, 1);
-        String inboundNoString =topInboundList.get(0).getInboundInfo().getInboundNo();
-        System.out.println(topInboundList.get(0).getInboundInfo().getInboundNo());
-        String leftInboundNoString= inboundNoString.substring(0,6);
-        System.out.println(leftInboundNoString);
-        String rightInboundNoString= inboundNoString.substring(6,11);
-        System.out.println(rightInboundNoString);
-        int rightInboundNo = Integer.parseInt(rightInboundNoString);
-        System.out.println(rightInboundNo); // This will print 1
+        if(inboundInfo.getInboundNo()!=null){
+            inboundMapper.updateInbound(inboundInfo.getInboundNo(),
+                    inboundInfo.getSupplierId(),inboundInfo.getRemark(),inboundInfo.getAccountingReversal());
+            return new Result(200, "修改成功！", null);
+        }else {
+            String newLeftInboundNoString = "";
+            String newRightInboundNoString = "";
+            List<Inbound> topInboundList= inboundMapper.queryInboundList(0, 1);
+            String inboundNoString =topInboundList.get(0).getInboundInfo().getInboundNo();
+            String leftInboundNoString= inboundNoString.substring(0,6);
+            String rightInboundNoString= inboundNoString.substring(6,11);
+            int rightInboundNo = Integer.parseInt(rightInboundNoString);
+            LocalDate today = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMM");
+            newLeftInboundNoString = today.format(formatter);
+            formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            String newInboundDate = today.format(formatter);
+            if(newLeftInboundNoString.equals(leftInboundNoString)){
+                newRightInboundNoString = String.format("%05d", rightInboundNo+1);
+            }
+            else{
+                newRightInboundNoString = "00001";
+            }
+            String newInboundNoString=newLeftInboundNoString+newRightInboundNoString;
+            inboundMapper.addInbound(newInboundNoString, LocalDate.parse(newInboundDate), inboundInfo.getSupplierId(),
+                    inboundInfo.getRemark(),0);
+            return new Result(200, "添加成功！", null);
+        }
 
-
-
-
-
-//        try {
-//            System.out.println(inboundInfo);
-//            System.out.println(inboundInfo.getId());
-//            if (inboundInfo.getId() != 0) {
-//                InboundInfo originalInboundInfo = inboundMapper.queryInboundById(inboundInfo.getId());
-//                inboundMapper.updateInbound(inboundInfo.getOrderNo(), inboundInfo.getArrivalDate(),
-//                        inboundInfo.getSupplierId(), inboundInfo.getRemark(),
-//                        inboundInfo.getId());
-//                System.out.println("originalInboundInfo");
-//                System.out.println(originalInboundInfo);
-//                System.out.println("inboundInfo");
-//                System.out.println(inboundInfo.getOrderNo());
-//                inboundMapper.updateInboundDetailListByOrderNo(originalInboundInfo.getOrderNo(),inboundInfo.getOrderNo());
-//                return new Result(200, "修改成功！", null);
-//            }
-//
-//
-//            inboundMapper.addInbound(inboundInfo.getOrderNo(), inboundInfo.getArrivalDate(), inboundInfo.getSupplierId(),
-//                    inboundInfo.getRemark());
-//
-//            return new Result(200, "添加成功！", null);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            System.out.println(e.getMessage());
-//            return new Result(500, "Error deleting item: " + e.getMessage(), null);
-//        }
-        return null;
     }
 
 
     @RequestMapping(value = "/addOrUpdateInboundDetail", method = RequestMethod.GET)
     public Result addOrUpdateInboundDetail
-            (@RequestParam String orderNo,
+            (@RequestParam String inboundNo,
              @RequestParam int itemId,
              @RequestParam(required = false, defaultValue = "") List<String> machineNumbers
             ) {
@@ -177,7 +166,7 @@ public class InboundController {
             if (machineNumbers.size() == 0) {
                 return new Result(300, "无添加信息！", null);
             }
-            System.out.println(orderNo);
+            System.out.println(inboundNo);
             System.out.println(itemId);
             System.out.println(machineNumbers);
             // Convert machineNumbers list to a comma-separated string
@@ -186,14 +175,14 @@ public class InboundController {
                     .collect(Collectors.joining(","));
 
             // Call the mapper method with the generated machineNumbersString
-            inboundMapper.deleteInboundDetailsByOrderNoAndItemIdAndMachineNoNotIn(orderNo, itemId, machineNumbersString);
+            inboundMapper.deleteInboundDetailsByInboundNoAndItemIdAndMachineNoNotIn(inboundNo, itemId, machineNumbersString);
 
 
             for (String machineNumber : machineNumbers) {
-                List<InboundItem> inboundItemList = inboundMapper.queryInboundDetailsByOrderNoAndItemIdAndMachineNo(orderNo, itemId, machineNumber);
+                List<InboundItem> inboundItemList = inboundMapper.queryInboundDetailsByInboundNoAndItemIdAndMachineNo(inboundNo, itemId, machineNumber);
                 System.out.println(inboundItemList);
                 if (inboundItemList.size() == 0) {
-                    inboundMapper.addInboundDetail(orderNo, itemId, machineNumber);
+                    inboundMapper.addInboundDetail(inboundNo, itemId, machineNumber);
                 }
 
             }

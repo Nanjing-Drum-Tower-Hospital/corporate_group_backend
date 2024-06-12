@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class InboundItem {
     private int id;
-    private int orderNo;
+    private String inboundNo;
     private int itemId;
     private String machineNo;
     private int machineNoCount;
