@@ -39,18 +39,43 @@ public interface OutboundMapper {
 
 
     @Select("SELECT outbound_list.*, \n" +
-            " outbound_detail_list.id as outbound_detail_list_id "+
-            " outbound_detail_list.outbound_no as outbound_detail_list_outbound_no "+
-            " outbound_detail_list.inbound_detail_id "+
+            "inbound_detail_list.inbound_no as inbound_detail_list_inbound_no, \n" +
+            "inbound_detail_list.item_id as inbound_detail_list_item_id, \n" +
             "COUNT(inbound_detail_list.machine_no) AS inbound_detail_list_machine_no_count,\n"+
+            "item_dictionary.id as item_dictionary_id, \n" +
+            "item_dictionary.code as item_dictionary_code, \n" +
+            "item_dictionary.name as item_dictionary_name, \n" +
+            "item_dictionary.model as item_dictionary_model, \n" +
+            "item_dictionary.unit_name as item_dictionary_unit_name, \n" +
+            "item_dictionary.selling_price as item_dictionary_selling_price, \n" +
+            "item_dictionary.manufacturer_id as item_dictionary_manufacturer_id, \n" +
+            "item_dictionary.bill_item as item_dictionary_bill_item, \n" +
+            "item_dictionary.standards as item_dictionary_standards, \n" +
+            "item_dictionary.approval_no as item_dictionary_approval_no, \n" +
+            "item_dictionary.type as item_dictionary_type, \n" +
+            "item_dictionary.expire_date as item_dictionary_expire_date, \n" +
+            "item_dictionary.create_date as item_dictionary_create_date, \n" +
+            "item_dictionary.extend_code1 as item_dictionary_extend_code1, \n" +
+            "item_dictionary.extend_code2 as item_dictionary_extend_code2, \n" +
+            "item_dictionary.extend_code3 as item_dictionary_extend_code3, \n" +
+            "item_dictionary.extend_code4 as item_dictionary_extend_code4, \n" +
+            "item_dictionary.extend_code5 as item_dictionary_extend_code5, \n" +
+            "item_dictionary.comment1 as item_dictionary_comment1, \n" +
+            "item_dictionary.comment2 as item_dictionary_comment2, \n" +
+            "item_dictionary.comment3 as item_dictionary_comment3, \n" +
+            "item_dictionary.comment4 as item_dictionary_comment4, \n" +
+            "item_dictionary.comment5 as item_dictionary_comment5, \n" +
+            "item_dictionary.certification_url as item_dictionary_certification_url, \n" +
+            "item_dictionary.pinyin_code as item_dictionary_pinyin_code \n" +
             "FROM outbound_list \n" +
             " JOIN outbound_detail_list ON outbound_list.outbound_no = outbound_detail_list.outbound_no \n" +
             " join inbound_detail_list on inbound_detail_id= inbound_detail_list.id \n" +
             " join item_dictionary on inbound_detail_list.item_id=item_dictionary.id " +
-            "WHERE inbound_list.inbound_no = #{inboundNo} \n" +
+            "WHERE outbound_list.outbound_no = #{outboundNo} \n" +
             "GROUP BY \n" +
-            "    outbound_list.inbound_no,outbound_list.inbound_date, outbound_list.supplier_id," +
-            "    outbound_list.remark, outbound_list.accounting_reversal, inbound_detail_list.inbound_no, \n" +
+            "    outbound_list.outbound_no,outbound_list.outbound_date," +
+            "    outbound_list.remark, outbound_list.accounting_reversal, " +
+            "    inbound_detail_list.inbound_no, \n" +
             "    inbound_detail_list.item_id, item_dictionary.id, item_dictionary.code, \n" +
             "    item_dictionary.name, item_dictionary.model, item_dictionary.unit_name,\n" +
             "    item_dictionary.selling_price, item_dictionary.manufacturer_id,\n" +
@@ -59,21 +84,14 @@ public interface OutboundMapper {
             "    item_dictionary.extend_code1, item_dictionary.extend_code2, item_dictionary.extend_code3,\n" +
             "    item_dictionary.extend_code4, item_dictionary.extend_code5, item_dictionary.comment1,\n" +
             "    item_dictionary.comment2, item_dictionary.comment3, item_dictionary.comment4, \n" +
-            "    item_dictionary.comment5, item_dictionary.certification_url, item_dictionary.pinyin_code,\n" +
-            "    supplier_dictionary.id, supplier_dictionary.supplier_name, supplier_dictionary.pinyin_code,\n" +
-            "    manufacturer_dictionary.id, manufacturer_dictionary.manufacturer_name, \n" +
-            "    manufacturer_dictionary.pinyin_code " +
+            "    item_dictionary.comment5, item_dictionary.certification_url, item_dictionary.pinyin_code \n" +
             "ORDER BY item_dictionary.id " +
             "OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY")
     @Results({
-            @Result(property = "inboundInfo.inboundNo", column = "inbound_no"),
-            @Result(property = "inboundInfo.inboundDate", column = "inbound_date"),
-            @Result(property = "inboundInfo.supplierId", column = "supplier_id"),
-            @Result(property = "inboundInfo.remark", column = "remark"),
-            @Result(property = "inboundInfo.accountingReversal", column = "accounting_reversal"),
-            @Result(property = "supplier.id", column = "supplier_dictionary_id"),
-            @Result(property = "supplier.supplierName", column = "supplier_dictionary_supplier_name"),
-            @Result(property = "supplier.pinyinCode", column = "supplier_dictionary_pinyin_code"),
+            @Result(property = "outboundInfo.outboundNo", column = "outbound_no"),
+            @Result(property = "outboundInfo.outboundDate", column = "outbound_date"),
+            @Result(property = "outboundInfo.remark", column = "remark"),
+            @Result(property = "outboundInfo.accountingReversal", column = "accounting_reversal"),
             @Result(property = "inboundItem.id", column = "inbound_detail_list_id"),
             @Result(property = "inboundItem.inboundNo", column = "inbound_detail_list_inbound_no"),
             @Result(property = "inboundItem.itemId", column = "inbound_detail_list_item_id"),
@@ -110,7 +128,30 @@ public interface OutboundMapper {
     List<Outbound> queryOutboundDetailMachineNoCount(String outboundNo, int offset, int pageSize);
 
 
-
+    @Select(
+            "SELECT COUNT(*) AS row_count\n" +
+                    "FROM (\n" +
+                    "    SELECT 1 AS dummy\n" +
+                    "    FROM outbound_list\n" +
+                    "    JOIN outbound_detail_list ON outbound_list.outbound_no = outbound_detail_list.outbound_no\n" +
+                    "    JOIN inbound_detail_list ON inbound_detail_list.id = inbound_detail_list.id\n" +
+                    "    JOIN item_dictionary ON inbound_detail_list.item_id = item_dictionary.id\n" +
+                    "    WHERE outbound_list.outbound_no = #{outboundNo}\n" +
+                    "    GROUP BY \n" +
+                    "        outbound_list.outbound_no, outbound_list.outbound_date,\n" +
+                    "        outbound_list.remark, outbound_list.accounting_reversal, \n" +
+                    "        inbound_detail_list.inbound_no, \n" +
+                    "        inbound_detail_list.item_id, item_dictionary.id, item_dictionary.code, \n" +
+                    "        item_dictionary.name, item_dictionary.model, item_dictionary.unit_name,\n" +
+                    "        item_dictionary.selling_price, item_dictionary.manufacturer_id,\n" +
+                    "        item_dictionary.bill_item, item_dictionary.standards, item_dictionary.approval_no,\n" +
+                    "        item_dictionary.type, item_dictionary.expire_date, item_dictionary.create_date,\n" +
+                    "        item_dictionary.extend_code1, item_dictionary.extend_code2, item_dictionary.extend_code3,\n" +
+                    "        item_dictionary.extend_code4, item_dictionary.extend_code5, item_dictionary.comment1,\n" +
+                    "        item_dictionary.comment2, item_dictionary.comment3, item_dictionary.comment4, \n" +
+                    "        item_dictionary.comment5, item_dictionary.certification_url, item_dictionary.pinyin_code\n" +
+                    ") AS subquery;")
+    int countOutboundDetailMachineNoCount(String outboundNo, int offset, int pageSize);
 
 
     @Select("select * from outbound_list where id= #{id}")

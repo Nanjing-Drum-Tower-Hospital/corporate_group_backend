@@ -92,4 +92,18 @@ public class OutboundController {
         return new Result(200, null, outboundDetailMachineNoCountList);
     }
 
+    @RequestMapping(value = "/countOutboundDetailMachineNoCount", method = RequestMethod.GET)
+    public Result countInboundDetailMachineNoCount
+            (@RequestParam(value = "outboundNo", required = false) String outboundNo,
+             @RequestParam(value = "currentPage", required = false) int currentPage,
+             @RequestParam(value = "pageSize", required = false) int pageSize) {
+        System.out.println(outboundNo);
+        System.out.println(currentPage);
+        System.out.println(pageSize);
+        int offset = (currentPage - 1) * pageSize;
+        int outboundDetailsCount = outboundMapper.countOutboundDetailMachineNoCount(outboundNo, offset, pageSize);
+        System.out.println(outboundDetailsCount);
+        return new Result(200, null, outboundDetailsCount);
+    }
+
 }
