@@ -80,4 +80,16 @@ public class OutboundController {
         return new Result(200, "删除成功！", null);
     }
 
+    @RequestMapping(value = "/queryOutboundDetailMachineNoCount", method = RequestMethod.GET)
+    public Result queryInboundDetailMachineNoCount
+            (@RequestParam(value = "outboundNo", required = false) String outboundNo,
+             @RequestParam(value = "currentPage", required = false) int currentPage,
+             @RequestParam(value = "pageSize", required = false) int pageSize) {
+        System.out.println(outboundNo);
+        int offset = (currentPage - 1) * pageSize;
+        List<Outbound> outboundDetailMachineNoCountList = outboundMapper.queryOutboundDetailMachineNoCount(outboundNo, offset, pageSize);
+        System.out.println(outboundDetailMachineNoCountList);
+        return new Result(200, null, outboundDetailMachineNoCountList);
+    }
+
 }
