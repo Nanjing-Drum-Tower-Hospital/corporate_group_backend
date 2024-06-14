@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin//解决跨域问题
@@ -18,6 +19,7 @@ public class OutboundController {
     private OutboundMapper outboundMapper;
     @Autowired
     private InboundMapper inboundMapper;
+
     @RequestMapping(value = "/queryOutboundList", method = RequestMethod.GET)
     public Result queryOutboundList
             (@RequestParam(value = "currentPage", required = false) int currentPage,
@@ -32,35 +34,35 @@ public class OutboundController {
             (@RequestBody OutboundInfo outboundInfo
             ) {
         System.out.println(outboundInfo);
-        if(outboundInfo.getOutboundNo()!=null){
-            outboundMapper.updateOutbound(outboundInfo.getOutboundNo(),outboundInfo.getRemark(),
+        if (outboundInfo.getOutboundNo() != null) {
+            outboundMapper.updateOutbound(outboundInfo.getOutboundNo(), outboundInfo.getRemark(),
                     outboundInfo.getAccountingReversal());
             return new Result(200, "修改成功！", null);
-        }else {
+        } else {
             String newLeftOutboundNoString = "";
             String newRightOutboundNoString = "";
-            List<Outbound> topOutboundList= outboundMapper.queryOutboundList(0, 1);
-            String outboundNoString =topOutboundList.get(0).getOutboundInfo().getOutboundNo();
-            String leftOutboundNoString= outboundNoString.substring(0,6);
-            String rightOutboundNoString= outboundNoString.substring(6,11);
+            List<Outbound> topOutboundList = outboundMapper.queryOutboundList(0, 1);
+            String outboundNoString = topOutboundList.get(0).getOutboundInfo().getOutboundNo();
+            String leftOutboundNoString = outboundNoString.substring(0, 6);
+            String rightOutboundNoString = outboundNoString.substring(6, 11);
             int rightOutboundNo = Integer.parseInt(rightOutboundNoString);
             LocalDate today = LocalDate.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMM");
             newLeftOutboundNoString = today.format(formatter);
             formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             String newOutboundDate = today.format(formatter);
-            if(newLeftOutboundNoString.equals(leftOutboundNoString)){
-                newRightOutboundNoString = String.format("%05d", rightOutboundNo+1);
-            }
-            else{
+            if (newLeftOutboundNoString.equals(leftOutboundNoString)) {
+                newRightOutboundNoString = String.format("%05d", rightOutboundNo + 1);
+            } else {
                 newRightOutboundNoString = "00001";
             }
-            String newOutboundNoString=newLeftOutboundNoString+newRightOutboundNoString;
+            String newOutboundNoString = newLeftOutboundNoString + newRightOutboundNoString;
             outboundMapper.addOutbound(newOutboundNoString, LocalDate.parse(newOutboundDate),
-                    outboundInfo.getRemark(),0);
+                    outboundInfo.getRemark(), 0);
             return new Result(200, "添加成功！", null);
         }
     }
+
     @RequestMapping(value = "/queryOutboundCount", method = RequestMethod.GET)
     public Result queryOutboundCount
             (@RequestParam(value = "currentPage", required = false) int currentPage,
@@ -106,4 +108,27 @@ public class OutboundController {
         return new Result(200, null, outboundDetailsCount);
     }
 
+
+    @RequestMapping(value = "/queryOutboundItemListByOutboundNoAndItemId", method = RequestMethod.GET)
+    public Result queryOutboundItemListByOutboundNoAndItemId
+            (@RequestParam(value = "outboundNo", required = false) String outboundNo,
+             @RequestParam(value = "itemId", required = false) int itemId) {
+        System.out.println(outboundNo);
+        System.out.println(itemId);
+        List<Outbound> outboundDetails = outboundMapper.queryOutboundItemListByOutboundNoAndItemId(outboundNo, itemId);
+        System.out.println(outboundDetails);
+        return new Result(200, null, outboundDetails);
+    }
+
+
+    @RequestMapping(value = "/addOrUpdateOutboundDetail", method = RequestMethod.POST)
+    public Result addOrUpdateOutboundDetail
+            (@RequestBody List<Outbound> outboundList
+            ) {
+        System.out.println(outboundList);
+
+
+        return new Result(200, "添加成功！", null);
+
+    }
 }

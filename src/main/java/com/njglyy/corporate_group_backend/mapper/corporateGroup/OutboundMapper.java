@@ -1,10 +1,8 @@
 package com.njglyy.corporate_group_backend.mapper.corporateGroup;
 
-import com.njglyy.corporate_group_backend.entity.Inbound;
-import com.njglyy.corporate_group_backend.entity.InboundInfo;
-import com.njglyy.corporate_group_backend.entity.Outbound;
-import com.njglyy.corporate_group_backend.entity.OutboundInfo;
+import com.njglyy.corporate_group_backend.entity.*;
 import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Result;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -154,22 +152,18 @@ public interface OutboundMapper {
     int countOutboundDetailMachineNoCount(String outboundNo, int offset, int pageSize);
 
 
-    @Select("select * from outbound_list where id= #{id}")
+    @Select("select outbound_no, inbound_detail_list.* from outbound_detail_list \n" +
+            "join inbound_detail_list on outbound_detail_list.inbound_detail_id=inbound_detail_list.id \n" +
+            "and item_id =#{itemId} and outbound_no =#{outboundNo}")
     @Results({
-            @Result(property = "id", column = "id"),
-            @Result(property = "orderNo", column = "order_no"),
-            @Result(property = "outboundDate", column = "outbound_date"),
-            @Result(property = "remark", column = "remark")
+            @Result(property = "outboundInfo.outboundNo", column = "outbound_no"),
+            @Result(property = "inboundItem.id", column = "id"),
+            @Result(property = "inboundItem.inboundNo", column = "inbound_no"),
+            @Result(property = "inboundItem.itemId", column = "item_id"),
+            @Result(property = "inboundItem.machineNo", column = "machine_no"),
     })
-    OutboundInfo queryOutboundById(int id);
+    List<Outbound> queryOutboundItemListByOutboundNoAndItemId(String outboundNo, int itemId);
 
-
-
-
-    @Update("UPDATE dbo.outbound_detail_list " +
-            " set order_no = #{newOrderNo} " +
-            "where order_no= #{oldOrderNo}")
-    void updateOutboundDetailListByOrderNo(String oldOrderNo,String newOrderNo);
 
 
     @Select("select COUNT(*) "+
