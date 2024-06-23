@@ -149,4 +149,16 @@ public class OutboundController {
         return new Result(200, "添加成功！", null);
 
     }
+
+
+    @RequestMapping(value = "/deleteOutboundItemListByOutboundNoAndItemId", method = RequestMethod.GET)
+    public Result addOrUpdateOutboundDetail
+            (
+             @RequestParam(value = "outboundNo", required = false) String outboundNo,
+             @RequestParam(value = "itemId", required = false) int itemId
+            ) {
+        outboundMapper.deleteOutboundItemListByOutboundNoAndItemId(outboundNo, itemId);
+        return new Result(200, "删除成功！", null);
+
+    }
 }

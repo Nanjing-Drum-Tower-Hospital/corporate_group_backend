@@ -196,6 +196,13 @@ public interface OutboundMapper {
     void addOutboundDetail(String outboundNo, int id);
 
 
+    @Delete("DELETE outbound_detail_list \n" +
+            "FROM outbound_detail_list \n" +
+            "JOIN inbound_detail_list ON outbound_detail_list.inbound_detail_id = inbound_detail_list.id \n" +
+            "WHERE outbound_detail_list.outbound_no = #{outboundNo} \n" +
+            "  AND inbound_detail_list.item_id = #{itemId} \n " )
+    void deleteOutboundItemListByOutboundNoAndItemId(String outboundNo,int itemId);
+
 
 //    @Delete("DELETE FROM outbound_list " +
 //            "WHERE order_no = #{orderNo} ")
