@@ -44,7 +44,6 @@ public interface OutboundMapper {
 
     @Select("SELECT outbound_list.*, \n" +
             "inbound_detail_list.item_id as inbound_detail_list_item_id, \n" +
-            "COUNT(inbound_detail_list.machine_no) AS inbound_detail_list_machine_no_count,\n"+
             "item_dictionary.id as item_dictionary_id, \n" +
             "item_dictionary.code as item_dictionary_code, \n" +
             "item_dictionary.name as item_dictionary_name, \n" +
@@ -75,18 +74,6 @@ public interface OutboundMapper {
             " join inbound_detail_list on inbound_detail_id= inbound_detail_list.id \n" +
             " join item_dictionary on inbound_detail_list.item_id=item_dictionary.id " +
             "WHERE outbound_list.outbound_no = #{outboundNo} \n" +
-            "GROUP BY \n" +
-            "    outbound_list.outbound_no,outbound_list.outbound_date," +
-            "    outbound_list.remark, outbound_list.accounting_reversal, " +
-            "    inbound_detail_list.item_id, item_dictionary.id, item_dictionary.code, \n" +
-            "    item_dictionary.name, item_dictionary.model, item_dictionary.unit_name,\n" +
-            "    item_dictionary.unit_price_excluding_tax, item_dictionary.manufacturer_id,\n" +
-            "    item_dictionary.bill_item, item_dictionary.standards, item_dictionary.approval_no,\n" +
-            "    item_dictionary.type, item_dictionary.expire_date, item_dictionary.create_date,\n" +
-            "    item_dictionary.extend_code1, item_dictionary.extend_code2, item_dictionary.extend_code3,\n" +
-            "    item_dictionary.extend_code4, item_dictionary.extend_code5, item_dictionary.comment1,\n" +
-            "    item_dictionary.comment2, item_dictionary.comment3, item_dictionary.comment4, \n" +
-            "    item_dictionary.comment5, item_dictionary.certification_url, item_dictionary.pinyin_code \n" +
             "ORDER BY item_dictionary.id " +
             "OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY")
     @Results({
@@ -95,7 +82,6 @@ public interface OutboundMapper {
             @Result(property = "outboundInfo.remark", column = "remark"),
             @Result(property = "outboundInfo.accountingReversal", column = "accounting_reversal"),
             @Result(property = "inboundItem.itemId", column = "inbound_detail_list_item_id"),
-            @Result(property = "inboundItem.machineNoCount", column = "inbound_detail_list_machine_no_count"),
             @Result(property = "item.itemDetail.id", column = "item_dictionary_id"),
             @Result(property = "item.itemDetail.code", column = "item_dictionary_code"),
             @Result(property = "item.itemDetail.name", column = "item_dictionary_name"),

@@ -17,95 +17,6 @@ public class InboundController {
     @Autowired
     private InboundMapper inboundMapper;
 
-    @RequestMapping(value = "/deleteInbound", method = RequestMethod.GET)
-    public Result deleteInbound
-            (@RequestParam(value = "inboundNo", required = false) String inboundNo
-            ) {
-
-        inboundMapper.deleteInboundItemListByInboundNo(inboundNo);
-        inboundMapper.deleteInboundListByInboundNo(inboundNo);
-        return new Result(200, "删除成功！", null);
-    }
-
-
-    @RequestMapping(value = "/deleteInboundItemListByInboundNoAndItemId", method = RequestMethod.GET)
-    public Result deleteInboundItemListByInboundNoAndItemId
-            (@RequestParam(value = "inboundNo", required = false) String inboundNo,
-             @RequestParam(value = "itemId", required = false) int itemId
-            ) {
-
-        inboundMapper.deleteInboundItemListByInboundNoAndItemId(inboundNo, itemId);
-        return new Result(200, "删除成功！", null);
-    }
-
-
-    @RequestMapping(value = "/queryInboundItemListByInboundNoAndItemId", method = RequestMethod.GET)
-    public Result queryInboundItemListByInboundNoAndItemId
-            (@RequestParam(value = "inboundNo", required = false) String inboundNo,
-             @RequestParam(value = "itemId", required = false) int itemId
-            ) {
-
-        List<InboundItem> InboundItemList = inboundMapper.queryInboundItemListByInboundNoAndItemId(inboundNo, itemId);
-        return new Result(200, null, InboundItemList);
-    }
-
-
-    @RequestMapping(value = "/queryInboundList", method = RequestMethod.GET)
-    public Result queryInboundList
-            (@RequestParam(value = "currentPage", required = false) int currentPage,
-             @RequestParam(value = "pageSize", required = false) int pageSize) {
-        int offset = (currentPage - 1) * pageSize;
-        List<Inbound> inboundList = inboundMapper.queryInboundList(offset, pageSize);
-        return new Result(200, null, inboundList);
-    }
-
-
-    @RequestMapping(value = "/queryInboundCount", method = RequestMethod.GET)
-    public Result queryInboundCount
-            (@RequestParam(value = "currentPage", required = false) int currentPage,
-             @RequestParam(value = "pageSize", required = false) int pageSize) {
-        int offset = (currentPage - 1) * pageSize;
-        int inboundsCount = inboundMapper.queryInboundCount(offset, pageSize);
-        return new Result(200, null, inboundsCount);
-    }
-
-//    @RequestMapping(value = "/queryInboundDetail", method = RequestMethod.GET)
-//    public Result queryInboundDetail
-//            (@RequestParam(value = "orderNo", required = false) String orderNo) {
-//        System.out.println(orderNo);
-//        List<Inbound> inboundDetailList = inboundMapper.queryInboundDetail(orderNo);
-//        System.out.println(inboundDetailList);
-//        return new Result(200, null, inboundDetailList);
-//    }
-
-//    @RequestMapping(value = "/queryInboundDetailMachineNoCount", method = RequestMethod.GET)
-//    public Result queryInboundDetailMachineNoCount
-//            (@RequestParam(value = "inboundNo", required = false) String inboundNo,
-//             @RequestParam(value = "currentPage", required = false) int currentPage,
-//             @RequestParam(value = "pageSize", required = false) int pageSize) {
-//        System.out.println(inboundNo);
-//        int offset = (currentPage - 1) * pageSize;
-//        List<Inbound> inboundDetailMachineNoCountList = inboundMapper.queryInboundDetailMachineNoCount(inboundNo, offset, pageSize);
-//        System.out.println(inboundDetailMachineNoCountList);
-//        return new Result(200, null, inboundDetailMachineNoCountList);
-//    }
-
-
-    @RequestMapping(value = "/countInboundDetailMachineNoCount", method = RequestMethod.GET)
-    public Result countInboundDetailMachineNoCount
-            (@RequestParam(value = "inboundNo", required = false) String inboundNo,
-             @RequestParam(value = "currentPage", required = false) int currentPage,
-             @RequestParam(value = "pageSize", required = false) int pageSize) {
-        System.out.println(inboundNo);
-        System.out.println(currentPage);
-        System.out.println(pageSize);
-        int offset = (currentPage - 1) * pageSize;
-        int inboundDetailsCount = inboundMapper.countInboundDetailMachineNoCount(inboundNo, offset, pageSize);
-        System.out.println(inboundDetailsCount);
-        return new Result(200, null, inboundDetailsCount);
-    }
-
-
     @RequestMapping(value = "/querySupplierList", method = RequestMethod.GET)
     public Result querySupplierList
             () {
@@ -118,7 +29,6 @@ public class InboundController {
             return new Result(500, "Error querying manufacturer list: " + e.getMessage(), null);
         }
     }
-
 
     @RequestMapping(value = "/addOrUpdateInbound", method = RequestMethod.POST)
     public Result addOrUpdateInbound
@@ -154,6 +64,69 @@ public class InboundController {
         }
 
     }
+    @RequestMapping(value = "/deleteInbound", method = RequestMethod.GET)
+    public Result deleteInbound
+            (@RequestParam(value = "inboundNo", required = false) String inboundNo
+            ) {
+
+        inboundMapper.deleteInboundItemListByInboundNo(inboundNo);
+        inboundMapper.deleteInboundListByInboundNo(inboundNo);
+        return new Result(200, "删除成功！", null);
+    }
+
+
+
+
+    @RequestMapping(value = "/queryInboundCount", method = RequestMethod.GET)
+    public Result queryInboundCount
+            (@RequestParam(value = "currentPage", required = false) int currentPage,
+             @RequestParam(value = "pageSize", required = false) int pageSize) {
+        int offset = (currentPage - 1) * pageSize;
+        int inboundsCount = inboundMapper.queryInboundCount(offset, pageSize);
+        return new Result(200, null, inboundsCount);
+    }
+
+//    @RequestMapping(value = "/queryInboundDetail", method = RequestMethod.GET)
+//    public Result queryInboundDetail
+//            (@RequestParam(value = "orderNo", required = false) String orderNo) {
+//        System.out.println(orderNo);
+//        List<Inbound> inboundDetailList = inboundMapper.queryInboundDetail(orderNo);
+//        System.out.println(inboundDetailList);
+//        return new Result(200, null, inboundDetailList);
+//    }
+
+    @RequestMapping(value = "/queryInboundDetailList", method = RequestMethod.GET)
+    public Result queryInboundDetailMachineNoCount
+            (@RequestParam(value = "inboundNo", required = false) String inboundNo,
+             @RequestParam(value = "currentPage", required = false) int currentPage,
+             @RequestParam(value = "pageSize", required = false) int pageSize) {
+        System.out.println(inboundNo);
+        int offset = (currentPage - 1) * pageSize;
+        List<Inbound> inboundDetailList = inboundMapper.queryInboundDetailList(inboundNo, offset, pageSize);
+        System.out.println(inboundDetailList);
+        return new Result(200, null, inboundDetailList);
+    }
+
+
+    @RequestMapping(value = "/countInboundDetailList", method = RequestMethod.GET)
+    public Result countInboundDetailMachineNoCount
+            (@RequestParam(value = "inboundNo", required = false) String inboundNo,
+             @RequestParam(value = "currentPage", required = false) int currentPage,
+             @RequestParam(value = "pageSize", required = false) int pageSize) {
+        System.out.println(inboundNo);
+        System.out.println(currentPage);
+        System.out.println(pageSize);
+        int offset = (currentPage - 1) * pageSize;
+        int inboundDetailsCount = inboundMapper.countInboundDetailList(inboundNo, offset, pageSize);
+        System.out.println(inboundDetailsCount);
+        return new Result(200, null, inboundDetailsCount);
+    }
+
+
+
+
+
+
 
 
     @RequestMapping(value = "/addOrUpdateInboundDetail", method = RequestMethod.GET)
@@ -195,5 +168,36 @@ public class InboundController {
             return new Result(500, "Error deleting item: " + e.getMessage(), null);
         }
     }
+    @RequestMapping(value = "/deleteInboundItemListByInboundNoAndItemId", method = RequestMethod.GET)
+    public Result deleteInboundItemListByInboundNoAndItemId
+            (@RequestParam(value = "inboundNo", required = false) String inboundNo,
+             @RequestParam(value = "itemId", required = false) int itemId
+            ) {
+
+        inboundMapper.deleteInboundItemListByInboundNoAndItemId(inboundNo, itemId);
+        return new Result(200, "删除成功！", null);
+    }
+
+
+    @RequestMapping(value = "/queryInboundItemListByInboundNoAndItemId", method = RequestMethod.GET)
+    public Result queryInboundItemListByInboundNoAndItemId
+            (@RequestParam(value = "inboundNo", required = false) String inboundNo,
+             @RequestParam(value = "itemId", required = false) int itemId
+            ) {
+
+        InboundItem InboundItemList = inboundMapper.queryInboundItemListByInboundNoAndItemId(inboundNo, itemId);
+        return new Result(200, null, InboundItemList);
+    }
+
+
+    @RequestMapping(value = "/queryInboundList", method = RequestMethod.GET)
+    public Result queryInboundList
+            (@RequestParam(value = "currentPage", required = false) int currentPage,
+             @RequestParam(value = "pageSize", required = false) int pageSize) {
+        int offset = (currentPage - 1) * pageSize;
+        List<Inbound> inboundList = inboundMapper.queryInboundList(offset, pageSize);
+        return new Result(200, null, inboundList);
+    }
+
 
 }

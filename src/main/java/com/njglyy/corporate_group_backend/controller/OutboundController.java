@@ -122,33 +122,33 @@ public class OutboundController {
     }
 
 
-    @RequestMapping(value = "/addOrUpdateOutboundDetail", method = RequestMethod.POST)
-    public Result addOrUpdateOutboundDetail
-            (@RequestBody List<Outbound> outboundList,
-             @RequestParam(value = "outboundNo", required = false) String outboundNo,
-             @RequestParam(value = "itemId", required = false) int itemId
-            ) {
-        System.out.println(outboundNo);
-        System.out.println(itemId);
-        System.out.println(outboundList);
-        List<Outbound> outboundedList =outboundMapper.queryOutboundItemListByOutboundNoAndItemId(outboundNo, itemId);
-        System.out.println(outboundedList);
-
-        for (Outbound outbound : outboundedList) {
-            if (!outboundList.contains(outbound)) {
-                outboundMapper.deleteOutboundListByOutboundNoAndItemIdAndMachineNo(outboundNo, itemId, outbound.getInboundItem().getMachineNo());
-            }
-        }
-        for(Outbound outbound : outboundList){
-            if(outbound.getOutboundInfo() == null) {
-                outboundMapper.addOutboundDetail(outboundNo, outbound.getInboundItem().getId());
-            }
-        }
-
-
-        return new Result(200, "添加成功！", null);
-
-    }
+//    @RequestMapping(value = "/addOrUpdateOutboundDetail", method = RequestMethod.POST)
+//    public Result addOrUpdateOutboundDetail
+//            (@RequestBody List<Outbound> outboundList,
+//             @RequestParam(value = "outboundNo", required = false) String outboundNo,
+//             @RequestParam(value = "itemId", required = false) int itemId
+//            ) {
+//        System.out.println(outboundNo);
+//        System.out.println(itemId);
+//        System.out.println(outboundList);
+//        List<Outbound> outboundedList =outboundMapper.queryOutboundItemListByOutboundNoAndItemId(outboundNo, itemId);
+//        System.out.println(outboundedList);
+//
+//        for (Outbound outbound : outboundedList) {
+//            if (!outboundList.contains(outbound)) {
+//                outboundMapper.deleteOutboundListByOutboundNoAndItemIdAndMachineNo(outboundNo, itemId, outbound.getInboundItem().getMachineNo());
+//            }
+//        }
+//        for(Outbound outbound : outboundList){
+//            if(outbound.getOutboundInfo() == null) {
+//                outboundMapper.addOutboundDetail(outboundNo, outbound.getInboundItem().getId());
+//            }
+//        }
+//
+//
+//        return new Result(200, "添加成功！", null);
+//
+//    }
 
 
     @RequestMapping(value = "/deleteOutboundItemListByOutboundNoAndItemId", method = RequestMethod.GET)

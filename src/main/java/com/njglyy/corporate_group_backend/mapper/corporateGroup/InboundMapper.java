@@ -61,10 +61,9 @@ public interface InboundMapper {
             @Result(property = "id", column = "id"),
             @Result(property = "inboundNo", column = "inbound_no"),
             @Result(property = "itemId", column = "item_id"),
-            @Result(property = "machineNo", column = "machine_no"),
-
+            @Result(property = "itemAmount", column = "item_amount"),
     })
-    List<InboundItem> queryInboundItemListByInboundNoAndItemId(String inboundNo, int itemId);
+    InboundItem queryInboundItemListByInboundNoAndItemId(String inboundNo, int itemId);
 
 
 
@@ -110,9 +109,10 @@ public interface InboundMapper {
             "    supplier_dictionary.id AS supplier_dictionary_id,\n" +
             "    supplier_dictionary.supplier_name AS supplier_dictionary_supplier_name,\n" +
             "    supplier_dictionary.pinyin_code AS supplier_dictionary_pinyin_code,\n" +
+            "    inbound_detail_list.id AS inbound_detail_list_id,\n" +
             "    inbound_detail_list.inbound_no AS inbound_detail_list_inbound_no,\n" +
             "    inbound_detail_list.item_id AS inbound_detail_list_item_id,\n" +
-            "    COUNT(inbound_detail_list.machine_no) AS inbound_detail_list_machine_no_count,\n" +
+            "    inbound_detail_list.item_amount AS inbound_detail_list_item_amount,\n" +
             "    item_dictionary.id AS item_dictionary_id,\n" +
             "    item_dictionary.code AS item_dictionary_code,\n" +
             "    item_dictionary.name AS item_dictionary_name,\n" +
@@ -147,21 +147,6 @@ public interface InboundMapper {
             "JOIN item_dictionary ON inbound_detail_list.item_id = item_dictionary.id \n" +
             "JOIN manufacturer_dictionary ON item_dictionary.manufacturer_id = manufacturer_dictionary.id \n" +
             "WHERE inbound_list.inbound_no = #{inboundNo} \n" +
-            "GROUP BY \n" +
-            "    inbound_list.inbound_no,inbound_list.inbound_date, inbound_list.supplier_id," +
-            "    inbound_list.remark, inbound_list.accounting_reversal, inbound_detail_list.inbound_no, \n" +
-            "    inbound_detail_list.item_id, item_dictionary.id, item_dictionary.code, \n" +
-            "    item_dictionary.name, item_dictionary.model, item_dictionary.unit_name,\n" +
-            "    item_dictionary.unit_price_excluding_tax, item_dictionary.manufacturer_id,\n" +
-            "    item_dictionary.bill_item, item_dictionary.standards, item_dictionary.approval_no,\n" +
-            "    item_dictionary.type, item_dictionary.expire_date, item_dictionary.create_date,\n" +
-            "    item_dictionary.extend_code1, item_dictionary.extend_code2, item_dictionary.extend_code3,\n" +
-            "    item_dictionary.extend_code4, item_dictionary.extend_code5, item_dictionary.comment1,\n" +
-            "    item_dictionary.comment2, item_dictionary.comment3, item_dictionary.comment4, \n" +
-            "    item_dictionary.comment5, item_dictionary.certification_url, item_dictionary.pinyin_code,\n" +
-            "    supplier_dictionary.id, supplier_dictionary.supplier_name, supplier_dictionary.pinyin_code,\n" +
-            "    manufacturer_dictionary.id, manufacturer_dictionary.manufacturer_name, \n" +
-            "    manufacturer_dictionary.pinyin_code " +
             "ORDER BY item_dictionary.id " +
             "OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY")
     @Results({
@@ -176,7 +161,7 @@ public interface InboundMapper {
             @Result(property = "inboundItem.id", column = "inbound_detail_list_id"),
             @Result(property = "inboundItem.inboundNo", column = "inbound_detail_list_inbound_no"),
             @Result(property = "inboundItem.itemId", column = "inbound_detail_list_item_id"),
-            @Result(property = "inboundItem.machineNoCount", column = "inbound_detail_list_machine_no_count"),
+            @Result(property = "inboundItem.itemAmount", column = "inbound_detail_list_item_amount"),
             @Result(property = "item.itemDetail.id", column = "item_dictionary_id"),
             @Result(property = "item.itemDetail.code", column = "item_dictionary_code"),
             @Result(property = "item.itemDetail.name", column = "item_dictionary_name"),
@@ -206,18 +191,12 @@ public interface InboundMapper {
             @Result(property = "item.manufacturer.manufacturerName", column = "manufacturer_dictionary_manufacturer_name"),
             @Result(property = "item.manufacturer.pinyinCode", column = "manufacturer_dictionary_pinyin_code"),
     })
-    List<Inbound> queryInboundDetailMachineNoCount(String inboundNo, int offset, int pageSize);
+    List<Inbound> queryInboundDetailList(String inboundNo, int offset, int pageSize);
 
 
 
-    @Select("SELECT COUNT(*) AS count_twice\n" +
-            "FROM (\n" +
-            "    SELECT COUNT(machine_no) AS count_once\n" +
-            "    FROM inbound_detail_list\n" +
-            "    WHERE inbound_no = #{inboundNo}\n" +
-            "    GROUP BY item_id\n" +
-            ") AS subquery_alias;")
-    int countInboundDetailMachineNoCount(String inboundNo, int offset, int pageSize);
+    @Select("select count(*) from inbound_list where inbound_no = #{inboundNo}")
+    int countInboundDetailList(String inboundNo, int offset, int pageSize);
 
     @Select("select inbound_list.*, \n" +
             "supplier_dictionary.id as supplier_dictionary_id, \n" +
