@@ -116,7 +116,7 @@ public class ItemController {
             System.out.println(itemDetail);
             LocalDate today = LocalDate.now();
             if(itemDetail.getId()!=0){
-                itemMapper.updateItem( itemDetail.getCode(),itemDetail.getName(), itemDetail.getModel(), itemDetail.getUnitName(), itemDetail.getSellingPrice(),
+                itemMapper.updateItem( itemDetail.getCode(),itemDetail.getName(), itemDetail.getModel(), itemDetail.getUnitName(), itemDetail.getUnitPriceExcludingTax(),
                         itemDetail.getManufacturerId(),  itemDetail.getBillItem(), itemDetail.getStandards(),
                         itemDetail.getApprovalNo(), itemDetail.getType(), itemDetail.getExpireDate(), today,
                         null, null, null, null, null, null,
@@ -126,7 +126,7 @@ public class ItemController {
             }
 
 
-            itemMapper.addItem(itemDetail.getCode(), itemDetail.getName(), itemDetail.getModel(), itemDetail.getUnitName(), itemDetail.getSellingPrice(),
+            itemMapper.addItem(itemDetail.getCode(), itemDetail.getName(), itemDetail.getModel(), itemDetail.getUnitName(), itemDetail.getUnitPriceExcludingTax(),
                     itemDetail.getManufacturerId(),  itemDetail.getBillItem(), itemDetail.getStandards(),
                     itemDetail.getApprovalNo(), itemDetail.getType(), itemDetail.getExpireDate(), today,
                     null, null, null, null, null, null,

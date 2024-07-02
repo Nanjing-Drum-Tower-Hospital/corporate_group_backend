@@ -17,7 +17,7 @@ public class ItemDetail {
     private String model;
     private String unitName;
 
-    private double sellingPrice;
+    private double unitPriceExcludingTax;
     private int manufacturerId;
     private String billItem;
     private String standards;
@@ -28,13 +28,14 @@ public class ItemDetail {
     private String certificationUrl;
     private String pinyinCode;
 
-    public BigDecimal getSellingPriceBeforeTax() {
-        BigDecimal sellingPriceBD = BigDecimal.valueOf(sellingPrice);
-        return sellingPriceBD.divide(BigDecimal.valueOf(1.13), 10, BigDecimal.ROUND_HALF_UP);
+    public BigDecimal getUnitPriceIncludingTax() {
+        BigDecimal sellingPriceBD = BigDecimal.valueOf(unitPriceExcludingTax);
+        return sellingPriceBD.multiply(BigDecimal.valueOf(1.13)).setScale(10, BigDecimal.ROUND_HALF_UP);
     }
 
+
     public BigDecimal getTax() {
-        BigDecimal sellingPriceBD = BigDecimal.valueOf(sellingPrice);
-        return sellingPriceBD.subtract(getSellingPriceBeforeTax());
+        BigDecimal sellingPriceBD = BigDecimal.valueOf(unitPriceExcludingTax);
+        return sellingPriceBD.multiply(BigDecimal.valueOf(0.13)).setScale(10, BigDecimal.ROUND_HALF_UP);
     }
 }

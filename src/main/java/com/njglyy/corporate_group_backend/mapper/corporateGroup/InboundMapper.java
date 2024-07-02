@@ -118,7 +118,7 @@ public interface InboundMapper {
             "    item_dictionary.name AS item_dictionary_name,\n" +
             "    item_dictionary.model AS item_dictionary_model,\n" +
             "    item_dictionary.unit_name AS item_dictionary_unit_name,\n" +
-            "    item_dictionary.selling_price AS item_dictionary_selling_price,\n" +
+            "    item_dictionary.unit_price_excluding_tax AS item_dictionary_unit_price_excluding_tax,\n" +
             "    item_dictionary.manufacturer_id AS item_dictionary_manufacturer_id,\n" +
             "    item_dictionary.bill_item AS item_dictionary_bill_item,\n" +
             "    item_dictionary.standards AS item_dictionary_standards,\n" +
@@ -152,7 +152,7 @@ public interface InboundMapper {
             "    inbound_list.remark, inbound_list.accounting_reversal, inbound_detail_list.inbound_no, \n" +
             "    inbound_detail_list.item_id, item_dictionary.id, item_dictionary.code, \n" +
             "    item_dictionary.name, item_dictionary.model, item_dictionary.unit_name,\n" +
-            "    item_dictionary.selling_price, item_dictionary.manufacturer_id,\n" +
+            "    item_dictionary.unit_price_excluding_tax, item_dictionary.manufacturer_id,\n" +
             "    item_dictionary.bill_item, item_dictionary.standards, item_dictionary.approval_no,\n" +
             "    item_dictionary.type, item_dictionary.expire_date, item_dictionary.create_date,\n" +
             "    item_dictionary.extend_code1, item_dictionary.extend_code2, item_dictionary.extend_code3,\n" +
@@ -182,7 +182,7 @@ public interface InboundMapper {
             @Result(property = "item.itemDetail.name", column = "item_dictionary_name"),
             @Result(property = "item.itemDetail.model", column = "item_dictionary_model"),
             @Result(property = "item.itemDetail.unitName", column = "item_dictionary_unit_name"),
-            @Result(property = "item.itemDetail.sellingPrice", column = "item_dictionary_selling_price"),
+            @Result(property = "item.itemDetail.unitPriceExcludingTax", column = "item_dictionary_unit_price_excluding_tax"),
             @Result(property = "item.itemDetail.manufacturerId", column = "item_dictionary_manufacturer_id"),
             @Result(property = "item.itemDetail.billItem", column = "item_dictionary_bill_item"),
             @Result(property = "item.itemDetail.standards", column = "item_dictionary_standards"),
@@ -232,7 +232,7 @@ public interface InboundMapper {
             "item_dictionary.name as item_dictionary_name, \n" +
             "item_dictionary.model as item_dictionary_model, \n" +
             "item_dictionary.unit_name as item_dictionary_unit_name, \n" +
-            "item_dictionary.selling_price as item_dictionary_selling_price, \n" +
+            "item_dictionary.unit_price_excluding_tax as item_dictionary_unit_price_excluding_tax, \n" +
             "item_dictionary.manufacturer_id as item_dictionary_manufacturer_id, \n" +
             "item_dictionary.bill_item as item_dictionary_bill_item, \n" +
             "item_dictionary.standards as item_dictionary_standards, \n" +
@@ -279,7 +279,7 @@ public interface InboundMapper {
             @Result(property = "item.itemDetail.name", column = "item_dictionary_name"),
             @Result(property = "item.itemDetail.model", column = "item_dictionary_model"),
             @Result(property = "item.itemDetail.unitName", column = "item_dictionary_unit_name"),
-            @Result(property = "item.itemDetail.sellingPrice", column = "item_dictionary_selling_price"),
+            @Result(property = "item.itemDetail.unitPriceExcludingTax", column = "item_dictionary_unit_price_excluding_tax"),
             @Result(property = "item.itemDetail.manufacturerId", column = "item_dictionary_manufacturer_id"),
             @Result(property = "item.itemDetail.billItem", column = "item_dictionary_bill_item"),
             @Result(property = "item.itemDetail.standards", column = "item_dictionary_standards"),

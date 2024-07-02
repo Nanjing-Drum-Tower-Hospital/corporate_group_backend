@@ -11,7 +11,7 @@ public class InboundItem {
     private int id;
     private String inboundNo;
     private int itemId;
-    private String machineNo;
-    private int machineNoCount;
+    private int itemAmount;
+
 
 }

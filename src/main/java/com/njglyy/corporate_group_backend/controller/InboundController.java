@@ -78,17 +78,17 @@ public class InboundController {
 //        return new Result(200, null, inboundDetailList);
 //    }
 
-    @RequestMapping(value = "/queryInboundDetailMachineNoCount", method = RequestMethod.GET)
-    public Result queryInboundDetailMachineNoCount
-            (@RequestParam(value = "inboundNo", required = false) String inboundNo,
-             @RequestParam(value = "currentPage", required = false) int currentPage,
-             @RequestParam(value = "pageSize", required = false) int pageSize) {
-        System.out.println(inboundNo);
-        int offset = (currentPage - 1) * pageSize;
-        List<Inbound> inboundDetailMachineNoCountList = inboundMapper.queryInboundDetailMachineNoCount(inboundNo, offset, pageSize);
-        System.out.println(inboundDetailMachineNoCountList);
-        return new Result(200, null, inboundDetailMachineNoCountList);
-    }
+//    @RequestMapping(value = "/queryInboundDetailMachineNoCount", method = RequestMethod.GET)
+//    public Result queryInboundDetailMachineNoCount
+//            (@RequestParam(value = "inboundNo", required = false) String inboundNo,
+//             @RequestParam(value = "currentPage", required = false) int currentPage,
+//             @RequestParam(value = "pageSize", required = false) int pageSize) {
+//        System.out.println(inboundNo);
+//        int offset = (currentPage - 1) * pageSize;
+//        List<Inbound> inboundDetailMachineNoCountList = inboundMapper.queryInboundDetailMachineNoCount(inboundNo, offset, pageSize);
+//        System.out.println(inboundDetailMachineNoCountList);
+//        return new Result(200, null, inboundDetailMachineNoCountList);
+//    }
 
 
     @RequestMapping(value = "/countInboundDetailMachineNoCount", method = RequestMethod.GET)
