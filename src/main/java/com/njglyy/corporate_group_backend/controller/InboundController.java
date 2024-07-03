@@ -126,39 +126,43 @@ public class InboundController {
 
 
 
+    public class DialogInboundDetail{
+        private InboundItem dialogInboundDetailOld;
+        private InboundItem dialogInboundDetailNew;
+    }
 
 
-
-    @RequestMapping(value = "/addOrUpdateInboundDetail", method = RequestMethod.GET)
+    @RequestMapping(value = "/addOrUpdateInboundDetail", method = RequestMethod.POST)
     public Result addOrUpdateInboundDetail
-            (@RequestParam String inboundNo,
-             @RequestParam int itemId,
-             @RequestParam(required = false, defaultValue = "") List<String> machineNumbers
+            (@RequestBody DialogInboundDetail dialogInboundDetail
+
             ) {
         try {
-            if (machineNumbers.size() == 0) {
-                return new Result(300, "无添加信息！", null);
-            }
-            System.out.println(inboundNo);
-            System.out.println(itemId);
-            System.out.println(machineNumbers);
-            // Convert machineNumbers list to a comma-separated string
-            String machineNumbersString = machineNumbers.stream()
-                    .map(machineNumber -> "'" + machineNumber + "'")
-                    .collect(Collectors.joining(","));
+            System.out.println(dialogInboundDetail);
 
-            // Call the mapper method with the generated machineNumbersString
-            inboundMapper.deleteInboundDetailsByInboundNoAndItemIdAndMachineNoNotIn(inboundNo, itemId, machineNumbersString);
-
-
-            for (String machineNumber : machineNumbers) {
-                List<InboundItem> inboundItemList = inboundMapper.queryInboundDetailsByInboundNoAndItemIdAndMachineNo(inboundNo, itemId, machineNumber);
-                System.out.println(inboundItemList);
-                if (inboundItemList.size() == 0) {
-                    inboundMapper.addInboundDetail(inboundNo, itemId, machineNumber);
-                }
-
-            }
+//            if (machineNumbers.size() == 0) {
+//                return new Result(300, "无添加信息！", null);
+//            }
+//            System.out.println(inboundNo);
+//            System.out.println(itemId);
+//            System.out.println(machineNumbers);
+//            // Convert machineNumbers list to a comma-separated string
+//            String machineNumbersString = machineNumbers.stream()
+//                    .map(machineNumber -> "'" + machineNumber + "'")
+//                    .collect(Collectors.joining(","));
+//
+//            // Call the mapper method with the generated machineNumbersString
+//            inboundMapper.deleteInboundDetailsByInboundNoAndItemIdAndMachineNoNotIn(inboundNo, itemId, machineNumbersString);
+//
+//
+//            for (String machineNumber : machineNumbers) {
+//                List<InboundItem> inboundItemList = inboundMapper.queryInboundDetailsByInboundNoAndItemIdAndMachineNo(inboundNo, itemId, machineNumber);
+//                System.out.println(inboundItemList);
+//                if (inboundItemList.size() == 0) {
+//                    inboundMapper.addInboundDetail(inboundNo, itemId, machineNumber);
+//                }
+//
+//            }
 
 
             return new Result(200, "添加成功！", null);

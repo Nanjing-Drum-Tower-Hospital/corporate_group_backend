@@ -12,6 +12,6 @@ public class InboundItem {
     private String inboundNo;
     private int itemId;
     private int itemAmount;
-
+    private String remark;
 
 }
