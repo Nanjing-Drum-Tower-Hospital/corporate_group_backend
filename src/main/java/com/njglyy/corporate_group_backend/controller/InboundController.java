@@ -126,23 +126,24 @@ public class InboundController {
 
 
 
-    public class DialogInboundDetail{
-        private InboundItem dialogInboundDetailOld;
-        private InboundItem dialogInboundDetailNew;
-    }
 
 
     @RequestMapping(value = "/addOrUpdateInboundDetail", method = RequestMethod.POST)
     public Result addOrUpdateInboundDetail
-            (@RequestBody DialogInboundDetail dialogInboundDetail
+            (@RequestBody List<InboundItem> dialogInboundDetail
 
             ) {
         try {
-            System.out.println(dialogInboundDetail);
 
-//            if (machineNumbers.size() == 0) {
-//                return new Result(300, "无添加信息！", null);
-//            }
+            System.out.println(dialogInboundDetail);
+            InboundItem dialogInboundDetailOld = dialogInboundDetail.get(0);
+            InboundItem dialogInboundDetailNew = dialogInboundDetail.get(1);
+            if (dialogInboundDetailOld.equals(dialogInboundDetailNew)) {
+                System.out.println("The items are equal.");
+            } else {
+                System.out.println("The items are different.");
+            }
+
 //            System.out.println(inboundNo);
 //            System.out.println(itemId);
 //            System.out.println(machineNumbers);
