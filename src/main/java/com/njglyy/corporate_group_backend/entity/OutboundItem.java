@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Outbound {
-    private OutboundInfo outboundInfo;
-    private OutboundItem outboundItem;
-    private Supplier supplier;
-    private Item item;
-
+public class OutboundItem {
+    private int id;
+    private String outboundNo;
+    private int itemId;
+    private int itemAmount;
+    private String remark;
 }

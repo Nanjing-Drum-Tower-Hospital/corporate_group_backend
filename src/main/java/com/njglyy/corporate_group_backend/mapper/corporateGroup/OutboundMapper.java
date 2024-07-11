@@ -6,23 +6,62 @@ import org.apache.ibatis.annotations.Result;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
 @Repository
 public interface OutboundMapper {
-    @Select("select * \n"+
+    @Delete("DELETE FROM outbound_list " +
+            "WHERE outbound_no = #{outboundNo} ")
+    void deleteOutboundListByOutboundNo(@Param("outboundNo") String outboundNo);
+
+
+    @Delete("DELETE FROM outbound_detail_list " +
+            "WHERE outbound_no = #{outboundNo} ")
+    void deleteOutboundItemListByOutboundNo(@Param("outboundNo") String outboundNo);
+
+    @Delete("DELETE FROM outbound_detail_list " +
+            "WHERE outbound_no = #{outboundNo} " +
+            "AND item_id = #{itemId} ")
+    void deleteOutboundItemListByOutboundNoAndItemId(@Param("outboundNo") String outboundNo,
+                                                   @Param("itemId") int itemId);
+
+
+
+    @Select("select * "+
+            "from " +
+            "outbound_detail_list \n" +
+            "where outbound_no = #{outboundNo} and item_id = #{itemId} \n" )
+    @Results({
+            @Result(property = "id", column = "id"),
+            @Result(property = "outboundNo", column = "outbound_no"),
+            @Result(property = "itemId", column = "item_id"),
+            @Result(property = "itemAmount", column = "item_amount"),
+    })
+    OutboundItem queryOutboundItemListByOutboundNoAndItemId(String outboundNo, int itemId);
+
+
+
+    @Insert("INSERT INTO dbo.outbound_detail_list " +
+            " values(#{outboundNo}, #{itemId}, #{itemAmount},#{remark})")
+    void addOutboundDetail(String outboundNo, int itemId, int itemAmount,String remark);
+
+
+
+    @Select("select outbound_list.* " +
             "from " +
             "outbound_list \n" +
-            "ORDER BY outbound_list.outbound_no  " +
+            "ORDER BY outbound_list.outbound_no desc " +
             "OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY \n" )
     @Results({
             @Result(property = "outboundInfo.outboundNo", column = "outbound_no"),
             @Result(property = "outboundInfo.outboundDate", column = "outbound_date"),
             @Result(property = "outboundInfo.remark", column = "remark"),
-            @Result(property = "outboundInfo.accountingReversal", column = "accounting_reversal"),
     })
     List<Outbound> queryOutboundList(int offset, int pageSize);
+
+
 
     @Select("select COUNT(*) "+
             "from " +
@@ -31,48 +70,46 @@ public interface OutboundMapper {
 
     int queryOutboundCount(int offset, int pageSize);
 
-    @Insert("INSERT INTO dbo.outbound_list " +
-            " values(#{outboundNo}, #{outboundDate},  #{remark},#{accountingReversal})")
-    void addOutbound(String outboundNo, LocalDate outboundDate,  String remark, int accountingReversal);
 
-
-    @Update("UPDATE dbo.outbound_list " +
-            " set remark = #{remark}, accounting_reversal=#{accountingReversal} " +
-            "where outbound_no= #{outboundNo}")
-    void updateOutbound(String outboundNo, String remark, int accountingReversal);
-
-
-    @Select("SELECT outbound_list.*, \n" +
-            "inbound_detail_list.item_id as inbound_detail_list_item_id, \n" +
-            "item_dictionary.id as item_dictionary_id, \n" +
-            "item_dictionary.code as item_dictionary_code, \n" +
-            "item_dictionary.name as item_dictionary_name, \n" +
-            "item_dictionary.model as item_dictionary_model, \n" +
-            "item_dictionary.unit_name as item_dictionary_unit_name, \n" +
-            "item_dictionary.unit_price_excluding_tax as item_dictionary_unit_price_excluding_tax, \n" +
-            "item_dictionary.manufacturer_id as item_dictionary_manufacturer_id, \n" +
-            "item_dictionary.bill_item as item_dictionary_bill_item, \n" +
-            "item_dictionary.standards as item_dictionary_standards, \n" +
-            "item_dictionary.approval_no as item_dictionary_approval_no, \n" +
-            "item_dictionary.type as item_dictionary_type, \n" +
-            "item_dictionary.expire_date as item_dictionary_expire_date, \n" +
-            "item_dictionary.create_date as item_dictionary_create_date, \n" +
-            "item_dictionary.extend_code1 as item_dictionary_extend_code1, \n" +
-            "item_dictionary.extend_code2 as item_dictionary_extend_code2, \n" +
-            "item_dictionary.extend_code3 as item_dictionary_extend_code3, \n" +
-            "item_dictionary.extend_code4 as item_dictionary_extend_code4, \n" +
-            "item_dictionary.extend_code5 as item_dictionary_extend_code5, \n" +
-            "item_dictionary.comment1 as item_dictionary_comment1, \n" +
-            "item_dictionary.comment2 as item_dictionary_comment2, \n" +
-            "item_dictionary.comment3 as item_dictionary_comment3, \n" +
-            "item_dictionary.comment4 as item_dictionary_comment4, \n" +
-            "item_dictionary.comment5 as item_dictionary_comment5, \n" +
-            "item_dictionary.certification_url as item_dictionary_certification_url, \n" +
-            "item_dictionary.pinyin_code as item_dictionary_pinyin_code \n" +
+    @Select("SELECT \n" +
+            "    outbound_list.*,\n" +
+            "    outbound_detail_list.id AS outbound_detail_list_id,\n" +
+            "    outbound_detail_list.outbound_no AS outbound_detail_list_outbound_no,\n" +
+            "    outbound_detail_list.item_id AS outbound_detail_list_item_id,\n" +
+            "    outbound_detail_list.item_amount AS outbound_detail_list_item_amount,\n" +
+            "    outbound_detail_list.remark AS outbound_detail_list_remark,\n" +
+            "    item_dictionary.id AS item_dictionary_id,\n" +
+            "    item_dictionary.code AS item_dictionary_code,\n" +
+            "    item_dictionary.name AS item_dictionary_name,\n" +
+            "    item_dictionary.model AS item_dictionary_model,\n" +
+            "    item_dictionary.unit_name AS item_dictionary_unit_name,\n" +
+            "    item_dictionary.unit_price_excluding_tax AS item_dictionary_unit_price_excluding_tax,\n" +
+            "    item_dictionary.manufacturer_id AS item_dictionary_manufacturer_id,\n" +
+            "    item_dictionary.bill_item AS item_dictionary_bill_item,\n" +
+            "    item_dictionary.standards AS item_dictionary_standards,\n" +
+            "    item_dictionary.approval_no AS item_dictionary_approval_no,\n" +
+            "    item_dictionary.type AS item_dictionary_type,\n" +
+            "    item_dictionary.expire_date AS item_dictionary_expire_date,\n" +
+            "    item_dictionary.create_date AS item_dictionary_create_date,\n" +
+            "    item_dictionary.extend_code1 AS item_dictionary_extend_code1,\n" +
+            "    item_dictionary.extend_code2 AS item_dictionary_extend_code2,\n" +
+            "    item_dictionary.extend_code3 AS item_dictionary_extend_code3,\n" +
+            "    item_dictionary.extend_code4 AS item_dictionary_extend_code4,\n" +
+            "    item_dictionary.extend_code5 AS item_dictionary_extend_code5,\n" +
+            "    item_dictionary.comment1 AS item_dictionary_comment1,\n" +
+            "    item_dictionary.comment2 AS item_dictionary_comment2,\n" +
+            "    item_dictionary.comment3 AS item_dictionary_comment3,\n" +
+            "    item_dictionary.comment4 AS item_dictionary_comment4,\n" +
+            "    item_dictionary.comment5 AS item_dictionary_comment5,\n" +
+            "    item_dictionary.certification_url AS item_dictionary_certification_url,\n" +
+            "    item_dictionary.pinyin_code AS item_dictionary_pinyin_code,\n" +
+            "    manufacturer_dictionary.id AS manufacturer_dictionary_id,\n" +
+            "    manufacturer_dictionary.manufacturer_name AS manufacturer_dictionary_manufacturer_name,\n" +
+            "    manufacturer_dictionary.pinyin_code AS manufacturer_dictionary_pinyin_code\n" +
             "FROM outbound_list \n" +
-            " JOIN outbound_detail_list ON outbound_list.outbound_no = outbound_detail_list.outbound_no \n" +
-            " join inbound_detail_list on inbound_detail_id= inbound_detail_list.id \n" +
-            " join item_dictionary on inbound_detail_list.item_id=item_dictionary.id " +
+            "JOIN outbound_detail_list ON outbound_list.outbound_no = outbound_detail_list.outbound_no \n" +
+            "JOIN item_dictionary ON outbound_detail_list.item_id = item_dictionary.id \n" +
+            "JOIN manufacturer_dictionary ON item_dictionary.manufacturer_id = manufacturer_dictionary.id \n" +
             "WHERE outbound_list.outbound_no = #{outboundNo} \n" +
             "ORDER BY item_dictionary.id " +
             "OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY")
@@ -81,7 +118,11 @@ public interface OutboundMapper {
             @Result(property = "outboundInfo.outboundDate", column = "outbound_date"),
             @Result(property = "outboundInfo.remark", column = "remark"),
             @Result(property = "outboundInfo.accountingReversal", column = "accounting_reversal"),
-            @Result(property = "inboundItem.itemId", column = "inbound_detail_list_item_id"),
+            @Result(property = "outboundItem.id", column = "outbound_detail_list_id"),
+            @Result(property = "outboundItem.outboundNo", column = "outbound_detail_list_outbound_no"),
+            @Result(property = "outboundItem.itemId", column = "outbound_detail_list_item_id"),
+            @Result(property = "outboundItem.itemAmount", column = "outbound_detail_list_item_amount"),
+            @Result(property = "outboundItem.remark", column = "outbound_detail_list_remark"),
             @Result(property = "item.itemDetail.id", column = "item_dictionary_id"),
             @Result(property = "item.itemDetail.code", column = "item_dictionary_code"),
             @Result(property = "item.itemDetail.name", column = "item_dictionary_name"),
@@ -111,91 +152,32 @@ public interface OutboundMapper {
             @Result(property = "item.manufacturer.manufacturerName", column = "manufacturer_dictionary_manufacturer_name"),
             @Result(property = "item.manufacturer.pinyinCode", column = "manufacturer_dictionary_pinyin_code"),
     })
-    List<Outbound> queryOutboundDetailMachineNoCount(String outboundNo, int offset, int pageSize);
+    List<Outbound> queryOutboundDetailList(String outboundNo, int offset, int pageSize);
 
 
-    @Select(
-            "SELECT COUNT(DISTINCT CONCAT_WS(',', outbound_list.outbound_no, outbound_list.outbound_date,\n" +
-                    "    outbound_list.remark, outbound_list.accounting_reversal,\n" +
-                    "    inbound_detail_list.item_id, item_dictionary.id, item_dictionary.code,\n" +
-                    "    item_dictionary.name, item_dictionary.model, item_dictionary.unit_name,\n" +
-                    "    item_dictionary.unit_price_excluding_tax, item_dictionary.manufacturer_id,\n" +
-                    "    item_dictionary.bill_item, item_dictionary.standards, item_dictionary.approval_no,\n" +
-                    "    item_dictionary.type, item_dictionary.expire_date, item_dictionary.create_date,\n" +
-                    "    item_dictionary.extend_code1, item_dictionary.extend_code2, item_dictionary.extend_code3,\n" +
-                    "    item_dictionary.extend_code4, item_dictionary.extend_code5, item_dictionary.comment1,\n" +
-                    "    item_dictionary.comment2, item_dictionary.comment3, item_dictionary.comment4,\n" +
-                    "    item_dictionary.comment5, item_dictionary.certification_url, item_dictionary.pinyin_code))\n" +
-                    "FROM outbound_list\n" +
-                    "JOIN outbound_detail_list ON outbound_list.outbound_no = outbound_detail_list.outbound_no\n" +
-                    "JOIN inbound_detail_list ON inbound_detail_id = inbound_detail_list.id\n" +
-                    "JOIN item_dictionary ON inbound_detail_list.item_id = item_dictionary.id\n" +
-                    "WHERE outbound_list.outbound_no = #{outboundNo}")
-    int countOutboundDetailMachineNoCount(String outboundNo, int offset, int pageSize);
+
+    @Select("select count(*) from outbound_list where outbound_no = #{outboundNo}")
+    int countOutboundDetailList(String outboundNo, int offset, int pageSize);
 
 
-    @Select("select outbound_no, inbound_detail_list.* from inbound_detail_list \n" +
-            "            left join outbound_detail_list on outbound_detail_list.inbound_detail_id=inbound_detail_list.id \n" +
-            "WHERE item_id = #{itemId} \n" +
-            "  AND inbound_detail_list.id NOT IN (\n" +
-            "    SELECT inbound_detail_list.id \n" +
-            "    FROM outbound_detail_list \n" +
-            "    JOIN inbound_detail_list \n" +
-            "      ON outbound_detail_list.inbound_detail_id = inbound_detail_list.id \n" +
-            "      AND item_id = #{itemId} \n" +
-            "    WHERE outbound_no != #{outboundNo}\n" +
-            "  );")
-    @Results({
-            @Result(property = "outboundInfo.outboundNo", column = "outbound_no"),
-            @Result(property = "inboundItem.id", column = "id"),
-            @Result(property = "inboundItem.inboundNo", column = "inbound_no"),
-            @Result(property = "inboundItem.itemId", column = "item_id"),
-            @Result(property = "inboundItem.machineNo", column = "machine_no"),
-    })
-    List<Outbound> queryOutboundItemListWithoutOutboundByOutboundNoAndItemId(String outboundNo, int itemId);
+    @Insert("INSERT INTO dbo.outbound_list " +
+            " values(#{outboundNo}, #{outboundDate}, #{remark},#{accountingReversal})")
+    void addOutbound(String outboundNo, LocalDate outboundDate,  String remark, int accountingReversal);
 
 
-    @Select("\n" +
-            "select outbound_no, inbound_detail_list.* from outbound_detail_list \n" +
-            "            join inbound_detail_list on outbound_detail_list.inbound_detail_id=inbound_detail_list.id \n" +
-            "            and item_id =#{itemId} where outbound_no=#{outboundNo}")
-    @Results({
-            @Result(property = "outboundInfo.outboundNo", column = "outbound_no"),
-            @Result(property = "inboundItem.id", column = "id"),
-            @Result(property = "inboundItem.inboundNo", column = "inbound_no"),
-            @Result(property = "inboundItem.itemId", column = "item_id"),
-            @Result(property = "inboundItem.machineNo", column = "machine_no"),
-    })
-    List<Outbound> queryOutboundItemListByOutboundNoAndItemId(String outboundNo, int itemId);
+
+    @Update("UPDATE dbo.outbound_list " +
+            " set ,remark = #{remark}, accounting_reversal=#{accountingReversal} " +
+            "where outbound_no= #{outboundNo}")
+    void updateOutbound(String outboundNo,  String remark,int accountingReversal);
 
 
-    @Delete("DELETE outbound_detail_list\n" +
-            "FROM outbound_detail_list\n" +
-            "JOIN inbound_detail_list ON outbound_detail_list.inbound_detail_id = inbound_detail_list.id " +
-            "WHERE outbound_no = #{outboundNo} and" +
-            " item_id = #{itemId} and " +
-            " machine_no=#{machineNo} " )
-    void deleteOutboundListByOutboundNoAndItemIdAndMachineNo(String outboundNo, int itemId,String machineNo);
 
-    @Insert("INSERT INTO dbo.outbound_detail_list " +
-            " values(#{outboundNo} , #{id})")
-    void addOutboundDetail(String outboundNo, int id);
+    @Update("UPDATE dbo.outbound_detail_list " +
+            " set outbound_no = #{outboundNo},item_id=#{itemId},item_amount=#{itemAmount},remark=#{remark} " +
+            "where id= #{id}")
+    void updateOutboundDetailById(int id,String outboundNo, int itemId, int itemAmount,String remark);
 
 
-    @Delete("DELETE outbound_detail_list \n" +
-            "FROM outbound_detail_list \n" +
-            "JOIN inbound_detail_list ON outbound_detail_list.inbound_detail_id = inbound_detail_list.id \n" +
-            "WHERE outbound_detail_list.outbound_no = #{outboundNo} \n" +
-            "  AND inbound_detail_list.item_id = #{itemId} \n " )
-    void deleteOutboundItemListByOutboundNoAndItemId(String outboundNo,int itemId);
 
-
-//    @Delete("DELETE FROM outbound_list " +
-//            "WHERE order_no = #{orderNo} ")
-//    void deleteOutboundListByOrderNo(@Param("orderNo") String orderNo);
-//
-//
-//    @Delete("DELETE FROM outbound_detail_list " +
-//            "WHERE order_no = #{orderNo} ")
-//    void deleteOutboundItemListByOrderNo(@Param("orderNo") String orderNo);
 }

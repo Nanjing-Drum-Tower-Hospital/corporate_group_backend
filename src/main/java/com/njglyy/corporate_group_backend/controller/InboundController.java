@@ -40,23 +40,28 @@ public class InboundController {
             return new Result(200, "修改成功！", null);
         }else {
             String newLeftInboundNoString = "";
-            String newRightInboundNoString = "";
-            List<Inbound> topInboundList= inboundMapper.queryInboundList(0, 1);
-            String inboundNoString =topInboundList.get(0).getInboundInfo().getInboundNo();
-            String leftInboundNoString= inboundNoString.substring(0,6);
-            String rightInboundNoString= inboundNoString.substring(6,11);
-            int rightInboundNo = Integer.parseInt(rightInboundNoString);
+            String newRightInboundNoString ="00001";
             LocalDate today = LocalDate.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMM");
             newLeftInboundNoString = today.format(formatter);
+
+            List<Inbound> topInboundList= inboundMapper.queryInboundList(0, 1);
+            System.out.println(topInboundList.size());
+            if(topInboundList.size()!=0){
+                String inboundNoString =topInboundList.get(0).getInboundInfo().getInboundNo();
+                String leftInboundNoString= inboundNoString.substring(0,6);
+                String rightInboundNoString= inboundNoString.substring(6,11);
+                int rightInboundNo = Integer.parseInt(rightInboundNoString);
+                if(newLeftInboundNoString.equals(leftInboundNoString)){
+                    newRightInboundNoString = String.format("%05d", rightInboundNo+1);
+                }
+
+            }
+
             formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             String newInboundDate = today.format(formatter);
-            if(newLeftInboundNoString.equals(leftInboundNoString)){
-                newRightInboundNoString = String.format("%05d", rightInboundNo+1);
-            }
-            else{
-                newRightInboundNoString = "00001";
-            }
+
+
             String newInboundNoString=newLeftInboundNoString+newRightInboundNoString;
             inboundMapper.addInbound(newInboundNoString, LocalDate.parse(newInboundDate), inboundInfo.getSupplierId(),
                     inboundInfo.getRemark(),0);
@@ -86,14 +91,6 @@ public class InboundController {
         return new Result(200, null, inboundsCount);
     }
 
-//    @RequestMapping(value = "/queryInboundDetail", method = RequestMethod.GET)
-//    public Result queryInboundDetail
-//            (@RequestParam(value = "orderNo", required = false) String orderNo) {
-//        System.out.println(orderNo);
-//        List<Inbound> inboundDetailList = inboundMapper.queryInboundDetail(orderNo);
-//        System.out.println(inboundDetailList);
-//        return new Result(200, null, inboundDetailList);
-//    }
 
     @RequestMapping(value = "/queryInboundDetailList", method = RequestMethod.GET)
     public Result queryInboundDetailMachineNoCount
@@ -138,32 +135,15 @@ public class InboundController {
             System.out.println(dialogInboundDetail);
             InboundItem dialogInboundDetailOld = dialogInboundDetail.get(0);
             InboundItem dialogInboundDetailNew = dialogInboundDetail.get(1);
-            if (dialogInboundDetailOld.equals(dialogInboundDetailNew)) {
-                System.out.println("The items are equal.");
-            } else {
-                System.out.println("The items are different.");
+            if (dialogInboundDetailOld.getId()==0){
+                inboundMapper.addInboundDetail(dialogInboundDetailNew.getInboundNo(), dialogInboundDetailNew.getItemId(),
+                        dialogInboundDetailNew.getItemAmount(),dialogInboundDetailNew.getRemark());
             }
-
-//            System.out.println(inboundNo);
-//            System.out.println(itemId);
-//            System.out.println(machineNumbers);
-//            // Convert machineNumbers list to a comma-separated string
-//            String machineNumbersString = machineNumbers.stream()
-//                    .map(machineNumber -> "'" + machineNumber + "'")
-//                    .collect(Collectors.joining(","));
-//
-//            // Call the mapper method with the generated machineNumbersString
-//            inboundMapper.deleteInboundDetailsByInboundNoAndItemIdAndMachineNoNotIn(inboundNo, itemId, machineNumbersString);
-//
-//
-//            for (String machineNumber : machineNumbers) {
-//                List<InboundItem> inboundItemList = inboundMapper.queryInboundDetailsByInboundNoAndItemIdAndMachineNo(inboundNo, itemId, machineNumber);
-//                System.out.println(inboundItemList);
-//                if (inboundItemList.size() == 0) {
-//                    inboundMapper.addInboundDetail(inboundNo, itemId, machineNumber);
-//                }
-//
-//            }
+            else{
+                inboundMapper.updateInboundDetailById(dialogInboundDetailNew.getId(),dialogInboundDetailNew.getInboundNo(),
+                        dialogInboundDetailNew.getItemId(), dialogInboundDetailNew.getItemAmount(),
+                        dialogInboundDetailNew.getRemark());
+            }
 
 
             return new Result(200, "添加成功！", null);

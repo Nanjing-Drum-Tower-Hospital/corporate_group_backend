@@ -12,6 +12,7 @@ import java.time.LocalDate;
 public class OutboundInfo {
     private String outboundNo;
     private LocalDate outboundDate;
+//    private int supplierId;
     private String remark;
     private int accountingReversal;
 
