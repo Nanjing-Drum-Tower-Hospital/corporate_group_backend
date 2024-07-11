@@ -29,23 +29,28 @@ public class OutboundController {
             return new Result(200, "修改成功！", null);
         }else {
             String newLeftOutboundNoString = "";
-            String newRightOutboundNoString = "";
-            List<Outbound> topOutboundList= outboundMapper.queryOutboundList(0, 1);
-            String outboundNoString =topOutboundList.get(0).getOutboundInfo().getOutboundNo();
-            String leftOutboundNoString= outboundNoString.substring(0,6);
-            String rightOutboundNoString= outboundNoString.substring(6,11);
-            int rightOutboundNo = Integer.parseInt(rightOutboundNoString);
+            String newRightOutboundNoString ="00001";
             LocalDate today = LocalDate.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMM");
             newLeftOutboundNoString = today.format(formatter);
+
+            List<Outbound> topOutboundList= outboundMapper.queryOutboundList(0, 1);
+            System.out.println(topOutboundList.size());
+            if(topOutboundList.size()!=0){
+                String outboundNoString =topOutboundList.get(0).getOutboundInfo().getOutboundNo();
+                String leftOutboundNoString= outboundNoString.substring(0,6);
+                String rightOutboundNoString= outboundNoString.substring(6,11);
+                int rightOutboundNo = Integer.parseInt(rightOutboundNoString);
+                if(newLeftOutboundNoString.equals(leftOutboundNoString)){
+                    newRightOutboundNoString = String.format("%05d", rightOutboundNo+1);
+                }
+
+            }
+
             formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             String newOutboundDate = today.format(formatter);
-            if(newLeftOutboundNoString.equals(leftOutboundNoString)){
-                newRightOutboundNoString = String.format("%05d", rightOutboundNo+1);
-            }
-            else{
-                newRightOutboundNoString = "00001";
-            }
+
+
             String newOutboundNoString=newLeftOutboundNoString+newRightOutboundNoString;
             outboundMapper.addOutbound(newOutboundNoString, LocalDate.parse(newOutboundDate),
                     outboundInfo.getRemark(),0);
