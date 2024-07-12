@@ -25,7 +25,7 @@ public class OutboundController {
             ) {
         if(outboundInfo.getOutboundNo()!=null){
             outboundMapper.updateOutbound(outboundInfo.getOutboundNo(),
-                    outboundInfo.getRemark(),outboundInfo.getAccountingReversal());
+                    outboundInfo.getRemark(),outboundInfo.getAccountingReversalOutboundNo());
             return new Result(200, "修改成功！", null);
         }else {
             String newLeftOutboundNoString = "";
@@ -53,7 +53,7 @@ public class OutboundController {
 
             String newOutboundNoString=newLeftOutboundNoString+newRightOutboundNoString;
             outboundMapper.addOutbound(newOutboundNoString, LocalDate.parse(newOutboundDate),
-                    outboundInfo.getRemark(),0);
+                    outboundInfo.getRemark(),null);
             return new Result(200, "添加成功！", null);
         }
 

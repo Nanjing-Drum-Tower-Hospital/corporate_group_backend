@@ -12,6 +12,11 @@ import java.util.List;
 @Mapper
 @Repository
 public interface InboundMapper {
+
+
+
+
+
     @Delete("DELETE FROM inbound_list " +
             "WHERE inbound_no = #{inboundNo} ")
     void deleteInboundListByInboundNo(@Param("inboundNo") String inboundNo);
@@ -131,7 +136,7 @@ public interface InboundMapper {
             @Result(property = "inboundInfo.inboundDate", column = "inbound_date"),
             @Result(property = "inboundInfo.supplierId", column = "supplier_id"),
             @Result(property = "inboundInfo.remark", column = "remark"),
-            @Result(property = "inboundInfo.accountingReversal", column = "accounting_reversal"),
+            @Result(property = "inboundInfo.accountingReversalInboundNo", column = "accounting_reversal_inbound_no"),
             @Result(property = "supplier.id", column = "supplier_dictionary_id"),
             @Result(property = "supplier.supplierName", column = "supplier_dictionary_supplier_name"),
             @Result(property = "supplier.pinyinCode", column = "supplier_dictionary_pinyin_code"),
@@ -178,15 +183,15 @@ public interface InboundMapper {
 
 
     @Insert("INSERT INTO dbo.inbound_list " +
-            " values(#{inboundNo}, #{inboundDate}, #{supplierId}, #{remark},#{accountingReversal})")
-    void addInbound(String inboundNo, LocalDate inboundDate, int supplierId, String remark, int accountingReversal);
+            " values(#{inboundNo}, #{inboundDate}, #{supplierId}, #{remark},#{accountingReversalInboundNo})")
+    void addInbound(String inboundNo, LocalDate inboundDate, int supplierId, String remark, String accountingReversalInboundNo);
 
 
 
     @Update("UPDATE dbo.inbound_list " +
-            " set supplier_id = #{supplierId},remark = #{remark}, accounting_reversal=#{accountingReversal} " +
+            " set supplier_id = #{supplierId},remark = #{remark}, accounting_reversal_inbound_no=#{accountingReversalInboundNo} " +
             "where inbound_no= #{inboundNo}")
-    void updateInbound(String inboundNo, int supplierId, String remark,int accountingReversal);
+    void updateInbound(String inboundNo, int supplierId, String remark,String accountingReversalInboundNo);
 
 
 

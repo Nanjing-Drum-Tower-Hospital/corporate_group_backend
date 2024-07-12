@@ -14,6 +14,6 @@ public class OutboundInfo {
     private LocalDate outboundDate;
 //    private int supplierId;
     private String remark;
-    private int accountingReversal;
+    private String accountingReversalOutboundNo;
 
 }

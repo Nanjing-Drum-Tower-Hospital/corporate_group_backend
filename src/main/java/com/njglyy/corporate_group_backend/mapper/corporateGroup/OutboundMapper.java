@@ -117,7 +117,7 @@ public interface OutboundMapper {
             @Result(property = "outboundInfo.outboundNo", column = "outbound_no"),
             @Result(property = "outboundInfo.outboundDate", column = "outbound_date"),
             @Result(property = "outboundInfo.remark", column = "remark"),
-            @Result(property = "outboundInfo.accountingReversal", column = "accounting_reversal"),
+            @Result(property = "outboundInfo.accountingReversalOutboundNo", column = "accounting_reversal_outbound_no"),
             @Result(property = "outboundItem.id", column = "outbound_detail_list_id"),
             @Result(property = "outboundItem.outboundNo", column = "outbound_detail_list_outbound_no"),
             @Result(property = "outboundItem.itemId", column = "outbound_detail_list_item_id"),
@@ -161,15 +161,15 @@ public interface OutboundMapper {
 
 
     @Insert("INSERT INTO dbo.outbound_list " +
-            " values(#{outboundNo}, #{outboundDate}, #{remark},#{accountingReversal})")
-    void addOutbound(String outboundNo, LocalDate outboundDate,  String remark, int accountingReversal);
+            " values(#{outboundNo}, #{outboundDate}, #{remark},#{accountingReversalOutboundNo})")
+    void addOutbound(String outboundNo, LocalDate outboundDate,  String remark, String accountingReversalOutboundNo);
 
 
 
     @Update("UPDATE dbo.outbound_list " +
-            " set ,remark = #{remark}, accounting_reversal=#{accountingReversal} " +
+            " set ,remark = #{remark}, accounting_reversal=#{accountingReversalOutboundNo} " +
             "where outbound_no= #{outboundNo}")
-    void updateOutbound(String outboundNo,  String remark,int accountingReversal);
+    void updateOutbound(String outboundNo,  String remark,String accountingReversalOutboundNo);
 
 
 

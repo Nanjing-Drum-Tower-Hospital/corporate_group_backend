@@ -2,6 +2,7 @@ package com.njglyy.corporate_group_backend.controller;
 
 import com.njglyy.corporate_group_backend.entity.*;
 import com.njglyy.corporate_group_backend.mapper.corporateGroup.InboundMapper;
+import org.apache.commons.lang3.SerializationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,30 +31,62 @@ public class InboundController {
         }
     }
 
+    @RequestMapping(value = "/inboundAccountingReversal", method = RequestMethod.GET)
+    public Result inboundAccountingReversal
+            (@RequestParam(value = "inboundNo", required = false) String inboundNo
+            ) {
+
+        List<Inbound> inboundDetailList = inboundMapper.queryInboundDetailList(inboundNo, 0, Integer.MAX_VALUE);
+
+        InboundInfo inboundInfo = inboundDetailList.get(0).getInboundInfo().clone();
+
+        // Deep copy of inboundInfo
+
+        inboundInfo.setInboundNo(null);
+        inboundInfo.setRemark(inboundNo + " 冲红");
+
+        String newInboundNoString = (String) addOrUpdateInbound(inboundInfo).getData();
+        inboundInfo = inboundDetailList.get(0).getInboundInfo().clone();
+
+        inboundMapper.updateInbound(inboundInfo.getInboundNo(),
+                inboundInfo.getSupplierId(), inboundInfo.getRemark(), newInboundNoString);
+        for(Inbound inbound:inboundDetailList){
+
+
+            inboundMapper.addInboundDetail(newInboundNoString, inbound.getInboundItem().getItemId(),
+                    (-inbound.getInboundItem().getItemId()), "冲红");
+        }
+
+
+
+        return new Result(200, "冲红成功！", null);
+    }
+
     @RequestMapping(value = "/addOrUpdateInbound", method = RequestMethod.POST)
     public Result addOrUpdateInbound
             (@RequestBody InboundInfo inboundInfo
             ) {
-        if(inboundInfo.getInboundNo()!=null){
+
+        if (inboundInfo.getInboundNo() != null) {
             inboundMapper.updateInbound(inboundInfo.getInboundNo(),
-                    inboundInfo.getSupplierId(),inboundInfo.getRemark(),inboundInfo.getAccountingReversal());
+                    inboundInfo.getSupplierId(), inboundInfo.getRemark(), inboundInfo.getAccountingReversalInboundNo());
             return new Result(200, "修改成功！", null);
-        }else {
+        } else {
             String newLeftInboundNoString = "";
-            String newRightInboundNoString ="00001";
+            String newRightInboundNoString = "00001";
             LocalDate today = LocalDate.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMM");
             newLeftInboundNoString = today.format(formatter);
 
-            List<Inbound> topInboundList= inboundMapper.queryInboundList(0, 1);
+            List<Inbound> topInboundList = inboundMapper.queryInboundList(0, 1);
             System.out.println(topInboundList.size());
-            if(topInboundList.size()!=0){
-                String inboundNoString =topInboundList.get(0).getInboundInfo().getInboundNo();
-                String leftInboundNoString= inboundNoString.substring(0,6);
-                String rightInboundNoString= inboundNoString.substring(6,11);
+            if (topInboundList.size() != 0) {
+                String inboundNoString = topInboundList.get(0).getInboundInfo().getInboundNo();
+                String leftInboundNoString = inboundNoString.substring(0, 6);
+                String rightInboundNoString = inboundNoString.substring(6, 11);
                 int rightInboundNo = Integer.parseInt(rightInboundNoString);
-                if(newLeftInboundNoString.equals(leftInboundNoString)){
-                    newRightInboundNoString = String.format("%05d", rightInboundNo+1);
+                if (newLeftInboundNoString.equals(leftInboundNoString)) {
+                    newRightInboundNoString = String.format("%05d", rightInboundNo + 1);
                 }
 
             }
@@ -62,13 +95,14 @@ public class InboundController {
             String newInboundDate = today.format(formatter);
 
 
-            String newInboundNoString=newLeftInboundNoString+newRightInboundNoString;
+            String newInboundNoString = newLeftInboundNoString + newRightInboundNoString;
             inboundMapper.addInbound(newInboundNoString, LocalDate.parse(newInboundDate), inboundInfo.getSupplierId(),
-                    inboundInfo.getRemark(),0);
-            return new Result(200, "添加成功！", null);
+                    inboundInfo.getRemark(), null);
+            return new Result(200, "添加成功！", newInboundNoString);
         }
 
     }
+
     @RequestMapping(value = "/deleteInbound", method = RequestMethod.GET)
     public Result deleteInbound
             (@RequestParam(value = "inboundNo", required = false) String inboundNo
@@ -78,8 +112,6 @@ public class InboundController {
         inboundMapper.deleteInboundListByInboundNo(inboundNo);
         return new Result(200, "删除成功！", null);
     }
-
-
 
 
     @RequestMapping(value = "/queryInboundCount", method = RequestMethod.GET)
@@ -120,11 +152,6 @@ public class InboundController {
     }
 
 
-
-
-
-
-
     @RequestMapping(value = "/addOrUpdateInboundDetail", method = RequestMethod.POST)
     public Result addOrUpdateInboundDetail
             (@RequestBody List<InboundItem> dialogInboundDetail
@@ -135,12 +162,13 @@ public class InboundController {
             System.out.println(dialogInboundDetail);
             InboundItem dialogInboundDetailOld = dialogInboundDetail.get(0);
             InboundItem dialogInboundDetailNew = dialogInboundDetail.get(1);
-            if (dialogInboundDetailOld.getId()==0){
+            if (dialogInboundDetailNew.getItemAmount() == 0)
+                return new Result(500, "数量不能为0！", null);
+            if (dialogInboundDetailOld.getId() == 0) {
                 inboundMapper.addInboundDetail(dialogInboundDetailNew.getInboundNo(), dialogInboundDetailNew.getItemId(),
-                        dialogInboundDetailNew.getItemAmount(),dialogInboundDetailNew.getRemark());
-            }
-            else{
-                inboundMapper.updateInboundDetailById(dialogInboundDetailNew.getId(),dialogInboundDetailNew.getInboundNo(),
+                        dialogInboundDetailNew.getItemAmount(), dialogInboundDetailNew.getRemark());
+            } else {
+                inboundMapper.updateInboundDetailById(dialogInboundDetailNew.getId(), dialogInboundDetailNew.getInboundNo(),
                         dialogInboundDetailNew.getItemId(), dialogInboundDetailNew.getItemAmount(),
                         dialogInboundDetailNew.getRemark());
             }
@@ -153,6 +181,7 @@ public class InboundController {
             return new Result(500, "Error deleting item: " + e.getMessage(), null);
         }
     }
+
     @RequestMapping(value = "/deleteInboundItemListByInboundNoAndItemId", method = RequestMethod.GET)
     public Result deleteInboundItemListByInboundNoAndItemId
             (@RequestParam(value = "inboundNo", required = false) String inboundNo,
