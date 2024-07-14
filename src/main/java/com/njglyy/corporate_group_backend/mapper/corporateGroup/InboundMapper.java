@@ -68,13 +68,34 @@ public interface InboundMapper {
             @Result(property = "inboundInfo.inboundDate", column = "inbound_date"),
             @Result(property = "inboundInfo.supplierId", column = "supplier_id"),
             @Result(property = "inboundInfo.remark", column = "remark"),
+            @Result(property = "inboundInfo.accountingReversalInboundNo", column = "accounting_reversal_inbound_no"),
+            @Result(property = "inboundInfo.entryType", column = "entry_type"),
             @Result(property = "supplier.id", column = "supplier_dictionary_id"),
             @Result(property = "supplier.supplierName", column = "supplier_dictionary_supplier_name"),
             @Result(property = "supplier.pinyinCode", column = "supplier_dictionary_pinyin_code"),
     })
     List<Inbound> queryInboundList(int offset, int pageSize);
 
-
+    @Select("select inbound_list.* , \n" +
+            "supplier_dictionary.id as supplier_dictionary_id, \n" +
+            "supplier_dictionary.supplier_name as supplier_dictionary_supplier_name, \n" +
+            "supplier_dictionary.pinyin_code as supplier_dictionary_pinyin_code " +
+            "from " +
+            "inbound_list,supplier_dictionary \n" +
+            "where inbound_list.supplier_id=supplier_dictionary.id " +
+            "and inbound_list.inbound_no = #{inboundNo} \n" )
+    @Results({
+            @Result(property = "inboundInfo.inboundNo", column = "inbound_no"),
+            @Result(property = "inboundInfo.inboundDate", column = "inbound_date"),
+            @Result(property = "inboundInfo.supplierId", column = "supplier_id"),
+            @Result(property = "inboundInfo.remark", column = "remark"),
+            @Result(property = "inboundInfo.accountingReversalInboundNo", column = "accounting_reversal_inbound_no"),
+            @Result(property = "inboundInfo.entryType", column = "entry_type"),
+            @Result(property = "supplier.id", column = "supplier_dictionary_id"),
+            @Result(property = "supplier.supplierName", column = "supplier_dictionary_supplier_name"),
+            @Result(property = "supplier.pinyinCode", column = "supplier_dictionary_pinyin_code"),
+    })
+    Inbound queryInboundByInboundNo(String inboundNo);
 
     @Select("select COUNT(*) "+
             "from " +
@@ -137,6 +158,7 @@ public interface InboundMapper {
             @Result(property = "inboundInfo.supplierId", column = "supplier_id"),
             @Result(property = "inboundInfo.remark", column = "remark"),
             @Result(property = "inboundInfo.accountingReversalInboundNo", column = "accounting_reversal_inbound_no"),
+            @Result(property = "inboundInfo.entryType", column = "entry_type"),
             @Result(property = "supplier.id", column = "supplier_dictionary_id"),
             @Result(property = "supplier.supplierName", column = "supplier_dictionary_supplier_name"),
             @Result(property = "supplier.pinyinCode", column = "supplier_dictionary_pinyin_code"),
@@ -183,15 +205,15 @@ public interface InboundMapper {
 
 
     @Insert("INSERT INTO dbo.inbound_list " +
-            " values(#{inboundNo}, #{inboundDate}, #{supplierId}, #{remark},#{accountingReversalInboundNo})")
-    void addInbound(String inboundNo, LocalDate inboundDate, int supplierId, String remark, String accountingReversalInboundNo);
+            " values(#{inboundNo}, #{inboundDate}, #{supplierId}, #{remark},#{accountingReversalInboundNo},#{entryType})")
+    void addInbound(String inboundNo, LocalDate inboundDate, int supplierId, String remark, String accountingReversalInboundNo,String entryType);
 
 
 
     @Update("UPDATE dbo.inbound_list " +
-            " set supplier_id = #{supplierId},remark = #{remark}, accounting_reversal_inbound_no=#{accountingReversalInboundNo} " +
+            " set supplier_id = #{supplierId},remark = #{remark}, accounting_reversal_inbound_no=#{accountingReversalInboundNo},entry_type = #{entryType} " +
             "where inbound_no= #{inboundNo}")
-    void updateInbound(String inboundNo, int supplierId, String remark,String accountingReversalInboundNo);
+    void updateInbound(String inboundNo, int supplierId, String remark,String accountingReversalInboundNo,String entryType);
 
 
 

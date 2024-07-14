@@ -44,17 +44,18 @@ public class InboundController {
 
         inboundInfo.setInboundNo(null);
         inboundInfo.setRemark(inboundNo + " 冲红");
-
+        inboundInfo.setAccountingReversalInboundNo(inboundNo);
+        inboundInfo.setEntryType("reversal");
         String newInboundNoString = (String) addOrUpdateInbound(inboundInfo).getData();
         inboundInfo = inboundDetailList.get(0).getInboundInfo().clone();
 
         inboundMapper.updateInbound(inboundInfo.getInboundNo(),
-                inboundInfo.getSupplierId(), inboundInfo.getRemark(), newInboundNoString);
+                inboundInfo.getSupplierId(), inboundInfo.getRemark(), newInboundNoString,"original");
         for(Inbound inbound:inboundDetailList){
 
 
             inboundMapper.addInboundDetail(newInboundNoString, inbound.getInboundItem().getItemId(),
-                    (-inbound.getInboundItem().getItemId()), "冲红");
+                    (-inbound.getInboundItem().getItemAmount()), "冲红");
         }
 
 
@@ -66,10 +67,12 @@ public class InboundController {
     public Result addOrUpdateInbound
             (@RequestBody InboundInfo inboundInfo
             ) {
+        if(inboundInfo.getSupplierId()==0)
+            return new Result(400, "请选择供应商！", null);
 
         if (inboundInfo.getInboundNo() != null) {
             inboundMapper.updateInbound(inboundInfo.getInboundNo(),
-                    inboundInfo.getSupplierId(), inboundInfo.getRemark(), inboundInfo.getAccountingReversalInboundNo());
+                    inboundInfo.getSupplierId(), inboundInfo.getRemark(), inboundInfo.getAccountingReversalInboundNo(),inboundInfo.getEntryType());
             return new Result(200, "修改成功！", null);
         } else {
             String newLeftInboundNoString = "";
@@ -79,7 +82,7 @@ public class InboundController {
             newLeftInboundNoString = today.format(formatter);
 
             List<Inbound> topInboundList = inboundMapper.queryInboundList(0, 1);
-            System.out.println(topInboundList.size());
+
             if (topInboundList.size() != 0) {
                 String inboundNoString = topInboundList.get(0).getInboundInfo().getInboundNo();
                 String leftInboundNoString = inboundNoString.substring(0, 6);
@@ -97,7 +100,7 @@ public class InboundController {
 
             String newInboundNoString = newLeftInboundNoString + newRightInboundNoString;
             inboundMapper.addInbound(newInboundNoString, LocalDate.parse(newInboundDate), inboundInfo.getSupplierId(),
-                    inboundInfo.getRemark(), null);
+                    inboundInfo.getRemark(), inboundInfo.getAccountingReversalInboundNo(),inboundInfo.getEntryType());
             return new Result(200, "添加成功！", newInboundNoString);
         }
 
@@ -108,6 +111,11 @@ public class InboundController {
             (@RequestParam(value = "inboundNo", required = false) String inboundNo
             ) {
 
+        Inbound inbound = inboundMapper.queryInboundByInboundNo(inboundNo);
+        Inbound inboundReversal = inboundMapper.queryInboundByInboundNo(inbound.getInboundInfo().getAccountingReversalInboundNo());
+        System.out.println(inbound);
+        inboundMapper.updateInbound(inboundReversal.getInboundInfo().getInboundNo(),
+                inboundReversal.getInboundInfo().getSupplierId(), inboundReversal.getInboundInfo().getRemark(), null,null);
         inboundMapper.deleteInboundItemListByInboundNo(inboundNo);
         inboundMapper.deleteInboundListByInboundNo(inboundNo);
         return new Result(200, "删除成功！", null);
@@ -129,10 +137,10 @@ public class InboundController {
             (@RequestParam(value = "inboundNo", required = false) String inboundNo,
              @RequestParam(value = "currentPage", required = false) int currentPage,
              @RequestParam(value = "pageSize", required = false) int pageSize) {
-        System.out.println(inboundNo);
+
         int offset = (currentPage - 1) * pageSize;
         List<Inbound> inboundDetailList = inboundMapper.queryInboundDetailList(inboundNo, offset, pageSize);
-        System.out.println(inboundDetailList);
+
         return new Result(200, null, inboundDetailList);
     }
 
@@ -142,12 +150,10 @@ public class InboundController {
             (@RequestParam(value = "inboundNo", required = false) String inboundNo,
              @RequestParam(value = "currentPage", required = false) int currentPage,
              @RequestParam(value = "pageSize", required = false) int pageSize) {
-        System.out.println(inboundNo);
-        System.out.println(currentPage);
-        System.out.println(pageSize);
+
         int offset = (currentPage - 1) * pageSize;
         int inboundDetailsCount = inboundMapper.countInboundDetailList(inboundNo, offset, pageSize);
-        System.out.println(inboundDetailsCount);
+
         return new Result(200, null, inboundDetailsCount);
     }
 
@@ -159,11 +165,11 @@ public class InboundController {
             ) {
         try {
 
-            System.out.println(dialogInboundDetail);
+
             InboundItem dialogInboundDetailOld = dialogInboundDetail.get(0);
             InboundItem dialogInboundDetailNew = dialogInboundDetail.get(1);
             if (dialogInboundDetailNew.getItemAmount() == 0)
-                return new Result(500, "数量不能为0！", null);
+                return new Result(400, "数量不能为0！", null);
             if (dialogInboundDetailOld.getId() == 0) {
                 inboundMapper.addInboundDetail(dialogInboundDetailNew.getInboundNo(), dialogInboundDetailNew.getItemId(),
                         dialogInboundDetailNew.getItemAmount(), dialogInboundDetailNew.getRemark());

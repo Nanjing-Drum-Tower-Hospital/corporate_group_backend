@@ -17,32 +17,63 @@ public class OutboundController {
     @Autowired
     private OutboundMapper outboundMapper;
 
+    @RequestMapping(value = "/outboundAccountingReversal", method = RequestMethod.GET)
+    public Result outboundAccountingReversal
+            (@RequestParam(value = "outboundNo", required = false) String outboundNo
+            ) {
+        System.out.println(outboundNo);
+        List<Outbound> outboundDetailList = outboundMapper.queryOutboundDetailList(outboundNo, 0, Integer.MAX_VALUE);
+        System.out.println(outboundDetailList);
 
+        OutboundInfo outboundInfo = outboundDetailList.get(0).getOutboundInfo().clone();
+
+        // Deep copy of outboundInfo
+
+        outboundInfo.setOutboundNo(null);
+        outboundInfo.setRemark(outboundNo + " 冲红");
+        outboundInfo.setAccountingReversalOutboundNo(outboundNo);
+        outboundInfo.setEntryType("reversal");
+        String newOutboundNoString = (String) addOrUpdateOutbound(outboundInfo).getData();
+        outboundInfo = outboundDetailList.get(0).getOutboundInfo().clone();
+
+        outboundMapper.updateOutbound(outboundInfo.getOutboundNo(),
+                 outboundInfo.getRemark(), newOutboundNoString,"original");
+        for(Outbound outbound:outboundDetailList){
+
+
+            outboundMapper.addOutboundDetail(newOutboundNoString, outbound.getOutboundItem().getItemId(),
+                    (-outbound.getOutboundItem().getItemAmount()), "冲红");
+        }
+
+
+
+        return new Result(200, "冲红成功！", null);
+    }
 
     @RequestMapping(value = "/addOrUpdateOutbound", method = RequestMethod.POST)
     public Result addOrUpdateOutbound
             (@RequestBody OutboundInfo outboundInfo
             ) {
-        if(outboundInfo.getOutboundNo()!=null){
+        if (outboundInfo.getOutboundNo() != null) {
             outboundMapper.updateOutbound(outboundInfo.getOutboundNo(),
-                    outboundInfo.getRemark(),outboundInfo.getAccountingReversalOutboundNo());
+                    outboundInfo.getRemark(), outboundInfo.getAccountingReversalOutboundNo(),outboundInfo.getEntryType());
             return new Result(200, "修改成功！", null);
-        }else {
+        } else {
             String newLeftOutboundNoString = "";
-            String newRightOutboundNoString ="00001";
+            String newRightOutboundNoString = "00001";
             LocalDate today = LocalDate.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMM");
             newLeftOutboundNoString = today.format(formatter);
 
-            List<Outbound> topOutboundList= outboundMapper.queryOutboundList(0, 1);
-            System.out.println(topOutboundList.size());
-            if(topOutboundList.size()!=0){
-                String outboundNoString =topOutboundList.get(0).getOutboundInfo().getOutboundNo();
-                String leftOutboundNoString= outboundNoString.substring(0,6);
-                String rightOutboundNoString= outboundNoString.substring(6,11);
+            List<Outbound> topOutboundList = outboundMapper.queryOutboundList(0, 1);
+
+            if (topOutboundList.size() != 0) {
+                String outboundNoString = topOutboundList.get(0).getOutboundInfo().getOutboundNo();
+                String leftOutboundNoString = outboundNoString.substring(0, 6);
+                String rightOutboundNoString = outboundNoString.substring(6, 11);
                 int rightOutboundNo = Integer.parseInt(rightOutboundNoString);
-                if(newLeftOutboundNoString.equals(leftOutboundNoString)){
-                    newRightOutboundNoString = String.format("%05d", rightOutboundNo+1);
+                if (newLeftOutboundNoString.equals(leftOutboundNoString)) {
+                    newRightOutboundNoString = String.format("%05d", rightOutboundNo + 1);
                 }
 
             }
@@ -51,10 +82,10 @@ public class OutboundController {
             String newOutboundDate = today.format(formatter);
 
 
-            String newOutboundNoString=newLeftOutboundNoString+newRightOutboundNoString;
+            String newOutboundNoString = newLeftOutboundNoString + newRightOutboundNoString;
             outboundMapper.addOutbound(newOutboundNoString, LocalDate.parse(newOutboundDate),
-                    outboundInfo.getRemark(),null);
-            return new Result(200, "添加成功！", null);
+                    outboundInfo.getRemark(), outboundInfo.getAccountingReversalOutboundNo(),outboundInfo.getEntryType());
+            return new Result(200, "添加成功！", newOutboundNoString);
         }
 
     }
@@ -62,7 +93,11 @@ public class OutboundController {
     public Result deleteOutbound
             (@RequestParam(value = "outboundNo", required = false) String outboundNo
             ) {
-
+        Outbound outbound = outboundMapper.queryOutboundByOutboundNo(outboundNo);
+        Outbound outboundReversal = outboundMapper.queryOutboundByOutboundNo(outbound.getOutboundInfo().getAccountingReversalOutboundNo());
+        System.out.println(outbound);
+        outboundMapper.updateOutbound(outboundReversal.getOutboundInfo().getOutboundNo(),
+                 outboundReversal.getOutboundInfo().getRemark(), null,null);
         outboundMapper.deleteOutboundItemListByOutboundNo(outboundNo);
         outboundMapper.deleteOutboundListByOutboundNo(outboundNo);
         return new Result(200, "删除成功！", null);
@@ -86,10 +121,10 @@ public class OutboundController {
             (@RequestParam(value = "outboundNo", required = false) String outboundNo,
              @RequestParam(value = "currentPage", required = false) int currentPage,
              @RequestParam(value = "pageSize", required = false) int pageSize) {
-        System.out.println(outboundNo);
+
         int offset = (currentPage - 1) * pageSize;
         List<Outbound> outboundDetailList = outboundMapper.queryOutboundDetailList(outboundNo, offset, pageSize);
-        System.out.println(outboundDetailList);
+
         return new Result(200, null, outboundDetailList);
     }
 
@@ -99,12 +134,10 @@ public class OutboundController {
             (@RequestParam(value = "outboundNo", required = false) String outboundNo,
              @RequestParam(value = "currentPage", required = false) int currentPage,
              @RequestParam(value = "pageSize", required = false) int pageSize) {
-        System.out.println(outboundNo);
-        System.out.println(currentPage);
-        System.out.println(pageSize);
+
         int offset = (currentPage - 1) * pageSize;
         int outboundDetailsCount = outboundMapper.countOutboundDetailList(outboundNo, offset, pageSize);
-        System.out.println(outboundDetailsCount);
+
         return new Result(200, null, outboundDetailsCount);
     }
 
@@ -121,7 +154,7 @@ public class OutboundController {
             ) {
         try {
 
-            System.out.println(dialogOutboundDetail);
+
             OutboundItem dialogOutboundDetailOld = dialogOutboundDetail.get(0);
             OutboundItem dialogOutboundDetailNew = dialogOutboundDetail.get(1);
             if (dialogOutboundDetailOld.getId()==0){

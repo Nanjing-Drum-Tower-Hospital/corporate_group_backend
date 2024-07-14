@@ -16,7 +16,7 @@ public class InboundInfo implements Cloneable{
     private int supplierId;
     private String remark;
     private String accountingReversalInboundNo;
-
+    private String entryType;
     @Override
     public InboundInfo clone() {
         try {
