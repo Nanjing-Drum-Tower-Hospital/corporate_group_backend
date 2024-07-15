@@ -2,10 +2,10 @@ package com.njglyy.corporate_group_backend.mapper.corporateGroup;
 
 import com.njglyy.corporate_group_backend.entity.Item;
 import com.njglyy.corporate_group_backend.entity.ItemDetail;
-import com.njglyy.corporate_group_backend.entity.Manufacturer;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -136,12 +136,12 @@ public interface ItemMapper {
             "#{billItem},#{standards},#{approvalNo},#{type},#{expireDate},#{createDate},#{extendCode1}," +
             "#{extendCode2},#{extendCode3},#{extendCode4},#{extendCode5},#{comment1},#{comment2},#{comment3}," +
             "#{comment4},#{comment5},#{certificationUrl},#{pinyinCode}) ")
-    void addItem(String code, String name, String model, String unitName, double unitPriceExcludingTax,
-                 int manufacturerId,  String billItem, String standards,
-                       String approvalNo, String type, LocalDate expireDate, LocalDate createDate,
-                       String extendCode1, String extendCode2, String extendCode3, String extendCode4,
-                       String extendCode5, String comment1, String comment2, String comment3,
-                       String comment4, String comment5, String certificationUrl,String pinyinCode);
+    void addItem(String code, String name, String model, String unitName, BigDecimal unitPriceExcludingTax,
+                 int manufacturerId, String billItem, String standards,
+                 String approvalNo, String type, LocalDate expireDate, LocalDate createDate,
+                 String extendCode1, String extendCode2, String extendCode3, String extendCode4,
+                 String extendCode5, String comment1, String comment2, String comment3,
+                 String comment4, String comment5, String certificationUrl, String pinyinCode);
 
     @Update("update dbo.item_dictionary " +
             " set name = #{name}, model = #{model}, unit_name = #{unitName}, unit_price_excluding_tax = #{unitPriceExcludingTax}, " +
@@ -151,12 +151,12 @@ public interface ItemMapper {
             " extend_code5 = #{extendCode5}, comment1 = #{comment1}, comment2 = #{comment2}, comment3 = #{comment3}, " +
             " comment4 = #{comment4}, comment5 = #{comment5}, certification_url = #{certificationUrl},pinyin_code = #{pinyinCode} " +
             " where id = #{id}")
-    void updateItem(String code, String name, String model, String unitName, double unitPriceExcludingTax,
-                 int manufacturerId,  String billItem, String standards,
-                 String approvalNo, String type, LocalDate expireDate, LocalDate createDate,
-                 String extendCode1, String extendCode2, String extendCode3, String extendCode4,
-                 String extendCode5, String comment1, String comment2, String comment3,
-                 String comment4, String comment5, String certificationUrl,String pinyinCode, int id);
+    void updateItem(String code, String name, String model, String unitName, BigDecimal unitPriceExcludingTax,
+                    int manufacturerId, String billItem, String standards,
+                    String approvalNo, String type, LocalDate expireDate, LocalDate createDate,
+                    String extendCode1, String extendCode2, String extendCode3, String extendCode4,
+                    String extendCode5, String comment1, String comment2, String comment3,
+                    String comment4, String comment5, String certificationUrl, String pinyinCode, int id);
 
 
 
