@@ -194,5 +194,12 @@ public interface OutboundMapper {
     void updateOutboundDetailById(int id,String outboundNo, int itemId, int itemAmount,String remark);
 
 
-
+    @Select("SELECT \n" +
+            "    (SELECT SUM(item_amount)\n" +
+            "     FROM inbound_detail_list\n" +
+            "     WHERE item_id = #{itemId}) -\n" +
+            "    (SELECT SUM(item_amount)\n" +
+            "     FROM outbound_detail_list\n" +
+            "     WHERE item_id = #{itemId}) ")
+    int queryExistingInventoryAmount(int itemId);
 }

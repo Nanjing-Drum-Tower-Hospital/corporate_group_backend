@@ -222,12 +222,6 @@ public interface InboundMapper {
             "where id= #{id}")
     void updateInboundDetailById(int id,String inboundNo, int itemId, int itemAmount,String remark);
 
-    @Select("select * from supplier_dictionary")
-    @Results({
-            @Result(property = "id", column = "id"),
-            @Result(property = "supplierName", column = "supplier_name"),
-            @Result(property = "pinyinCode", column = "pinyin_code")
-    })
-    List<Supplier> querySupplierList();
+
 
 }

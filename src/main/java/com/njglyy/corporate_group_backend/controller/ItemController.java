@@ -4,6 +4,7 @@ import com.njglyy.corporate_group_backend.entity.Item;
 import com.njglyy.corporate_group_backend.entity.Manufacturer;
 import com.njglyy.corporate_group_backend.entity.Result;
 import com.njglyy.corporate_group_backend.mapper.corporateGroup.ItemMapper;
+import com.njglyy.corporate_group_backend.service.PinyinService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,9 @@ import java.util.List;
 public class ItemController {
     @Autowired
     private ItemMapper itemMapper;
+
+    @Autowired
+    private PinyinService pinyinService;
     @RequestMapping(value = "/queryItemByCodeOrName", method = RequestMethod.GET)
     public Result queryItemByCodeOrName
             (@RequestParam(value = "input", required = false) String input
@@ -121,7 +125,7 @@ public class ItemController {
                         itemDetail.getApprovalNo(), itemDetail.getType(), itemDetail.getExpireDate(), today,
                         null, null, null, null, null, null,
                         null, null, null, null,
-                        itemDetail.getCertificationUrl(),itemDetail.getId());
+                        itemDetail.getCertificationUrl(),pinyinService.getPinyinInitials(itemDetail.getName()),itemDetail.getId());
                 return new Result(200, "修改成功！", null);
             }
 
@@ -131,7 +135,7 @@ public class ItemController {
                     itemDetail.getApprovalNo(), itemDetail.getType(), itemDetail.getExpireDate(), today,
                     null, null, null, null, null, null,
                     null, null, null, null,
-                    itemDetail.getCertificationUrl());
+                    itemDetail.getCertificationUrl(),pinyinService.getPinyinInitials(itemDetail.getName()));
 
             return new Result(200, "添加成功！", null);
         } catch (Exception e) {
@@ -156,18 +160,7 @@ public class ItemController {
     }
 
 
-    @RequestMapping(value = "/queryManufacturerList", method = RequestMethod.GET)
-    public Result queryManufacturerList
-            () {
-        try {
-            List<Manufacturer> manufacturerList = itemMapper.queryManufacturerList();
-            return new Result(200, null, manufacturerList);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-            return new Result(500, "Error querying manufacturer list: " + e.getMessage(), null);
-        }
-    }
+
 
 
 }

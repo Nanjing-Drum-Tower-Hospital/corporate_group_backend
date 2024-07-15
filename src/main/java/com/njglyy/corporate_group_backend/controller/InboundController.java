@@ -18,18 +18,7 @@ public class InboundController {
     @Autowired
     private InboundMapper inboundMapper;
 
-    @RequestMapping(value = "/querySupplierList", method = RequestMethod.GET)
-    public Result querySupplierList
-            () {
-        try {
-            List<Supplier> supplierList = inboundMapper.querySupplierList();
-            return new Result(200, null, supplierList);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-            return new Result(500, "Error querying manufacturer list: " + e.getMessage(), null);
-        }
-    }
+
 
     @RequestMapping(value = "/inboundAccountingReversal", method = RequestMethod.GET)
     public Result inboundAccountingReversal

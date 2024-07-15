@@ -206,5 +206,12 @@ public class OutboundController {
         return new Result(200, null, outboundList);
     }
 
+    @RequestMapping(value = "/queryExistingInventoryAmount", method = RequestMethod.GET)
+    public Result queryExistingInventoryAmount
+            (@RequestParam(value = "itemId", required = false) int itemId) {
+        int existingInventoryAmount = outboundMapper.queryExistingInventoryAmount(itemId);
+        return new Result(200, null, existingInventoryAmount);
+    }
+
 
 }
