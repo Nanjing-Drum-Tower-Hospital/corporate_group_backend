@@ -1,7 +1,6 @@
 package com.njglyy.corporate_group_backend.mapper;
 
 import com.njglyy.corporate_group_backend.entity.Item;
-import com.njglyy.corporate_group_backend.entity.ItemDetail;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
@@ -12,44 +11,45 @@ import java.util.List;
 @Mapper
 @Repository
 public interface ItemMapper {
-    @Select("SELECT item_dictionary.*, manufacturer_dictionary.id as manufacturer_dictionary_id, manufacturer_dictionary.manufacturer_name, " +
-            "manufacturer_dictionary.pinyin_code as manufacturer_dictionary_pinyin_code " +
-            "FROM dbo.item_dictionary, manufacturer_dictionary " +
-            "WHERE item_dictionary.manufacturer_id = manufacturer_dictionary.id " +
+    @Select("SELECT * "+
+            "FROM dbo.item_dictionary " +
+            "WHERE 1=1 "+
             "${codeSQL} " +
             "${beginDateSQL} " +
             "${endDateSQL} " +
             "ORDER BY item_dictionary.id " +
             "OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY")
     @Results({
-            @Result(property = "itemDetail.id", column = "id"),
-            @Result(property = "itemDetail.code", column = "code"),
-            @Result(property = "itemDetail.name", column = "name"),
-            @Result(property = "itemDetail.model", column = "model"),
-            @Result(property = "itemDetail.unitName", column = "unit_name"),
-            @Result(property = "itemDetail.unitPriceExcludingTax", column = "unit_price_excluding_tax"),
-            @Result(property = "itemDetail.manufacturerId", column = "manufacturer_id"),
-            @Result(property = "itemDetail.billItem", column = "bill_item"),
-            @Result(property = "itemDetail.standards", column = "standards"),
-            @Result(property = "itemDetail.approvalNo", column = "approval_no"),
-            @Result(property = "itemDetail.type", column = "type"),
-            @Result(property = "itemDetail.expireDate", column = "expire_date"),
-            @Result(property = "itemDetail.createDate", column = "create_date"),
-            @Result(property = "itemDetail.extendCode1", column = "extend_code1"),
-            @Result(property = "itemDetail.extendCode2", column = "extend_code2"),
-            @Result(property = "itemDetail.extendCode3", column = "extend_code3"),
-            @Result(property = "itemDetail.extendCode4", column = "extend_code4"),
-            @Result(property = "itemDetail.extendCode5", column = "extend_code5"),
-            @Result(property = "itemDetail.comment1", column = "comment1"),
-            @Result(property = "itemDetail.comment2", column = "comment2"),
-            @Result(property = "itemDetail.comment3", column = "comment3"),
-            @Result(property = "itemDetail.comment4", column = "comment4"),
-            @Result(property = "itemDetail.comment5", column = "comment5"),
-            @Result(property = "itemDetail.certificationUrl", column = "certification_url"),
-            @Result(property = "itemDetail.pinyinCode", column = "pinyin_code"),
+            @Result(property = "id", column = "id"),
+            @Result(property = "code", column = "code"),
+            @Result(property = "name", column = "name"),
+            @Result(property = "model", column = "model"),
+            @Result(property = "unitName", column = "unit_name"),
+            @Result(property = "unitPriceExcludingTax", column = "unit_price_excluding_tax"),
+            @Result(property = "manufacturerId", column = "manufacturer_id"),
+            @Result(property = "billItem", column = "bill_item"),
+            @Result(property = "standards", column = "standards"),
+            @Result(property = "approvalNo", column = "approval_no"),
+            @Result(property = "type", column = "type"),
+            @Result(property = "expireDate", column = "expire_date"),
+            @Result(property = "createDate", column = "create_date"),
+            @Result(property = "extendCode1", column = "extend_code1"),
+            @Result(property = "extendCode2", column = "extend_code2"),
+            @Result(property = "extendCode3", column = "extend_code3"),
+            @Result(property = "extendCode4", column = "extend_code4"),
+            @Result(property = "extendCode5", column = "extend_code5"),
+            @Result(property = "comment1", column = "comment1"),
+            @Result(property = "comment2", column = "comment2"),
+            @Result(property = "comment3", column = "comment3"),
+            @Result(property = "comment4", column = "comment4"),
+            @Result(property = "comment5", column = "comment5"),
+            @Result(property = "certificationUrl", column = "certification_url"),
+            @Result(property = "pinyinCode", column = "pinyin_code"),
             @Result(property = "manufacturer.id", column = "manufacturer_dictionary_id"),
             @Result(property = "manufacturer.manufacturerName", column = "manufacturer_name"),
             @Result(property = "manufacturer.pinyinCode", column = "manufacturer_dictionary_pinyin_code"),
+            @Result(property = "manufacturer", column = "manufacturer_id",
+                    one = @One(select = "com.njglyy.corporate_group_backend.mapper.ManufacturerMapper.queryManufacturerById"))
     })
     List<Item> queryItemsByCondition(String codeSQL, String beginDateSQL, String endDateSQL, int offset, int pageSize);
 
@@ -86,7 +86,7 @@ public interface ItemMapper {
             @Result(property = "pinyinCode", column = "pinyin_code")
 
     })
-    ItemDetail queryItemByCode(String code);
+    Item queryItemByCode(String code);
 
 
     @Select("SELECT * " +
@@ -121,7 +121,7 @@ public interface ItemMapper {
             @Result(property = "pinyinCode", column = "pinyin_code")
 
     })
-    List<ItemDetail> queryItemByCodeOrName(String input);
+    List<Item> queryItemByCodeOrName(String input);
 
     @Select("SELECT COUNT(*) " +
             "FROM dbo.item_dictionary, manufacturer_dictionary " +

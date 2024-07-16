@@ -16,7 +16,7 @@ public class InboundDetail {
     private int itemAmount;
     private String remark;
     private Item item;
-    public BigDecimal getUnitPriceExcludingTax() {
+    public BigDecimal getInboundDetailPriceExcludingTax() {
         if (item!=null  && item.getUnitPriceExcludingTax() != null) {
             return item.getUnitPriceExcludingTax()
                     .multiply(BigDecimal.valueOf(itemAmount))
@@ -27,7 +27,7 @@ public class InboundDetail {
 
 
     // Calculate the total unit price including tax based on itemAmount
-    public BigDecimal getUnitPriceIncludingTax() {
+    public BigDecimal getInboundDetailPriceIncludingTax() {
         if (item!=null  && item.getUnitPriceExcludingTax() != null) {
             return item.getUnitPriceExcludingTax()
                     .multiply(BigDecimal.valueOf(itemAmount))
@@ -38,7 +38,7 @@ public class InboundDetail {
     }
 
     // Calculate the total tax for the item based on itemAmount
-    public BigDecimal getTax() {
+    public BigDecimal getInboundDetailTax() {
         if (item!=null &&  item.getUnitPriceExcludingTax() != null) {
             return item.getUnitPriceExcludingTax()
                     .multiply(BigDecimal.valueOf(itemAmount))

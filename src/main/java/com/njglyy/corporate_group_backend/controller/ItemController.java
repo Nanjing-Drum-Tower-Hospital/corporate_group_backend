@@ -1,5 +1,4 @@
 package com.njglyy.corporate_group_backend.controller;
-import com.njglyy.corporate_group_backend.entity.ItemDetail;
 import com.njglyy.corporate_group_backend.entity.Item;
 import com.njglyy.corporate_group_backend.entity.Result;
 import com.njglyy.corporate_group_backend.mapper.ItemMapper;
@@ -26,7 +25,7 @@ public class ItemController {
         System.out.println(input);
         String inputStr = "%"+input+"%";
 
-        List<ItemDetail> itemDetailList = itemMapper.queryItemByCodeOrName(inputStr);
+        List<Item> itemDetailList = itemMapper.queryItemByCodeOrName(inputStr);
         return new Result(200,null,itemDetailList);
     }
 
@@ -113,28 +112,28 @@ public class ItemController {
 
     @RequestMapping(value = "/addOrUpdateItem", method = RequestMethod.POST)
     public Result addOrUpdateItem
-            (@RequestBody ItemDetail itemDetail
+            (@RequestBody Item item
             ) {
         try {
-            System.out.println(itemDetail);
+            System.out.println(item);
             LocalDate today = LocalDate.now();
-            if(itemDetail.getId()!=0){
-                itemMapper.updateItem( itemDetail.getCode(),itemDetail.getName(), itemDetail.getModel(), itemDetail.getUnitName(), itemDetail.getUnitPriceExcludingTax(),
-                        itemDetail.getManufacturerId(),  itemDetail.getBillItem(), itemDetail.getStandards(),
-                        itemDetail.getApprovalNo(), itemDetail.getType(), itemDetail.getExpireDate(), today,
+            if(item.getId()!=0){
+                itemMapper.updateItem( item.getCode(),item.getName(), item.getModel(), item.getUnitName(), item.getUnitPriceExcludingTax(),
+                        item.getManufacturerId(),  item.getBillItem(), item.getStandards(),
+                        item.getApprovalNo(), item.getType(), item.getExpireDate(), today,
                         null, null, null, null, null, null,
                         null, null, null, null,
-                        itemDetail.getCertificationUrl(),pinyinService.getPinyinInitials(itemDetail.getName()),itemDetail.getId());
+                        item.getCertificationUrl(),pinyinService.getPinyinInitials(item.getName()),item.getId());
                 return new Result(200, "修改成功！", null);
             }
 
 
-            itemMapper.addItem(itemDetail.getCode(), itemDetail.getName(), itemDetail.getModel(), itemDetail.getUnitName(), itemDetail.getUnitPriceExcludingTax(),
-                    itemDetail.getManufacturerId(),  itemDetail.getBillItem(), itemDetail.getStandards(),
-                    itemDetail.getApprovalNo(), itemDetail.getType(), itemDetail.getExpireDate(), today,
+            itemMapper.addItem(item.getCode(), item.getName(), item.getModel(), item.getUnitName(), item.getUnitPriceExcludingTax(),
+                    item.getManufacturerId(),  item.getBillItem(), item.getStandards(),
+                    item.getApprovalNo(), item.getType(), item.getExpireDate(), today,
                     null, null, null, null, null, null,
                     null, null, null, null,
-                    itemDetail.getCertificationUrl(),pinyinService.getPinyinInitials(itemDetail.getName()));
+                    item.getCertificationUrl(),pinyinService.getPinyinInitials(item.getName()));
 
             return new Result(200, "添加成功！", null);
         } catch (Exception e) {

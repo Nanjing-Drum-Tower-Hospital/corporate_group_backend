@@ -35,7 +35,7 @@ public class Item {
     }
 
 
-    public BigDecimal getTax() {
+    public BigDecimal getUnitTax() {
         BigDecimal sellingPriceBD = unitPriceExcludingTax;
         return sellingPriceBD.multiply(BigDecimal.valueOf(0.13)).setScale(10, BigDecimal.ROUND_HALF_UP);
     }

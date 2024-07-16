@@ -17,48 +17,45 @@ public class InboundController {
 
 
 
-//    @RequestMapping(value = "/inboundAccountingReversal", method = RequestMethod.GET)
-//    public Result inboundAccountingReversal
-//            (@RequestParam(value = "inboundNo", required = false) String inboundNo
-//            ) {
-//
-//        List<Inbound> inboundDetailList = inboundMapper.queryInboundDetailList(inboundNo, 0, Integer.MAX_VALUE);
-//
-//        InboundInfo inboundInfo = inboundDetailList.get(0).getInboundInfo().clone();
-//
-//        // Deep copy of inboundInfo
-//
-//        inboundInfo.setInboundNo(null);
-//        inboundInfo.setRemark(inboundNo + " 冲红");
-//        inboundInfo.setAccountingReversalInboundNo(inboundNo);
-//        inboundInfo.setEntryType("reversal");
-//        String newInboundNoString = (String) addOrUpdateInbound(inboundInfo).getData();
-//        inboundInfo = inboundDetailList.get(0).getInboundInfo().clone();
-//
-//        inboundMapper.updateInbound(inboundInfo.getInboundNo(),
-//                inboundInfo.getSupplierId(), inboundInfo.getRemark(), newInboundNoString,"original");
-//        for(Inbound inbound:inboundDetailList){
-//
-//
-//            inboundMapper.addInboundDetail(newInboundNoString, inbound.getInboundItem().getItemId(),
-//                    (-inbound.getInboundItem().getItemAmount()), "冲红");
-//        }
-//
-//
-//
-//        return new Result(200, "冲红成功！", null);
-//    }
+    @RequestMapping(value = "/inboundAccountingReversal", method = RequestMethod.GET)
+    public Result inboundAccountingReversal
+            (@RequestParam(value = "inboundNo", required = false) String inboundNo
+            ) {
+
+        Inbound inbound = inboundMapper.queryInboundByInboundNo(inboundNo);
+
+
+        inbound.setInboundNo(null);
+        inbound.setRemark(inboundNo + " 冲红");
+        inbound.setAccountingReversalInboundNo(inboundNo);
+        inbound.setEntryType("reversal");
+        String newInboundNoString = (String) addOrUpdateInbound(inbound).getData();
+        inbound = inboundMapper.queryInboundByInboundNo(inboundNo);
+
+        inboundMapper.updateInbound(inbound.getInboundNo(),
+                inbound.getSupplierId(), inbound.getRemark(), newInboundNoString,"original");
+        for(InboundDetail inboundDetail:inbound.getInboundDetailList()){
+
+
+            inboundMapper.addInboundDetail(newInboundNoString, inboundDetail.getItemId(),
+                    (-inboundDetail.getItemAmount()), "冲红");
+        }
+
+
+
+        return new Result(200, "冲红成功！", null);
+    }
 
     @RequestMapping(value = "/addOrUpdateInbound", method = RequestMethod.POST)
     public Result addOrUpdateInbound
-            (@RequestBody InboundInfo inboundInfo
+            (@RequestBody Inbound inbound
             ) {
-        if(inboundInfo.getSupplierId()==0)
+        if(inbound.getSupplierId()==0)
             return new Result(400, "请选择供应商！", null);
 
-        if (inboundInfo.getInboundNo() != null) {
-            inboundMapper.updateInbound(inboundInfo.getInboundNo(),
-                    inboundInfo.getSupplierId(), inboundInfo.getRemark(), inboundInfo.getAccountingReversalInboundNo(),inboundInfo.getEntryType());
+        if (inbound.getInboundNo() != null) {
+            inboundMapper.updateInbound(inbound.getInboundNo(),
+                    inbound.getSupplierId(), inbound.getRemark(), inbound.getAccountingReversalInboundNo(),inbound.getEntryType());
             return new Result(200, "修改成功！", null);
         } else {
             String newLeftInboundNoString = "";
@@ -85,30 +82,28 @@ public class InboundController {
 
 
             String newInboundNoString = newLeftInboundNoString + newRightInboundNoString;
-            inboundMapper.addInbound(newInboundNoString, LocalDate.parse(newInboundDate), inboundInfo.getSupplierId(),
-                    inboundInfo.getRemark(), inboundInfo.getAccountingReversalInboundNo(),inboundInfo.getEntryType());
+            inboundMapper.addInbound(newInboundNoString, LocalDate.parse(newInboundDate), inbound.getSupplierId(),
+                    inbound.getRemark(), inbound.getAccountingReversalInboundNo(),inbound.getEntryType());
             return new Result(200, "添加成功！", newInboundNoString);
         }
 
     }
 
-    @RequestMapping(value = "/deleteInbound", method = RequestMethod.GET)
+    @RequestMapping(value = "/deleteInboundByInboundNo", method = RequestMethod.GET)
     public Result deleteInbound
             (@RequestParam(value = "inboundNo", required = false) String inboundNo
             ) {
 
         Inbound inbound = inboundMapper.queryInboundByInboundNo(inboundNo);
         Inbound inboundReversal = inboundMapper.queryInboundByInboundNo(inbound.getAccountingReversalInboundNo());
-        System.out.println(inbound);
-        inboundMapper.updateInbound(inboundReversal.getInboundNo(),
-                inboundReversal.getSupplierId(), inboundReversal.getRemark(), null,null);
+        if(inboundReversal!=null){
+            inboundMapper.updateInbound(inboundReversal.getInboundNo(),
+                    inboundReversal.getSupplierId(), inboundReversal.getRemark(), null,null);
+        }
         inboundMapper.deleteInboundDetailListByInboundNo(inboundNo);
         inboundMapper.deleteInboundByInboundNo(inboundNo);
         return new Result(200, "删除成功！", null);
     }
-
-
-
 
 
     @RequestMapping(value = "/queryInboundDetailList", method = RequestMethod.GET)
@@ -143,6 +138,7 @@ public class InboundController {
 
             ) {
         try {
+            System.out.println(dialogInboundDetail);
 
             InboundDetail dialogInboundDetailOld = dialogInboundDetail.get(0);
             InboundDetail dialogInboundDetailNew = dialogInboundDetail.get(1);
@@ -165,27 +161,27 @@ public class InboundController {
             return new Result(500, "Error deleting item: " + e.getMessage(), null);
         }
     }
-//
-//    @RequestMapping(value = "/deleteInboundItemListByInboundNoAndItemId", method = RequestMethod.GET)
-//    public Result deleteInboundItemListByInboundNoAndItemId
-//            (@RequestParam(value = "inboundNo", required = false) String inboundNo,
-//             @RequestParam(value = "itemId", required = false) int itemId
-//            ) {
-//
-//        inboundMapper.deleteInboundItemListByInboundNoAndItemId(inboundNo, itemId);
-//        return new Result(200, "删除成功！", null);
-//    }
-//
-//
-//    @RequestMapping(value = "/queryInboundItemListByInboundNoAndItemId", method = RequestMethod.GET)
-//    public Result queryInboundItemListByInboundNoAndItemId
-//            (@RequestParam(value = "inboundNo", required = false) String inboundNo,
-//             @RequestParam(value = "itemId", required = false) int itemId
-//            ) {
-//
-//        InboundDetail InboundItemList = inboundMapper.queryInboundItemListByInboundNoAndItemId(inboundNo, itemId);
-//        return new Result(200, null, InboundItemList);
-//    }
+
+    @RequestMapping(value = "/deleteInboundDetailByInboundNoAndItemId", method = RequestMethod.GET)
+    public Result deleteInboundDetailByInboundNoAndItemId
+            (@RequestParam(value = "inboundNo", required = false) String inboundNo,
+             @RequestParam(value = "itemId", required = false) int itemId
+            ) {
+
+        inboundMapper.deleteInboundDetailByInboundNoAndItemId(inboundNo, itemId);
+        return new Result(200, "删除成功！", null);
+    }
+
+
+    @RequestMapping(value = "/queryInboundItemListByInboundNoAndItemId", method = RequestMethod.GET)
+    public Result queryInboundItemListByInboundNoAndItemId
+            (@RequestParam(value = "inboundNo", required = false) String inboundNo,
+             @RequestParam(value = "itemId", required = false) int itemId
+            ) {
+
+        InboundDetail InboundItemList = inboundMapper.queryInboundDetailListByInboundNoAndItemId(inboundNo, itemId);
+        return new Result(200, null, InboundItemList);
+    }
 //
 //
     @RequestMapping(value = "/queryInboundList", method = RequestMethod.GET)
