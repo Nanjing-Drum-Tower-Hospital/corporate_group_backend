@@ -16,7 +16,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import javax.sql.DataSource;
 
 @Configuration
-@MapperScan(basePackages = "com.njglyy.corporate_group_backend.mapper.corporateGroup", sqlSessionTemplateRef = "corporateGroupSqlSessionTemplate")
+@MapperScan(basePackages = "com.njglyy.corporate_group_backend.mapper", sqlSessionTemplateRef = "corporateGroupSqlSessionTemplate")
 
 public class CorporateGroupDataSourceConfig {
     @Bean(name = "corporateGroupDataSource")

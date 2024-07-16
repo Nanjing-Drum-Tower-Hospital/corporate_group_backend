@@ -1,9 +1,8 @@
 package com.njglyy.corporate_group_backend.controller;
 import com.njglyy.corporate_group_backend.entity.ItemDetail;
 import com.njglyy.corporate_group_backend.entity.Item;
-import com.njglyy.corporate_group_backend.entity.Manufacturer;
 import com.njglyy.corporate_group_backend.entity.Result;
-import com.njglyy.corporate_group_backend.mapper.corporateGroup.ItemMapper;
+import com.njglyy.corporate_group_backend.mapper.ItemMapper;
 import com.njglyy.corporate_group_backend.service.PinyinService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;

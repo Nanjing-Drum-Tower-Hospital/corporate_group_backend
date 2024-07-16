@@ -1,6 +1,5 @@
-package com.njglyy.corporate_group_backend.mapper.corporateGroup;
+package com.njglyy.corporate_group_backend.mapper;
 
-import com.njglyy.corporate_group_backend.entity.Manufacturer;
 import com.njglyy.corporate_group_backend.entity.Manufacturer;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
@@ -26,4 +25,14 @@ public interface ManufacturerMapper {
 
     @Delete("delete from manufacturer_dictionary where id=#{id}")
     void deleteManufacturer(int id);
+
+
+    @Select("select * from manufacturer_dictionary where id = #{id}")
+    @Results({
+            @Result(property = "id", column = "id"),
+            @Result(property = "manufacturerName", column = "manufacturer_name"),
+            @Result(property = "pinyinCode", column = "pinyin_code")
+
+    })
+    Manufacturer queryManufacturerById(int id);
 }

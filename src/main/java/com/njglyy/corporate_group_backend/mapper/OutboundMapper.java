@@ -1,4 +1,4 @@
-package com.njglyy.corporate_group_backend.mapper.corporateGroup;
+package com.njglyy.corporate_group_backend.mapper;
 
 import com.njglyy.corporate_group_backend.entity.*;
 import org.apache.ibatis.annotations.*;
@@ -6,7 +6,6 @@ import org.apache.ibatis.annotations.Result;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper

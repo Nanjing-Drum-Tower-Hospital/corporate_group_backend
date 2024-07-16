@@ -2,7 +2,7 @@ package com.njglyy.corporate_group_backend.controller;
 
 import com.njglyy.corporate_group_backend.entity.Result;
 import com.njglyy.corporate_group_backend.entity.Manufacturer;
-import com.njglyy.corporate_group_backend.mapper.corporateGroup.ManufacturerMapper;
+import com.njglyy.corporate_group_backend.mapper.ManufacturerMapper;
 import com.njglyy.corporate_group_backend.service.PinyinService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

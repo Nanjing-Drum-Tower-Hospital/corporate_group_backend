@@ -1,4 +1,4 @@
-package com.njglyy.corporate_group_backend.mapper.corporateGroup;
+package com.njglyy.corporate_group_backend.mapper;
 
 
 import com.njglyy.corporate_group_backend.entity.Token;

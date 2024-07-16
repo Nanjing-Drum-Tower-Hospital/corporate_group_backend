@@ -1,4 +1,4 @@
-package com.njglyy.corporate_group_backend.mapper.corporateGroup;
+package com.njglyy.corporate_group_backend.mapper;
 
 import com.njglyy.corporate_group_backend.entity.Supplier;
 import org.apache.ibatis.annotations.*;
@@ -23,6 +23,15 @@ public interface SupplierMapper {
             @Result(property = "pinyinCode", column = "pinyin_code")
     })
     List<Supplier> querySupplierList();
+
+    @Select("select * from supplier_dictionary where id = #{id}")
+    @Results({
+            @Result(property = "id", column = "id"),
+            @Result(property = "supplierName", column = "supplier_name"),
+            @Result(property = "pinyinCode", column = "pinyin_code")
+
+    })
+    Supplier querySupplierById(int id);
 
     @Delete("delete from supplier_dictionary where id=#{id}")
     void deleteSupplier(int id);
