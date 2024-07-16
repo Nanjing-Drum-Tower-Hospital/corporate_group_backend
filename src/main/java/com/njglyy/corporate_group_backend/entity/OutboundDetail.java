@@ -9,14 +9,14 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class InboundDetail {
+public class OutboundDetail {
     private int id;
-    private String inboundNo;
+    private String outboundNo;
     private int itemId;
     private int itemAmount;
     private String remark;
     private Item item;
-    public BigDecimal getInboundDetailPriceExcludingTax() {
+    public BigDecimal getOutboundDetailPriceExcludingTax() {
         if (item!=null  && item.getUnitPriceExcludingTax() != null) {
             return item.getUnitPriceExcludingTax()
                     .multiply(BigDecimal.valueOf(itemAmount))
@@ -24,8 +24,7 @@ public class InboundDetail {
         }
         return BigDecimal.ZERO;
     }
-
-    public BigDecimal getInboundDetailPriceIncludingTax() {
+    public BigDecimal getOutboundDetailPriceIncludingTax() {
         if (item!=null  && item.getUnitPriceExcludingTax() != null) {
             return item.getUnitPriceExcludingTax()
                     .multiply(BigDecimal.valueOf(itemAmount))
@@ -34,8 +33,7 @@ public class InboundDetail {
         }
         return BigDecimal.ZERO;
     }
-
-    public BigDecimal getInboundDetailTax() {
+    public BigDecimal getOutboundDetailTax() {
         if (item!=null &&  item.getUnitPriceExcludingTax() != null) {
             return item.getUnitPriceExcludingTax()
                     .multiply(BigDecimal.valueOf(itemAmount))
@@ -44,7 +42,5 @@ public class InboundDetail {
         }
         return BigDecimal.ZERO;
     }
-
-
 
 }

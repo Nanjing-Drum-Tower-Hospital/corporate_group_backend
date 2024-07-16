@@ -38,7 +38,7 @@ public interface OutboundMapper {
             @Result(property = "itemId", column = "item_id"),
             @Result(property = "itemAmount", column = "item_amount"),
     })
-    OutboundItem queryOutboundItemListByOutboundNoAndItemId(String outboundNo, int itemId);
+    OutboundDetail queryOutboundItemListByOutboundNoAndItemId(String outboundNo, int itemId);
 
 
 

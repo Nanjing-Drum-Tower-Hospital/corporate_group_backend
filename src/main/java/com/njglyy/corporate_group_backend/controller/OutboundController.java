@@ -147,14 +147,14 @@ public class OutboundController {
 
     @RequestMapping(value = "/addOrUpdateOutboundDetail", method = RequestMethod.POST)
     public Result addOrUpdateOutboundDetail
-            (@RequestBody List<OutboundItem> dialogOutboundDetail
+            (@RequestBody List<OutboundDetail> dialogOutboundDetail
 
             ) {
         try {
 
 
-            OutboundItem dialogOutboundDetailOld = dialogOutboundDetail.get(0);
-            OutboundItem dialogOutboundDetailNew = dialogOutboundDetail.get(1);
+            OutboundDetail dialogOutboundDetailOld = dialogOutboundDetail.get(0);
+            OutboundDetail dialogOutboundDetailNew = dialogOutboundDetail.get(1);
             if (dialogOutboundDetailOld.getId()==0){
                 outboundMapper.addOutboundDetail(dialogOutboundDetailNew.getOutboundNo(), dialogOutboundDetailNew.getItemId(),
                         dialogOutboundDetailNew.getItemAmount(),dialogOutboundDetailNew.getRemark());
@@ -190,8 +190,8 @@ public class OutboundController {
              @RequestParam(value = "itemId", required = false) int itemId
             ) {
 
-        OutboundItem OutboundItemList = outboundMapper.queryOutboundItemListByOutboundNoAndItemId(outboundNo, itemId);
-        return new Result(200, null, OutboundItemList);
+        OutboundDetail outboundDetailList = outboundMapper.queryOutboundItemListByOutboundNoAndItemId(outboundNo, itemId);
+        return new Result(200, null, outboundDetailList);
     }
 
 
