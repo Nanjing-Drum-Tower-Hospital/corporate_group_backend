@@ -5,6 +5,8 @@ import com.njglyy.corporate_group_backend.mapper.ItemMapper;
 import com.njglyy.corporate_group_backend.service.PinyinService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -141,6 +143,8 @@ public class ItemController {
             System.out.println(e.getMessage());
             return new Result(500, "Error deleting item: " + e.getMessage(), null);
         }
+
+
     }
 
     @RequestMapping(value = "/deleteItem", method = RequestMethod.GET)
@@ -157,6 +161,10 @@ public class ItemController {
         }
     }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public Result handleJsonParseException(HttpMessageNotReadableException e) {
+        return new Result(400, "检测到异常字符！", null);
+    }
 
 
 

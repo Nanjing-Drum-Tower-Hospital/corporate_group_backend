@@ -15,32 +15,30 @@ public class OutboundController {
     @Autowired
     private OutboundMapper outboundMapper;
 
+
+
     @RequestMapping(value = "/outboundAccountingReversal", method = RequestMethod.GET)
     public Result outboundAccountingReversal
             (@RequestParam(value = "outboundNo", required = false) String outboundNo
             ) {
-        System.out.println(outboundNo);
-        List<Outbound> outboundDetailList = outboundMapper.queryOutboundDetailList(outboundNo, 0, Integer.MAX_VALUE);
-        System.out.println(outboundDetailList);
 
-        OutboundInfo outboundInfo = outboundDetailList.get(0).getOutboundInfo().clone();
-
-        // Deep copy of outboundInfo
-
-        outboundInfo.setOutboundNo(null);
-        outboundInfo.setRemark(outboundNo + " 冲红");
-        outboundInfo.setAccountingReversalOutboundNo(outboundNo);
-        outboundInfo.setEntryType("reversal");
-        String newOutboundNoString = (String) addOrUpdateOutbound(outboundInfo).getData();
-        outboundInfo = outboundDetailList.get(0).getOutboundInfo().clone();
-
-        outboundMapper.updateOutbound(outboundInfo.getOutboundNo(),
-                 outboundInfo.getRemark(), newOutboundNoString,"original");
-        for(Outbound outbound:outboundDetailList){
+        Outbound outbound = outboundMapper.queryOutboundByOutboundNo(outboundNo);
 
 
-            outboundMapper.addOutboundDetail(newOutboundNoString, outbound.getOutboundItem().getItemId(),
-                    (-outbound.getOutboundItem().getItemAmount()), "冲红");
+        outbound.setOutboundNo(null);
+        outbound.setRemark(outboundNo + " 冲红");
+        outbound.setAccountingReversalOutboundNo(outboundNo);
+        outbound.setEntryType("reversal");
+        String newOutboundNoString = (String) addOrUpdateOutbound(outbound).getData();
+        outbound = outboundMapper.queryOutboundByOutboundNo(outboundNo);
+
+        outboundMapper.updateOutbound(outbound.getOutboundNo(),
+                 outbound.getRemark(), newOutboundNoString,"original");
+        for(OutboundDetail outboundDetail:outbound.getOutboundDetailList()){
+
+
+            outboundMapper.addOutboundDetail(newOutboundNoString, outboundDetail.getItemId(),
+                    (-outboundDetail.getItemAmount()), "冲红");
         }
 
 
@@ -50,11 +48,13 @@ public class OutboundController {
 
     @RequestMapping(value = "/addOrUpdateOutbound", method = RequestMethod.POST)
     public Result addOrUpdateOutbound
-            (@RequestBody OutboundInfo outboundInfo
+            (@RequestBody Outbound outbound
             ) {
-        if (outboundInfo.getOutboundNo() != null) {
-            outboundMapper.updateOutbound(outboundInfo.getOutboundNo(),
-                    outboundInfo.getRemark(), outboundInfo.getAccountingReversalOutboundNo(),outboundInfo.getEntryType());
+
+
+        if (outbound.getOutboundNo() != null) {
+            outboundMapper.updateOutbound(outbound.getOutboundNo(),
+                     outbound.getRemark(), outbound.getAccountingReversalOutboundNo(),outbound.getEntryType());
             return new Result(200, "修改成功！", null);
         } else {
             String newLeftOutboundNoString = "";
@@ -66,7 +66,7 @@ public class OutboundController {
             List<Outbound> topOutboundList = outboundMapper.queryOutboundList(0, 1);
 
             if (topOutboundList.size() != 0) {
-                String outboundNoString = topOutboundList.get(0).getOutboundInfo().getOutboundNo();
+                String outboundNoString = topOutboundList.get(0).getOutboundNo();
                 String leftOutboundNoString = outboundNoString.substring(0, 6);
                 String rightOutboundNoString = outboundNoString.substring(6, 11);
                 int rightOutboundNo = Integer.parseInt(rightOutboundNoString);
@@ -82,35 +82,26 @@ public class OutboundController {
 
             String newOutboundNoString = newLeftOutboundNoString + newRightOutboundNoString;
             outboundMapper.addOutbound(newOutboundNoString, LocalDate.parse(newOutboundDate),
-                    outboundInfo.getRemark(), outboundInfo.getAccountingReversalOutboundNo(),outboundInfo.getEntryType());
+                    outbound.getRemark(), outbound.getAccountingReversalOutboundNo(),outbound.getEntryType());
             return new Result(200, "添加成功！", newOutboundNoString);
         }
 
     }
-    @RequestMapping(value = "/deleteOutbound", method = RequestMethod.GET)
+
+    @RequestMapping(value = "/deleteOutboundByOutboundNo", method = RequestMethod.GET)
     public Result deleteOutbound
             (@RequestParam(value = "outboundNo", required = false) String outboundNo
             ) {
+
         Outbound outbound = outboundMapper.queryOutboundByOutboundNo(outboundNo);
-        Outbound outboundReversal = outboundMapper.queryOutboundByOutboundNo(outbound.getOutboundInfo().getAccountingReversalOutboundNo());
-        System.out.println(outbound);
-        outboundMapper.updateOutbound(outboundReversal.getOutboundInfo().getOutboundNo(),
-                 outboundReversal.getOutboundInfo().getRemark(), null,null);
-        outboundMapper.deleteOutboundItemListByOutboundNo(outboundNo);
-        outboundMapper.deleteOutboundListByOutboundNo(outboundNo);
+        Outbound outboundReversal = outboundMapper.queryOutboundByOutboundNo(outbound.getAccountingReversalOutboundNo());
+        if(outboundReversal!=null){
+            outboundMapper.updateOutbound(outboundReversal.getOutboundNo(),
+                     outboundReversal.getRemark(), null,null);
+        }
+        outboundMapper.deleteOutboundDetailListByOutboundNo(outboundNo);
+        outboundMapper.deleteOutboundByOutboundNo(outboundNo);
         return new Result(200, "删除成功！", null);
-    }
-
-
-
-
-    @RequestMapping(value = "/queryOutboundCount", method = RequestMethod.GET)
-    public Result queryOutboundCount
-            (@RequestParam(value = "currentPage", required = false) int currentPage,
-             @RequestParam(value = "pageSize", required = false) int pageSize) {
-        int offset = (currentPage - 1) * pageSize;
-        int outboundsCount = outboundMapper.queryOutboundCount(offset, pageSize);
-        return new Result(200, null, outboundsCount);
     }
 
 
@@ -121,28 +112,23 @@ public class OutboundController {
              @RequestParam(value = "pageSize", required = false) int pageSize) {
 
         int offset = (currentPage - 1) * pageSize;
-        List<Outbound> outboundDetailList = outboundMapper.queryOutboundDetailList(outboundNo, offset, pageSize);
+        List<OutboundDetail> outboundDetailList = outboundMapper.queryOutboundDetailListByOutboundNo(outboundNo, offset, pageSize);
 
         return new Result(200, null, outboundDetailList);
     }
 
 
-    @RequestMapping(value = "/countOutboundDetailList", method = RequestMethod.GET)
+    @RequestMapping(value = "/queryOutboundDetailListCount", method = RequestMethod.GET)
     public Result countOutboundDetailMachineNoCount
             (@RequestParam(value = "outboundNo", required = false) String outboundNo,
              @RequestParam(value = "currentPage", required = false) int currentPage,
              @RequestParam(value = "pageSize", required = false) int pageSize) {
 
         int offset = (currentPage - 1) * pageSize;
-        int outboundDetailsCount = outboundMapper.countOutboundDetailList(outboundNo, offset, pageSize);
+        int outboundDetailsCount = outboundMapper.queryOutboundDetailListCountByOutboundNo(outboundNo);
 
         return new Result(200, null, outboundDetailsCount);
     }
-
-
-
-
-
 
 
     @RequestMapping(value = "/addOrUpdateOutboundDetail", method = RequestMethod.POST)
@@ -151,16 +137,17 @@ public class OutboundController {
 
             ) {
         try {
-
+            System.out.println(dialogOutboundDetail);
 
             OutboundDetail dialogOutboundDetailOld = dialogOutboundDetail.get(0);
             OutboundDetail dialogOutboundDetailNew = dialogOutboundDetail.get(1);
-            if (dialogOutboundDetailOld.getId()==0){
+            if (dialogOutboundDetailNew.getItemAmount() == 0)
+                return new Result(400, "数量不能为0！", null);
+            if (dialogOutboundDetailOld.getId() == 0) {
                 outboundMapper.addOutboundDetail(dialogOutboundDetailNew.getOutboundNo(), dialogOutboundDetailNew.getItemId(),
-                        dialogOutboundDetailNew.getItemAmount(),dialogOutboundDetailNew.getRemark());
-            }
-            else{
-                outboundMapper.updateOutboundDetailById(dialogOutboundDetailNew.getId(),dialogOutboundDetailNew.getOutboundNo(),
+                        dialogOutboundDetailNew.getItemAmount(), dialogOutboundDetailNew.getRemark());
+            } else {
+                outboundMapper.updateOutboundDetailById(dialogOutboundDetailNew.getId(), dialogOutboundDetailNew.getOutboundNo(),
                         dialogOutboundDetailNew.getItemId(), dialogOutboundDetailNew.getItemAmount(),
                         dialogOutboundDetailNew.getRemark());
             }
@@ -173,13 +160,14 @@ public class OutboundController {
             return new Result(500, "Error deleting item: " + e.getMessage(), null);
         }
     }
-    @RequestMapping(value = "/deleteOutboundItemListByOutboundNoAndItemId", method = RequestMethod.GET)
-    public Result deleteOutboundItemListByOutboundNoAndItemId
+
+    @RequestMapping(value = "/deleteOutboundDetailByOutboundNoAndItemId", method = RequestMethod.GET)
+    public Result deleteOutboundDetailByOutboundNoAndItemId
             (@RequestParam(value = "outboundNo", required = false) String outboundNo,
              @RequestParam(value = "itemId", required = false) int itemId
             ) {
 
-        outboundMapper.deleteOutboundItemListByOutboundNoAndItemId(outboundNo, itemId);
+        outboundMapper.deleteOutboundDetailByOutboundNoAndItemId(outboundNo, itemId);
         return new Result(200, "删除成功！", null);
     }
 
@@ -190,18 +178,27 @@ public class OutboundController {
              @RequestParam(value = "itemId", required = false) int itemId
             ) {
 
-        OutboundDetail outboundDetailList = outboundMapper.queryOutboundItemListByOutboundNoAndItemId(outboundNo, itemId);
-        return new Result(200, null, outboundDetailList);
+        OutboundDetail OutboundItemList = outboundMapper.queryOutboundDetailListByOutboundNoAndItemId(outboundNo, itemId);
+        return new Result(200, null, OutboundItemList);
     }
-
-
+    //
+//
     @RequestMapping(value = "/queryOutboundList", method = RequestMethod.GET)
     public Result queryOutboundList
-            (@RequestParam(value = "currentPage", required = false) int currentPage,
-             @RequestParam(value = "pageSize", required = false) int pageSize) {
+    (@RequestParam(value = "currentPage", required = false) int currentPage,
+     @RequestParam(value = "pageSize", required = false) int pageSize) {
         int offset = (currentPage - 1) * pageSize;
         List<Outbound> outboundList = outboundMapper.queryOutboundList(offset, pageSize);
         return new Result(200, null, outboundList);
+    }
+
+    @RequestMapping(value = "/queryOutboundListCount", method = RequestMethod.GET)
+    public Result queryOutboundCount
+            (@RequestParam(value = "currentPage", required = false) int currentPage,
+             @RequestParam(value = "pageSize", required = false) int pageSize) {
+        int offset = (currentPage - 1) * pageSize;
+        int outboundsCount = outboundMapper.queryOutboundListCount();
+        return new Result(200, null, outboundsCount);
     }
 
     @RequestMapping(value = "/queryExistingInventoryAmount", method = RequestMethod.GET)
@@ -210,6 +207,5 @@ public class OutboundController {
         int existingInventoryAmount = outboundMapper.queryExistingInventoryAmount(itemId);
         return new Result(200, null, existingInventoryAmount);
     }
-
 
 }
