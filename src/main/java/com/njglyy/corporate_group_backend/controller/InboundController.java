@@ -38,7 +38,7 @@ public class InboundController {
 
 
             inboundMapper.addInboundDetail(newInboundNoString, inboundDetail.getItemId(),
-                    (-inboundDetail.getItemAmount()), "冲红");
+                    inboundDetail.getItemAmount().negate(), "冲红");
         }
 
 
@@ -142,7 +142,7 @@ public class InboundController {
 
             InboundDetail dialogInboundDetailOld = dialogInboundDetail.get(0);
             InboundDetail dialogInboundDetailNew = dialogInboundDetail.get(1);
-            if (dialogInboundDetailNew.getItemAmount() == 0)
+            if (dialogInboundDetailNew.getItemAmount().equals(0))
                 return new Result(400, "数量不能为0！", null);
             if (dialogInboundDetailOld.getId() == 0) {
                 inboundMapper.addInboundDetail(dialogInboundDetailNew.getInboundNo(), dialogInboundDetailNew.getItemId(),

@@ -13,13 +13,13 @@ public class InboundDetail {
     private int id;
     private String inboundNo;
     private int itemId;
-    private int itemAmount;
+    private BigDecimal itemAmount;
     private String remark;
     private Item item;
     public BigDecimal getInboundDetailPriceExcludingTax() {
         if (item!=null  && item.getUnitPriceExcludingTax() != null) {
             return item.getUnitPriceExcludingTax()
-                    .multiply(BigDecimal.valueOf(itemAmount))
+                    .multiply(itemAmount)
                     .setScale(10, BigDecimal.ROUND_HALF_UP);
         }
         return BigDecimal.ZERO;
@@ -28,7 +28,7 @@ public class InboundDetail {
     public BigDecimal getInboundDetailPriceIncludingTax() {
         if (item!=null  && item.getUnitPriceExcludingTax() != null) {
             return item.getUnitPriceExcludingTax()
-                    .multiply(BigDecimal.valueOf(itemAmount))
+                    .multiply(itemAmount)
                     .multiply(BigDecimal.valueOf(1.13))
                     .setScale(10, BigDecimal.ROUND_HALF_UP);
         }
@@ -38,7 +38,7 @@ public class InboundDetail {
     public BigDecimal getInboundDetailTax() {
         if (item!=null &&  item.getUnitPriceExcludingTax() != null) {
             return item.getUnitPriceExcludingTax()
-                    .multiply(BigDecimal.valueOf(itemAmount))
+                    .multiply(itemAmount)
                     .multiply(BigDecimal.valueOf(0.13))
                     .setScale(10, BigDecimal.ROUND_HALF_UP);
         }
