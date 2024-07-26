@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.annotations.Result;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -69,7 +70,7 @@ public interface OutboundMapper {
 
     @Insert("INSERT INTO dbo.outbound_detail_list " +
             " values(#{outboundNo}, #{itemId}, #{itemAmount},#{remark})")
-    void addOutboundDetail(String outboundNo, int itemId, int itemAmount,String remark);
+    void addOutboundDetail(String outboundNo, int itemId, BigDecimal itemAmount, String remark);
 
 
     @Delete("DELETE FROM outbound_detail_list " +
@@ -85,7 +86,7 @@ public interface OutboundMapper {
     @Update("UPDATE dbo.outbound_detail_list " +
             " set outbound_no = #{outboundNo},item_id=#{itemId},item_amount=#{itemAmount},remark=#{remark} " +
             "where id= #{id}")
-    void updateOutboundDetailById(int id,String outboundNo, int itemId, int itemAmount,String remark);
+    void updateOutboundDetailById(int id,String outboundNo, int itemId, BigDecimal itemAmount,String remark);
 
 
 

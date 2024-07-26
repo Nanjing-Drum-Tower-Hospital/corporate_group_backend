@@ -13,32 +13,32 @@ public class OutboundDetail {
     private int id;
     private String outboundNo;
     private int itemId;
-    private int itemAmount;
+    private BigDecimal itemAmount;
     private String remark;
     private Item item;
     public BigDecimal getOutboundDetailPriceExcludingTax() {
         if (item!=null  && item.getUnitPriceExcludingTax() != null) {
             return item.getUnitPriceExcludingTax()
-                    .multiply(BigDecimal.valueOf(itemAmount))
-                    .setScale(10, BigDecimal.ROUND_HALF_UP);
+                    .multiply(itemAmount)
+                    .setScale(20, BigDecimal.ROUND_HALF_UP);
         }
         return BigDecimal.ZERO;
     }
     public BigDecimal getOutboundDetailPriceIncludingTax() {
         if (item!=null  && item.getUnitPriceExcludingTax() != null) {
             return item.getUnitPriceExcludingTax()
-                    .multiply(BigDecimal.valueOf(itemAmount))
+                    .multiply(itemAmount)
                     .multiply(BigDecimal.valueOf(1.13))
-                    .setScale(10, BigDecimal.ROUND_HALF_UP);
+                    .setScale(20, BigDecimal.ROUND_HALF_UP);
         }
         return BigDecimal.ZERO;
     }
     public BigDecimal getOutboundDetailTax() {
         if (item!=null &&  item.getUnitPriceExcludingTax() != null) {
             return item.getUnitPriceExcludingTax()
-                    .multiply(BigDecimal.valueOf(itemAmount))
+                    .multiply(itemAmount)
                     .multiply(BigDecimal.valueOf(0.13))
-                    .setScale(10, BigDecimal.ROUND_HALF_UP);
+                    .setScale(20, BigDecimal.ROUND_HALF_UP);
         }
         return BigDecimal.ZERO;
     }

@@ -20,7 +20,7 @@ public class InboundDetail {
         if (item!=null  && item.getUnitPriceExcludingTax() != null) {
             return item.getUnitPriceExcludingTax()
                     .multiply(itemAmount)
-                    .setScale(10, BigDecimal.ROUND_HALF_UP);
+                    .setScale(20, BigDecimal.ROUND_HALF_UP);
         }
         return BigDecimal.ZERO;
     }
@@ -30,7 +30,7 @@ public class InboundDetail {
             return item.getUnitPriceExcludingTax()
                     .multiply(itemAmount)
                     .multiply(BigDecimal.valueOf(1.13))
-                    .setScale(10, BigDecimal.ROUND_HALF_UP);
+                    .setScale(20, BigDecimal.ROUND_HALF_UP);
         }
         return BigDecimal.ZERO;
     }
@@ -40,7 +40,7 @@ public class InboundDetail {
             return item.getUnitPriceExcludingTax()
                     .multiply(itemAmount)
                     .multiply(BigDecimal.valueOf(0.13))
-                    .setScale(10, BigDecimal.ROUND_HALF_UP);
+                    .setScale(20, BigDecimal.ROUND_HALF_UP);
         }
         return BigDecimal.ZERO;
     }

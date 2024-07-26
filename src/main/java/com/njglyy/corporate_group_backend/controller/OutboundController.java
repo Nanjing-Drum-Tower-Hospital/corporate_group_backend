@@ -38,7 +38,7 @@ public class OutboundController {
 
 
             outboundMapper.addOutboundDetail(newOutboundNoString, outboundDetail.getItemId(),
-                    (-outboundDetail.getItemAmount()), "冲红");
+                    outboundDetail.getItemAmount().negate(), "冲红");
         }
 
 
@@ -141,7 +141,7 @@ public class OutboundController {
 
             OutboundDetail dialogOutboundDetailOld = dialogOutboundDetail.get(0);
             OutboundDetail dialogOutboundDetailNew = dialogOutboundDetail.get(1);
-            if (dialogOutboundDetailNew.getItemAmount() == 0)
+            if (dialogOutboundDetailNew.getItemAmount().equals(0))
                 return new Result(400, "数量不能为0！", null);
             if (dialogOutboundDetailOld.getId() == 0) {
                 outboundMapper.addOutboundDetail(dialogOutboundDetailNew.getOutboundNo(), dialogOutboundDetailNew.getItemId(),
