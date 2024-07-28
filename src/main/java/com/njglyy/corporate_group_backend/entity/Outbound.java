@@ -18,6 +18,7 @@ public class Outbound implements Cloneable{
     private String accountingReversalOutboundNo;
     private String entryType;
     private List<OutboundDetail> outboundDetailList;
+    private CheckOut checkOut;
     @Override
     public Outbound clone() {
         try {

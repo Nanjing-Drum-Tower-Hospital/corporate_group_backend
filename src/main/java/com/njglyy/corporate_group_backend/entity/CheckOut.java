@@ -16,5 +16,5 @@ public class CheckOut {
     private LocalDate checkOutEndDate;
     private LocalDate createDate;
     private String remark;
-
+    private String validity;
 }

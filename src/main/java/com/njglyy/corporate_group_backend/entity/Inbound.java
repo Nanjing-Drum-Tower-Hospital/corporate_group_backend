@@ -20,6 +20,7 @@ public class Inbound implements Cloneable{
     private String entryType;
     private Supplier supplier;
     private List<InboundDetail> inboundDetailList;
+    private CheckOut checkOut;
 
     @Override
     public Inbound clone() {

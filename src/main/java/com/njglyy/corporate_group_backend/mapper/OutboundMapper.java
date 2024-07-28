@@ -39,7 +39,10 @@ public interface OutboundMapper {
             @Result(property = "accountingReversalOutboundNo", column = "accounting_reversal_outbound_no"),
             @Result(property = "entryType", column = "entry_type"),
             @Result(property = "outboundDetailList", column = "outbound_no",
-                    many = @Many(select = "queryOutboundDetailListByOutboundNo"))
+                    many = @Many(select = "queryOutboundDetailListByOutboundNo")),
+            @Result(property = "checkOut", column = "outbound_date",
+                    one = @One(select = "com.njglyy.corporate_group_backend.mapper.CheckOutMapper.queryOutboundValidCheckOutByDate")
+            ),
     })
     List<Outbound> queryOutboundList(int offset, int pageSize);
 

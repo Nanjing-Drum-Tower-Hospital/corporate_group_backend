@@ -42,7 +42,10 @@ public interface InboundMapper {
             @Result(property = "supplier", column = "supplier_id",
                     one = @One(select = "com.njglyy.corporate_group_backend.mapper.SupplierMapper.querySupplierById")),
             @Result(property = "inboundDetailList", column = "inbound_no",
-                    many = @Many(select = "queryInboundDetailListByInboundNo"))
+                    many = @Many(select = "queryInboundDetailListByInboundNo")),
+            @Result(property = "checkOut", column = "inbound_date",
+                    one = @One(select = "com.njglyy.corporate_group_backend.mapper.CheckOutMapper.queryInboundValidCheckOutByDate")
+            ),
     })
     List<Inbound> queryInboundList(int offset, int pageSize);
 
