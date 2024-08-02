@@ -1,10 +1,8 @@
 package com.njglyy.corporate_group_backend.controller;
 
-import com.njglyy.corporate_group_backend.entity.Inbound;
-import com.njglyy.corporate_group_backend.entity.InboundDetail;
-import com.njglyy.corporate_group_backend.entity.Outbound;
-import com.njglyy.corporate_group_backend.entity.Result;
+import com.njglyy.corporate_group_backend.entity.*;
 import com.njglyy.corporate_group_backend.mapper.InboundMapper;
+import org.apache.commons.io.IOUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -13,12 +11,16 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.util.List;
+
+
 
 @RestController
 @CrossOrigin
@@ -46,12 +48,12 @@ public class StatementController {
 
         // Populate details
         int rowNum = 1;
-        for (InboundDetail detail : inbound.getInboundDetailList()) {
+        for (InboundDetail detail : inboundDB.getInboundDetailList()) {
             Row row = sheet.createRow(rowNum++);
             row.createCell(0).setCellValue(detail.getItem().getCode());
             row.createCell(1).setCellValue(detail.getItem().getName());
             row.createCell(2).setCellValue(detail.getItem().getUnitName());
-            row.createCell(3).setCellValue(detail.getItemAmount().doubleValue());
+            row.createCell(3).setCellValue(String.valueOf(detail.getItemAmount()));
             row.createCell(4).setCellValue(String.valueOf(detail.getItem().getUnitPriceExcludingTax().setScale(2, RoundingMode.HALF_UP)));
             row.createCell(5).setCellValue(String.valueOf(detail.getInboundDetailTax().setScale(2, RoundingMode.HALF_UP)));
             row.createCell(6).setCellValue(String.valueOf(detail.getInboundDetailPriceExcludingTax().setScale(2, RoundingMode.HALF_UP)));
@@ -60,6 +62,15 @@ public class StatementController {
             row.createCell(9).setCellValue("13%");
         }
 
+// Insert blank row
+        sheet.createRow(rowNum++);
+
+// Continue with more data after the blank row
+        Row nextRow = sheet.createRow(rowNum++);
+        nextRow.createCell(0).setCellValue(String.valueOf("合计"));
+        nextRow.createCell(5).setCellValue(String.valueOf(inboundDB.getInboundTax().setScale(2, RoundingMode.HALF_UP)));
+        nextRow.createCell(6).setCellValue(String.valueOf(inboundDB.getInboundPriceExcludingTax().setScale(2, RoundingMode.HALF_UP)));
+        nextRow.createCell(8).setCellValue(String.valueOf(inboundDB.getInboundPriceIncludingTax().setScale(2, RoundingMode.HALF_UP)));
         // Auto size columns
         for (int i = 0; i < headers.length; i++) {
             sheet.autoSizeColumn(i);
@@ -81,9 +92,26 @@ public class StatementController {
             }
         }
 
+        try {
+            FileInputStream fileInputStream = new FileInputStream(filePath);
+            byte[] bytes = IOUtils.toByteArray(fileInputStream);
+            String base64 = Base64.getEncoder().encodeToString(bytes);
+            FileData fileData = new FileData();
+            fileData.setFileName(filePath);
+            fileData.setFileContent(base64);
+            Result result = new Result();
+            result.setCode(200); // Success code
+            result.setMessage("导出成功！");
+            result.setData(fileData);
+
+            return result;
+        } catch (Exception e) {
+            // Handle exceptions
+            return new Result(400, "生成失败！", null);
+        }
 
 
-        return new Result(200, "导出成功！", null);
+
 
     }
 
