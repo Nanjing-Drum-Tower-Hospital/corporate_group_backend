@@ -11,20 +11,24 @@ public interface ManufacturerMapper {
     @Insert("   insert into manufacturer_dictionary  values (#{manufacturerName},#{pinyinCode})")
     void addManufacturer(String manufacturerName,String pinyinCode);
 
+    @Delete("delete from manufacturer_dictionary where id=#{id}")
+    void deleteManufacturer(int id);
 
     @Update("   update manufacturer_dictionary  set manufacturer_name=#{manufacturerName},pinyin_code=#{pinyinCode} where id=#{id}")
     void updateManufacturer(int id,String manufacturerName,String pinyinCode);
 
-    @Select("select * from manufacturer_dictionary")
+    @Select("select * from manufacturer_dictionary " +
+            "order by id "+
+            "OFFSET #{offset} ROWS FETCH NEXT #{pageSize} ROWS ONLY ")
     @Results({
             @Result(property = "id", column = "id"),
             @Result(property = "manufacturerName", column = "manufacturer_name"),
             @Result(property = "pinyinCode", column = "pinyin_code")
     })
-    List<Manufacturer> queryManufacturerList();
+    List<Manufacturer> queryManufacturerList(int offset, int pageSize);
 
-    @Delete("delete from manufacturer_dictionary where id=#{id}")
-    void deleteManufacturer(int id);
+    @Select("SELECT COUNT(*) FROM manufacturer_dictionary")
+    int queryManufacturersCount();
 
 
     @Select("select * from manufacturer_dictionary where id = #{id}")

@@ -19,7 +19,6 @@ public class ManufacturerController {
     public Result addOrUpdateManufacturer
             (@RequestBody Manufacturer manufacturer
             ) {
-        System.out.println(manufacturer);
         if(manufacturer.getManufacturerName() == null){
             return new Result(400,"供应商名称不能为空！",null);
         }
@@ -36,21 +35,6 @@ public class ManufacturerController {
         return new Result(200,"添加成功！",null);
     }
 
-
-    @RequestMapping(value = "/queryManufacturerList", method = RequestMethod.GET)
-    public Result queryManufacturerList
-            () {
-        try {
-            List<Manufacturer> manufacturerList = manufacturerMapper.queryManufacturerList();
-            return new Result(200, null, manufacturerList);
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-            return new Result(500, "Error querying manufacturer list: " + e.getMessage(), null);
-        }
-    }
-
-
     @RequestMapping(value = "/deleteManufacturer", method = RequestMethod.GET)
     public Result deleteManufacturer
             (@RequestParam(value = "id", required = false) int id
@@ -58,4 +42,24 @@ public class ManufacturerController {
         manufacturerMapper.deleteManufacturer(id);
         return new Result(200, "删除成功！", null);
     }
+
+    @RequestMapping(value = "/queryManufacturerList", method = RequestMethod.GET)
+    public Result queryManufacturerList
+            (@RequestParam(value = "currentPage", required = false) int currentPage,
+             @RequestParam(value = "pageSize", required = false) int pageSize) {
+        int offset = (currentPage - 1) * pageSize;
+        List<Manufacturer> manufacturerList = manufacturerMapper.queryManufacturerList(offset, pageSize);
+        return new Result(200, null, manufacturerList);
+    }
+
+    @RequestMapping(value = "/queryManufacturersCount", method = RequestMethod.GET)
+    public Result queryManufacturersCount
+            (@RequestParam(value = "currentPage", required = false) int currentPage,
+             @RequestParam(value = "pageSize", required = false) int pageSize) {
+        int manufacturersCount = manufacturerMapper.queryManufacturersCount();
+        return new Result(200, null, manufacturersCount);
+    }
+
+
+
 }
