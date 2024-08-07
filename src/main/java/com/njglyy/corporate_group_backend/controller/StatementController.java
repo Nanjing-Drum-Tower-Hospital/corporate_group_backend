@@ -206,7 +206,10 @@ public class StatementController {
 
 
     }
-
+    // Method to format value with replacement if zero
+    private String getFormattedValue(BigDecimal value) {
+        return value.compareTo(BigDecimal.ZERO) == 0 ? "0.0000000000" : String.valueOf(value.setScale(10, RoundingMode.HALF_UP));
+    }
 
     @RequestMapping(value = "/inventoryManagementStatement", method = RequestMethod.GET)
     public Result inventoryManagementStatement
@@ -284,12 +287,8 @@ public class StatementController {
                     }
                     row.createCell(3).setCellValue(String.valueOf(initialItemAmount));
                     BigDecimal totalInitialItemPrice = item.getUnitPriceExcludingTax().multiply(initialItemAmount);
-                    row.createCell(4).setCellValue(item.getUnitPriceExcludingTax().setScale(10, RoundingMode.HALF_UP).toString());
-                    if (totalInitialItemPrice.compareTo(BigDecimal.ZERO) == 0) {
-                        row.createCell(5).setCellValue("0.0000000000");
-                    } else {
-                        row.createCell(5).setCellValue(totalInitialItemPrice.setScale(10, RoundingMode.HALF_UP).toString());
-                    }
+                    row.createCell(4).setCellValue(getFormattedValue(item.getUnitPriceExcludingTax()));
+                    row.createCell(5).setCellValue(getFormattedValue(totalInitialItemPrice));
                     totalInitialManufacturerPrice=totalInitialManufacturerPrice.add(totalInitialItemPrice);
 
 
@@ -308,13 +307,8 @@ public class StatementController {
                     }
                     row.createCell(6).setCellValue(String.valueOf(inboundItemAmount));
                     BigDecimal totalInboundItemPrice = item.getUnitPriceExcludingTax().multiply(inboundItemAmount);
-                    row.createCell(7).setCellValue(item.getUnitPriceExcludingTax().setScale(10, RoundingMode.HALF_UP).toString());
-
-                    if (totalInboundItemPrice.compareTo(BigDecimal.ZERO) == 0) {
-                        row.createCell(8).setCellValue("0.0000000000");
-                    } else {
-                        row.createCell(8).setCellValue(totalInboundItemPrice.setScale(10, RoundingMode.HALF_UP).toString());
-                    }
+                    row.createCell(7).setCellValue(getFormattedValue(item.getUnitPriceExcludingTax()));
+                    row.createCell(8).setCellValue(getFormattedValue(totalInboundItemPrice));
                     totalInboundManufacturerPrice=totalInboundManufacturerPrice.add(totalInboundItemPrice);
 
 
@@ -334,13 +328,8 @@ public class StatementController {
                     }
                     row.createCell(9).setCellValue(String.valueOf(outboundItemAmount));
                     BigDecimal totalOutboundItemPrice = item.getUnitPriceExcludingTax().multiply(outboundItemAmount);
-                    row.createCell(10).setCellValue(item.getUnitPriceExcludingTax().setScale(10, RoundingMode.HALF_UP).toString());
-
-                    if (totalOutboundItemPrice.compareTo(BigDecimal.ZERO) == 0) {
-                        row.createCell(11).setCellValue("0.0000000000");
-                    } else {
-                        row.createCell(11).setCellValue(totalOutboundItemPrice.setScale(10, RoundingMode.HALF_UP).toString());
-                    }
+                    row.createCell(10).setCellValue(getFormattedValue(item.getUnitPriceExcludingTax()));
+                    row.createCell(11).setCellValue(getFormattedValue(totalOutboundItemPrice));
                     totalOutboundManufacturerPrice=totalOutboundManufacturerPrice.add(totalOutboundItemPrice);
 
 
@@ -365,22 +354,19 @@ public class StatementController {
                     }
                     row.createCell(12).setCellValue(String.valueOf(finalItemAmount));
                     BigDecimal totalFinalItemPrice = item.getUnitPriceExcludingTax().multiply(finalItemAmount);
-                    row.createCell(13).setCellValue(item.getUnitPriceExcludingTax().setScale(10, RoundingMode.HALF_UP).toString());
-                    if (totalFinalItemPrice.compareTo(BigDecimal.ZERO) == 0) {
-                        row.createCell(14).setCellValue("0.0000000000");
-                    } else {
-                        row.createCell(14).setCellValue(totalFinalItemPrice.setScale(10, RoundingMode.HALF_UP).toString());
-                    }
+                    row.createCell(13).setCellValue(getFormattedValue(item.getUnitPriceExcludingTax()));
+                    row.createCell(14).setCellValue(getFormattedValue(totalFinalItemPrice));
                     totalFinalManufacturerPrice=totalFinalManufacturerPrice.add(totalFinalItemPrice);
                 }
             }
 
             Row nextRow = sheet.createRow(rowNum++);
+
             nextRow.createCell(0).setCellValue("小计（" + manufacturer.getManufacturerName() + "）");
-            nextRow.createCell(5).setCellValue(String.valueOf(totalInitialManufacturerPrice.setScale(10, RoundingMode.HALF_UP)));
-            nextRow.createCell(8).setCellValue(String.valueOf(totalInboundManufacturerPrice.setScale(10, RoundingMode.HALF_UP)));
-            nextRow.createCell(11).setCellValue(String.valueOf(totalOutboundManufacturerPrice.setScale(10, RoundingMode.HALF_UP)));
-            nextRow.createCell(14).setCellValue(String.valueOf(totalFinalManufacturerPrice.setScale(10, RoundingMode.HALF_UP)));
+            nextRow.createCell(5).setCellValue(getFormattedValue(totalInitialManufacturerPrice));
+            nextRow.createCell(8).setCellValue(getFormattedValue(totalInboundManufacturerPrice));
+            nextRow.createCell(11).setCellValue(getFormattedValue(totalOutboundManufacturerPrice));
+            nextRow.createCell(14).setCellValue(getFormattedValue(totalFinalManufacturerPrice));
         }
         Row nextRow = sheet.createRow(rowNum++);
         nextRow.createCell(0).setCellValue("合计");
