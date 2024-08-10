@@ -30,6 +30,9 @@ public class CheckOutController {
         if(beginDate.isAfter(endDate)){
             return new Result(400, "结账开始日期不能晚于结账结束日期！", null);
         }
+        if (endDate.isAfter(LocalDate.now())) {
+            return new Result(400, "结账结束日期不得晚于当前时间！", null);
+        }
         if(lastCheckOut==null){
             checkOutMapper.addCheckOut(type,beginDate,endDate,LocalDate.now(),remark,"valid");
             return new Result(200, "添加成功！", null);
@@ -40,8 +43,6 @@ public class CheckOutController {
         if (!lastCheckOut.getCheckOutEndDate().plusDays(1).equals(beginDate)) {
             return new Result(400, "结账开始日期必须在上一次结账结束日期的后一天！", null);
         }
-        System.out.println(LocalDate.now());
-
         checkOutMapper.addCheckOut(type,beginDate,endDate,LocalDate.now(),remark,"valid");
         return new Result(200, "添加成功！", null);
     }

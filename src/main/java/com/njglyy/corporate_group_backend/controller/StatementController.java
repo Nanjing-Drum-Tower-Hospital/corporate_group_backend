@@ -255,6 +255,10 @@ public class StatementController {
         List<Manufacturer> manufacturerList = manufacturerMapper.queryManufacturerList(0, Integer.MAX_VALUE);
         List<Item> itemList = itemMapper.queryItemsByCondition(null,null,null,0, Integer.MAX_VALUE);
         int rowNum = 1;
+        BigDecimal totalInitialPrice = new BigDecimal(0);
+        BigDecimal totalInboundPrice = new BigDecimal(0);
+        BigDecimal totalOutboundPrice = new BigDecimal(0);
+        BigDecimal totalFinalPrice = new BigDecimal(0);
         for (Manufacturer manufacturer : manufacturerList) {
             BigDecimal totalInitialManufacturerPrice = new BigDecimal(0);
             BigDecimal totalInboundManufacturerPrice = new BigDecimal(0);
@@ -290,6 +294,7 @@ public class StatementController {
                     row.createCell(4).setCellValue(getFormattedValue(item.getUnitPriceExcludingTax()));
                     row.createCell(5).setCellValue(getFormattedValue(totalInitialItemPrice));
                     totalInitialManufacturerPrice=totalInitialManufacturerPrice.add(totalInitialItemPrice);
+                    totalInitialPrice=totalInitialPrice.add(totalInitialManufacturerPrice);
 
 
 
@@ -310,7 +315,7 @@ public class StatementController {
                     row.createCell(7).setCellValue(getFormattedValue(item.getUnitPriceExcludingTax()));
                     row.createCell(8).setCellValue(getFormattedValue(totalInboundItemPrice));
                     totalInboundManufacturerPrice=totalInboundManufacturerPrice.add(totalInboundItemPrice);
-
+                    totalInboundPrice=totalInboundPrice.add(totalInboundManufacturerPrice);
 
 
 
@@ -331,6 +336,7 @@ public class StatementController {
                     row.createCell(10).setCellValue(getFormattedValue(item.getUnitPriceExcludingTax()));
                     row.createCell(11).setCellValue(getFormattedValue(totalOutboundItemPrice));
                     totalOutboundManufacturerPrice=totalOutboundManufacturerPrice.add(totalOutboundItemPrice);
+                    totalOutboundPrice=totalOutboundPrice.add(totalOutboundManufacturerPrice);
 
 
                     BigDecimal finalItemAmount = new BigDecimal(0);
@@ -357,6 +363,7 @@ public class StatementController {
                     row.createCell(13).setCellValue(getFormattedValue(item.getUnitPriceExcludingTax()));
                     row.createCell(14).setCellValue(getFormattedValue(totalFinalItemPrice));
                     totalFinalManufacturerPrice=totalFinalManufacturerPrice.add(totalFinalItemPrice);
+                    totalFinalPrice=totalFinalPrice.add(totalFinalManufacturerPrice);
                 }
             }
 
@@ -370,10 +377,19 @@ public class StatementController {
         }
         Row nextRow = sheet.createRow(rowNum++);
         nextRow.createCell(0).setCellValue("合计");
-
+        nextRow.createCell(5).setCellValue(getFormattedValue(totalInitialPrice));
+        nextRow.createCell(8).setCellValue(getFormattedValue(totalInboundPrice));
+        nextRow.createCell(11).setCellValue(getFormattedValue(totalOutboundPrice));
+        nextRow.createCell(14).setCellValue(getFormattedValue(totalFinalPrice));
 
         nextRow = sheet.createRow(rowNum++);
         nextRow.createCell(0).setCellValue("合计（保留小数点后2位)");
+        nextRow.createCell(5).setCellValue(totalInitialPrice.setScale(2, RoundingMode.HALF_UP).toString());
+        nextRow.createCell(8).setCellValue(totalInboundPrice.setScale(2, RoundingMode.HALF_UP).toString());
+        nextRow.createCell(11).setCellValue(totalOutboundPrice.setScale(2, RoundingMode.HALF_UP).toString());
+        nextRow.createCell(14).setCellValue(totalFinalPrice.setScale(2, RoundingMode.HALF_UP).toString());
+
+
 
 //        // Auto size columns
         for (int i = 0; i < headers.length; i++) {
