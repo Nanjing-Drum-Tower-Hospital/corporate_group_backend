@@ -36,6 +36,8 @@ public class StatementController {
     private ManufacturerMapper manufacturerMapper;
     @Autowired
     private CheckOutMapper checkOutMapper;
+    @Autowired
+    private UnitRatioMapper unitRatioMapper;
 
     @RequestMapping(value = "/exportInboundStatement", method = RequestMethod.POST)
     public Result exportInboundStatement
@@ -214,10 +216,14 @@ public class StatementController {
     @RequestMapping(value = "/inventoryManagementStatement", method = RequestMethod.GET)
     public Result inventoryManagementStatement
             (@RequestParam(value = "beginDate", required = false) LocalDate beginDate,
-             @RequestParam(value = "endDate", required = false) LocalDate endDate
+             @RequestParam(value = "endDate", required = false) LocalDate endDate,
+                @RequestParam(value = "mainUnitName", required = false) String mainUnitName
             ) {
         if (beginDate == null || endDate == null) {
             return new Result(400, "日期不能为空！", null);
+        }
+        if (mainUnitName == null) {
+            return new Result(400, "合计单位不能为空！", null);
         }
         if (beginDate.isAfter(endDate)) {
             return new Result(400, "开始日期不能晚于结束日期！", null);
@@ -259,17 +265,29 @@ public class StatementController {
         BigDecimal totalInboundPrice = new BigDecimal(0);
         BigDecimal totalOutboundPrice = new BigDecimal(0);
         BigDecimal totalFinalPrice = new BigDecimal(0);
+        BigDecimal totalInitialCount = new BigDecimal(0);
+        BigDecimal totalInboundCount = new BigDecimal(0);
+        BigDecimal totalOutboundCount = new BigDecimal(0);
+        BigDecimal totalFinalCount = new BigDecimal(0);
+
         for (Manufacturer manufacturer : manufacturerList) {
             BigDecimal totalInitialManufacturerPrice = new BigDecimal(0);
             BigDecimal totalInboundManufacturerPrice = new BigDecimal(0);
             BigDecimal totalOutboundManufacturerPrice = new BigDecimal(0);
             BigDecimal totalFinalManufacturerPrice = new BigDecimal(0);
+            BigDecimal totalInitialManufacturerCount = new BigDecimal(0);
+            BigDecimal totalInboundManufacturerCount = new BigDecimal(0);
+            BigDecimal totalOutboundManufacturerCount = new BigDecimal(0);
+            BigDecimal totalFinalManufacturerCount = new BigDecimal(0);
             for (Item item : itemList){
                 if(item.getManufacturerId() == manufacturer.getId()){
                     Row row = sheet.createRow(rowNum++);
                     row.createCell(0).setCellValue(item.getName());
                     row.createCell(1).setCellValue(item.getType());
                     row.createCell(2).setCellValue(item.getUnitName());
+
+
+
                     BigDecimal initialItemAmount = new BigDecimal(0);
                     for(Inbound inbound : inboundList){
                         if(inbound.getInboundDate().isBefore(beginDate)){
@@ -290,6 +308,8 @@ public class StatementController {
                         }
                     }
                     row.createCell(3).setCellValue(String.valueOf(initialItemAmount));
+
+
                     BigDecimal totalInitialItemPrice = item.getUnitPriceExcludingTax().multiply(initialItemAmount);
                     row.createCell(4).setCellValue(getFormattedValue(item.getUnitPriceExcludingTax()));
                     row.createCell(5).setCellValue(getFormattedValue(totalInitialItemPrice));
@@ -305,7 +325,6 @@ public class StatementController {
                             for(InboundDetail inboundDetail : inbound.getInboundDetailList()){
                                 if(inboundDetail.getItemId() == item.getId()){
                                     inboundItemAmount = inboundItemAmount.add(inboundDetail.getItemAmount()) ;
-                                    System.out.println(inboundDetail.getItemAmount());
                                 }
                             }
                         }
@@ -326,7 +345,6 @@ public class StatementController {
                             for(OutboundDetail outboundDetail : outbound.getOutboundDetailList()){
                                 if(outboundDetail.getItemId() == item.getId()){
                                     outboundItemAmount = outboundItemAmount.add(outboundDetail.getItemAmount()) ;
-                                    System.out.println(outboundDetail.getItemAmount());
                                 }
                             }
                         }
@@ -364,29 +382,79 @@ public class StatementController {
                     row.createCell(14).setCellValue(getFormattedValue(totalFinalItemPrice));
                     totalFinalManufacturerPrice=totalFinalManufacturerPrice.add(totalFinalItemPrice);
                     totalFinalPrice=totalFinalPrice.add(totalFinalManufacturerPrice);
+
+                    UnitRatio unitRatio = unitRatioMapper.queryUnitRatioByUnitName(item.getUnitName(),mainUnitName);
+                    if(item.getUnitName().equals(mainUnitName)){
+                        totalInitialManufacturerCount=totalInitialManufacturerCount.add(initialItemAmount);
+                        totalInboundManufacturerCount=totalInboundManufacturerCount.add(inboundItemAmount);
+                        totalOutboundManufacturerCount=totalOutboundManufacturerCount.add(outboundItemAmount);
+                        totalFinalManufacturerCount=totalFinalManufacturerCount.add(finalItemAmount);
+                    }
+                    else{
+                        if(unitRatio==null){
+                            return new Result(400, item.getUnitName()+"与"+mainUnitName+"的单位换算关系不存在！", null);
+                        }
+                        else{
+                            if(unitRatio.getUnitNameLeft().equals(mainUnitName)){
+                                totalInitialManufacturerCount=totalInitialManufacturerCount.add(initialItemAmount.divide(new BigDecimal(unitRatio.getRatio()),1, RoundingMode.HALF_UP));
+                                totalInboundManufacturerCount=totalInboundManufacturerCount.add(inboundItemAmount.divide(new BigDecimal(unitRatio.getRatio()),1, RoundingMode.HALF_UP));
+                                totalOutboundManufacturerCount=totalOutboundManufacturerCount.add(outboundItemAmount.divide(new BigDecimal(unitRatio.getRatio()),1, RoundingMode.HALF_UP));
+                                totalFinalManufacturerCount=totalFinalManufacturerCount.add(finalItemAmount.divide(new BigDecimal(unitRatio.getRatio()),1, RoundingMode.HALF_UP));
+                            }
+                            else{
+                                totalInitialManufacturerCount=totalInitialManufacturerCount.add(initialItemAmount.multiply(new BigDecimal(unitRatio.getRatio())));
+                                totalInboundManufacturerCount=totalInboundManufacturerCount.add(inboundItemAmount.multiply(new BigDecimal(unitRatio.getRatio())));
+                                totalOutboundManufacturerCount=totalOutboundManufacturerCount.add(outboundItemAmount.multiply(new BigDecimal(unitRatio.getRatio())));
+                                totalFinalManufacturerCount=totalFinalManufacturerCount.add(finalItemAmount.multiply(new BigDecimal(unitRatio.getRatio())));
+                                System.out.println(initialItemAmount);
+                                System.out.println(unitRatio.getRatio());
+                                System.out.println(totalInitialManufacturerCount);
+
+                            }
+                        }
+                    }
+
                 }
+
             }
-
+            totalInitialCount=totalInitialCount.add(totalInitialManufacturerCount);
+            totalInboundCount=totalInboundCount.add(totalInboundManufacturerCount);
+            totalOutboundCount=totalOutboundCount.add(totalOutboundManufacturerCount);
+            totalFinalCount=totalFinalCount.add(totalFinalManufacturerCount);
             Row nextRow = sheet.createRow(rowNum++);
-
             nextRow.createCell(0).setCellValue("小计（" + manufacturer.getManufacturerName() + "）");
+            nextRow.createCell(2).setCellValue(mainUnitName);
+            nextRow.createCell(3).setCellValue(totalInitialManufacturerCount.toString());
             nextRow.createCell(5).setCellValue(getFormattedValue(totalInitialManufacturerPrice));
+            nextRow.createCell(6).setCellValue(totalInboundManufacturerCount.toString());
             nextRow.createCell(8).setCellValue(getFormattedValue(totalInboundManufacturerPrice));
+            nextRow.createCell(9).setCellValue(totalOutboundManufacturerCount.toString());
             nextRow.createCell(11).setCellValue(getFormattedValue(totalOutboundManufacturerPrice));
+            nextRow.createCell(12).setCellValue(totalFinalManufacturerCount.toString());
             nextRow.createCell(14).setCellValue(getFormattedValue(totalFinalManufacturerPrice));
         }
         Row nextRow = sheet.createRow(rowNum++);
         nextRow.createCell(0).setCellValue("合计");
+        nextRow.createCell(2).setCellValue(mainUnitName);
+        nextRow.createCell(3).setCellValue(totalInitialCount.toString());
         nextRow.createCell(5).setCellValue(getFormattedValue(totalInitialPrice));
+        nextRow.createCell(6).setCellValue(totalInboundCount.toString());
         nextRow.createCell(8).setCellValue(getFormattedValue(totalInboundPrice));
+        nextRow.createCell(9).setCellValue(totalOutboundCount.toString());
         nextRow.createCell(11).setCellValue(getFormattedValue(totalOutboundPrice));
+        nextRow.createCell(12).setCellValue(totalFinalCount.toString());
         nextRow.createCell(14).setCellValue(getFormattedValue(totalFinalPrice));
 
         nextRow = sheet.createRow(rowNum++);
         nextRow.createCell(0).setCellValue("合计（保留小数点后2位)");
+        nextRow.createCell(2).setCellValue(mainUnitName);
+        nextRow.createCell(3).setCellValue(totalInitialCount.toString());
         nextRow.createCell(5).setCellValue(totalInitialPrice.setScale(2, RoundingMode.HALF_UP).toString());
+        nextRow.createCell(6).setCellValue(totalInboundCount.toString());
         nextRow.createCell(8).setCellValue(totalInboundPrice.setScale(2, RoundingMode.HALF_UP).toString());
+        nextRow.createCell(9).setCellValue(totalOutboundCount.toString());
         nextRow.createCell(11).setCellValue(totalOutboundPrice.setScale(2, RoundingMode.HALF_UP).toString());
+        nextRow.createCell(12).setCellValue(totalFinalCount.toString());
         nextRow.createCell(14).setCellValue(totalFinalPrice.setScale(2, RoundingMode.HALF_UP).toString());
 
 
