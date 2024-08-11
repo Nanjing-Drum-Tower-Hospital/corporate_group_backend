@@ -30,7 +30,7 @@ public interface SupplierMapper {
     List<Supplier> querySupplierList(int offset, int pageSize);
 
     @Select("SELECT COUNT(*) FROM supplier_dictionary")
-    int querySuppliersCount();
+    int querySupplierListCount();
 
 
     @Select("select * from supplier_dictionary where id = #{id}")

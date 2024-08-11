@@ -58,7 +58,7 @@ public class ItemController {
         }
 
         int offset = (currentPage - 1) * pageSize;
-        List<Item> itemList = itemMapper.queryItemsByCondition(codeSQL, beginDateSQL, endDateSQL, offset, pageSize);
+        List<Item> itemList = itemMapper.queryItemListByCondition(codeSQL, beginDateSQL, endDateSQL, offset, pageSize);
 
 
         return new Result(200,null,itemList);
@@ -79,8 +79,8 @@ public class ItemController {
 //        return new Result(200,null,itemDetail);
 //    }
 
-    @RequestMapping(value = "/queryItemsCount", method = RequestMethod.GET)
-    public Result queryItemsCountByCondition
+    @RequestMapping(value = "/queryItemListCount", method = RequestMethod.GET)
+    public Result queryItemListCountByCondition
             (@RequestParam(value = "code", required = false) String code,
              @RequestParam(value = "beginDate", required = false)
              @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate beginDate,
@@ -104,9 +104,9 @@ public class ItemController {
             endDateSQL="and item_dictionary.create_date <= '"+endDate+"' ";
         }
 
-        int itemsCount = itemMapper.queryItemsCountByCondition(codeSQL, beginDateSQL, endDateSQL);
+        int itemListCount = itemMapper.queryItemListCountByCondition(codeSQL, beginDateSQL, endDateSQL);
 
-        return new Result(200,null,itemsCount);
+        return new Result(200,null,itemListCount);
     }
 
 

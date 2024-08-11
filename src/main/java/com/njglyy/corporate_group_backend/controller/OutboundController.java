@@ -125,9 +125,9 @@ public class OutboundController {
              @RequestParam(value = "pageSize", required = false) int pageSize) {
 
         int offset = (currentPage - 1) * pageSize;
-        int outboundDetailsCount = outboundMapper.queryOutboundDetailListCountByOutboundNo(outboundNo);
+        int outboundDetailListCount = outboundMapper.queryOutboundDetailListCountByOutboundNo(outboundNo);
 
-        return new Result(200, null, outboundDetailsCount);
+        return new Result(200, null, outboundDetailListCount);
     }
 
 
@@ -197,8 +197,8 @@ public class OutboundController {
             (@RequestParam(value = "currentPage", required = false) int currentPage,
              @RequestParam(value = "pageSize", required = false) int pageSize) {
         int offset = (currentPage - 1) * pageSize;
-        int outboundsCount = outboundMapper.queryOutboundListCount();
-        return new Result(200, null, outboundsCount);
+        int outboundListCount = outboundMapper.queryOutboundListCount();
+        return new Result(200, null, outboundListCount);
     }
 
     @RequestMapping(value = "/queryExistingInventoryAmount", method = RequestMethod.GET)

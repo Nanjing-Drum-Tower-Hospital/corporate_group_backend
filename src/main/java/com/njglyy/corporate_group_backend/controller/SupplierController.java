@@ -54,11 +54,11 @@ public class SupplierController {
         return new Result(200, null, supplierList);
     }
 
-    @RequestMapping(value = "/querySuppliersCount", method = RequestMethod.GET)
-    public Result querySuppliersCount
+    @RequestMapping(value = "/querySupplierListCount", method = RequestMethod.GET)
+    public Result querySupplierListCount
             (@RequestParam(value = "currentPage", required = false) int currentPage,
              @RequestParam(value = "pageSize", required = false) int pageSize) {
-        int suppliersCount = supplierMapper.querySuppliersCount();
-        return new Result(200, null, suppliersCount);
+        int supplierListCount = supplierMapper.querySupplierListCount();
+        return new Result(200, null, supplierListCount);
     }
 }

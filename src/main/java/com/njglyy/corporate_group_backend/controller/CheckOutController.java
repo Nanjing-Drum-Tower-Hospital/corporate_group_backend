@@ -83,7 +83,7 @@ public class CheckOutController {
         return new Result(200, null, checkOutList);
     }
     @RequestMapping(value = "/queryCheckOutListCount", method = RequestMethod.GET)
-    public Result countInboundDetailMachineNoCount
+    public Result queryCheckOutListCount
             (@RequestParam(value = "type", required = false) String type,
              @RequestParam(value = "currentPage", required = false) int currentPage,
              @RequestParam(value = "pageSize", required = false) int pageSize) {

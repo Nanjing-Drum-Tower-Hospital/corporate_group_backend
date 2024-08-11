@@ -28,7 +28,7 @@ public interface ManufacturerMapper {
     List<Manufacturer> queryManufacturerList(int offset, int pageSize);
 
     @Select("SELECT COUNT(*) FROM manufacturer_dictionary")
-    int queryManufacturersCount();
+    int queryManufacturerListCount();
 
 
     @Select("select * from manufacturer_dictionary where id = #{id}")

@@ -253,7 +253,7 @@ public class StatementController {
         List<Inbound> inboundList = inboundMapper.queryInboundList(0, Integer.MAX_VALUE);
         List<Outbound> outboundList = outboundMapper.queryOutboundList(0, Integer.MAX_VALUE);
         List<Manufacturer> manufacturerList = manufacturerMapper.queryManufacturerList(0, Integer.MAX_VALUE);
-        List<Item> itemList = itemMapper.queryItemsByCondition(null,null,null,0, Integer.MAX_VALUE);
+        List<Item> itemList = itemMapper.queryItemListByCondition(null,null,null,0, Integer.MAX_VALUE);
         int rowNum = 1;
         BigDecimal totalInitialPrice = new BigDecimal(0);
         BigDecimal totalInboundPrice = new BigDecimal(0);

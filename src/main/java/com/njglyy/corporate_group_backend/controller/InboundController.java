@@ -107,7 +107,7 @@ public class InboundController {
 
 
     @RequestMapping(value = "/queryInboundDetailList", method = RequestMethod.GET)
-    public Result queryInboundDetailMachineNoCount
+    public Result queryInboundDetailList
             (@RequestParam(value = "inboundNo", required = false) String inboundNo,
              @RequestParam(value = "currentPage", required = false) int currentPage,
              @RequestParam(value = "pageSize", required = false) int pageSize) {
@@ -120,15 +120,15 @@ public class InboundController {
 
 
     @RequestMapping(value = "/queryInboundDetailListCount", method = RequestMethod.GET)
-    public Result countInboundDetailMachineNoCount
+    public Result queryInboundDetailListCount
             (@RequestParam(value = "inboundNo", required = false) String inboundNo,
              @RequestParam(value = "currentPage", required = false) int currentPage,
              @RequestParam(value = "pageSize", required = false) int pageSize) {
 
         int offset = (currentPage - 1) * pageSize;
-        int inboundDetailsCount = inboundMapper.queryInboundDetailListCountByInboundNo(inboundNo);
+        int inboundDetailListCount = inboundMapper.queryInboundDetailListCountByInboundNo(inboundNo);
 
-        return new Result(200, null, inboundDetailsCount);
+        return new Result(200, null, inboundDetailListCount);
     }
 
 
@@ -198,8 +198,8 @@ public class InboundController {
             (@RequestParam(value = "currentPage", required = false) int currentPage,
              @RequestParam(value = "pageSize", required = false) int pageSize) {
         int offset = (currentPage - 1) * pageSize;
-        int inboundsCount = inboundMapper.queryInboundListCount();
-        return new Result(200, null, inboundsCount);
+        int inboundListCount = inboundMapper.queryInboundListCount();
+        return new Result(200, null, inboundListCount);
     }
 
 

@@ -52,12 +52,12 @@ public class ManufacturerController {
         return new Result(200, null, manufacturerList);
     }
 
-    @RequestMapping(value = "/queryManufacturersCount", method = RequestMethod.GET)
-    public Result queryManufacturersCount
+    @RequestMapping(value = "/queryManufacturerListCount", method = RequestMethod.GET)
+    public Result queryManufacturerListCount
             (@RequestParam(value = "currentPage", required = false) int currentPage,
              @RequestParam(value = "pageSize", required = false) int pageSize) {
-        int manufacturersCount = manufacturerMapper.queryManufacturersCount();
-        return new Result(200, null, manufacturersCount);
+        int manufacturerListCount = manufacturerMapper.queryManufacturerListCount();
+        return new Result(200, null, manufacturerListCount);
     }
 
 

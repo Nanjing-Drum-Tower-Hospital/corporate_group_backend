@@ -51,7 +51,7 @@ public interface ItemMapper {
             @Result(property = "manufacturer", column = "manufacturer_id",
                     one = @One(select = "com.njglyy.corporate_group_backend.mapper.ManufacturerMapper.queryManufacturerById"))
     })
-    List<Item> queryItemsByCondition(String codeSQL, String beginDateSQL, String endDateSQL, int offset, int pageSize);
+    List<Item> queryItemListByCondition(String codeSQL, String beginDateSQL, String endDateSQL, int offset, int pageSize);
 
 
     @Select("SELECT * " +
@@ -129,7 +129,7 @@ public interface ItemMapper {
             "${codeSQL} " +
             "${beginDateSQL} " +
             "${endDateSQL}")
-    int queryItemsCountByCondition(String codeSQL, String beginDateSQL, String endDateSQL);
+    int queryItemListCountByCondition(String codeSQL, String beginDateSQL, String endDateSQL);
 
     @Insert("INSERT INTO dbo.item_dictionary " +
             " values(#{code},#{name},#{model},#{unitName},#{unitPriceExcludingTax},#{manufacturerId}," +
