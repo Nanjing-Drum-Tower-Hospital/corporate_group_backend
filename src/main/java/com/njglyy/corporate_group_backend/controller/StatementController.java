@@ -314,7 +314,7 @@ public class StatementController {
                     row.createCell(4).setCellValue(getFormattedValue(item.getUnitPriceExcludingTax()));
                     row.createCell(5).setCellValue(getFormattedValue(totalInitialItemPrice));
                     totalInitialManufacturerPrice=totalInitialManufacturerPrice.add(totalInitialItemPrice);
-                    totalInitialPrice=totalInitialPrice.add(totalInitialManufacturerPrice);
+
 
 
 
@@ -334,7 +334,7 @@ public class StatementController {
                     row.createCell(7).setCellValue(getFormattedValue(item.getUnitPriceExcludingTax()));
                     row.createCell(8).setCellValue(getFormattedValue(totalInboundItemPrice));
                     totalInboundManufacturerPrice=totalInboundManufacturerPrice.add(totalInboundItemPrice);
-                    totalInboundPrice=totalInboundPrice.add(totalInboundManufacturerPrice);
+
 
 
 
@@ -354,7 +354,7 @@ public class StatementController {
                     row.createCell(10).setCellValue(getFormattedValue(item.getUnitPriceExcludingTax()));
                     row.createCell(11).setCellValue(getFormattedValue(totalOutboundItemPrice));
                     totalOutboundManufacturerPrice=totalOutboundManufacturerPrice.add(totalOutboundItemPrice);
-                    totalOutboundPrice=totalOutboundPrice.add(totalOutboundManufacturerPrice);
+
 
 
                     BigDecimal finalItemAmount = new BigDecimal(0);
@@ -381,7 +381,7 @@ public class StatementController {
                     row.createCell(13).setCellValue(getFormattedValue(item.getUnitPriceExcludingTax()));
                     row.createCell(14).setCellValue(getFormattedValue(totalFinalItemPrice));
                     totalFinalManufacturerPrice=totalFinalManufacturerPrice.add(totalFinalItemPrice);
-                    totalFinalPrice=totalFinalPrice.add(totalFinalManufacturerPrice);
+
 
                     UnitRatio unitRatio = unitRatioMapper.queryUnitRatioByUnitName(item.getUnitName(),mainUnitName);
                     if(item.getUnitName().equals(mainUnitName)){
@@ -406,9 +406,7 @@ public class StatementController {
                                 totalInboundManufacturerCount=totalInboundManufacturerCount.add(inboundItemAmount.multiply(new BigDecimal(unitRatio.getRatio())));
                                 totalOutboundManufacturerCount=totalOutboundManufacturerCount.add(outboundItemAmount.multiply(new BigDecimal(unitRatio.getRatio())));
                                 totalFinalManufacturerCount=totalFinalManufacturerCount.add(finalItemAmount.multiply(new BigDecimal(unitRatio.getRatio())));
-                                System.out.println(initialItemAmount);
-                                System.out.println(unitRatio.getRatio());
-                                System.out.println(totalInitialManufacturerCount);
+
 
                             }
                         }
@@ -417,6 +415,10 @@ public class StatementController {
                 }
 
             }
+            totalInitialPrice=totalInitialPrice.add(totalInitialManufacturerPrice);
+            totalInboundPrice=totalInboundPrice.add(totalInboundManufacturerPrice);
+            totalOutboundPrice=totalOutboundPrice.add(totalOutboundManufacturerPrice);
+            totalFinalPrice=totalFinalPrice.add(totalFinalManufacturerPrice);
             totalInitialCount=totalInitialCount.add(totalInitialManufacturerCount);
             totalInboundCount=totalInboundCount.add(totalInboundManufacturerCount);
             totalOutboundCount=totalOutboundCount.add(totalOutboundManufacturerCount);
