@@ -39,8 +39,8 @@ public class StatementController {
     @Autowired
     private UnitRatioMapper unitRatioMapper;
 
-    @RequestMapping(value = "/exportInboundStatement", method = RequestMethod.POST)
-    public Result exportInboundStatement
+    @RequestMapping(value = "/inboundStatement", method = RequestMethod.POST)
+    public Result inboundStatement
             (@RequestBody Inbound inbound
             ) {
         Inbound inboundDB = inboundMapper.queryInboundByInboundNo(inbound.getInboundNo());
@@ -125,8 +125,8 @@ public class StatementController {
 
     }
 
-    @RequestMapping(value = "/exportOutboundStatement", method = RequestMethod.POST)
-    public Result exportOutboundStatement
+    @RequestMapping(value = "/outboundStatement", method = RequestMethod.POST)
+    public Result outboundStatement
             (@RequestBody Outbound outbound
             ) {
         Outbound outboundDB = outboundMapper.queryOutboundByOutboundNo(outbound.getOutboundNo());
@@ -470,6 +470,243 @@ public class StatementController {
 
         // Define the file path for saving the Excel file locally
         String filePath = beginDate + "至" + endDate + "收发存汇总表.xlsx";  // Update with your desired file path
+
+        // Write the workbook to a file
+        try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
+            workbook.write(fileOut);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                workbook.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        try {
+            FileInputStream fileInputStream = new FileInputStream(filePath);
+            byte[] bytes = IOUtils.toByteArray(fileInputStream);
+            String base64 = Base64.getEncoder().encodeToString(bytes);
+            FileData fileData = new FileData();
+            fileData.setFileName(filePath);
+            fileData.setFileContent(base64);
+            Result result = new Result();
+            result.setCode(200); // Success code
+            result.setMessage("导出成功！");
+            result.setData(fileData);
+
+            return result;
+        } catch (Exception e) {
+            // Handle exceptions
+            return new Result(400, "生成失败！", null);
+        }
+
+    }
+    @RequestMapping(value = "/inboundSummaryStatement", method = RequestMethod.GET)
+    public Result inboundSummaryStatement
+            (@RequestParam(value = "beginDate", required = false) LocalDate beginDate,
+             @RequestParam(value = "endDate", required = false) LocalDate endDate,
+             @RequestParam(value = "mainUnitName", required = false) String mainUnitName
+            ) {
+        if (beginDate == null || endDate == null) {
+            return new Result(400, "日期不能为空！", null);
+        }
+        if (mainUnitName == null) {
+            return new Result(400, "合计单位不能为空！", null);
+        }
+        if (beginDate.isAfter(endDate)) {
+            return new Result(400, "开始日期不能晚于结束日期！", null);
+        }
+        List<CheckOut> checkOutInboundList = checkOutMapper.queryCheckOutList("inbound",0, Integer.MAX_VALUE);
+
+        boolean isNotInsideAnyInboundCheckOut = checkOutInboundList.stream()
+                .noneMatch(checkOut ->
+                        !beginDate.isBefore(checkOut.getCheckOutBeginDate()) &&
+                                !endDate.isAfter(checkOut.getCheckOutEndDate())
+                );
+
+
+        if (isNotInsideAnyInboundCheckOut ) {
+            return new Result(400, "该时间区间内有未结算的账单！", null);
+        }
+
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("收发存汇总");
+
+
+        String[] headers = {"入库单号","产品编码", "产品名称", "单位", "数量", "单价", "税额", "金额", "含税单价", "价税合计", "税率","备注"};
+        Row headerRow = sheet.createRow(0);
+        for (int i = 0; i < headers.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(headers[i]);
+        }
+        List<Inbound> inboundList = inboundMapper.queryInboundList(0, Integer.MAX_VALUE);
+
+        int rowNum = 1;
+        BigDecimal totalInboundTax = new BigDecimal(0);
+        BigDecimal totalInboundPriceExcludingTax = new BigDecimal(0);
+        BigDecimal totalInboundPriceIncludingTax = new BigDecimal(0);
+
+
+        for(Inbound inbound : inboundList){
+            if((inbound.getInboundDate().isAfter(beginDate) || inbound.getInboundDate().isEqual(beginDate))
+                    && (inbound.getInboundDate().isBefore(endDate) || inbound.getInboundDate().isEqual(endDate))){
+                for (InboundDetail detail : inbound.getInboundDetailList()) {
+                    Row row = sheet.createRow(rowNum++);
+                    row.createCell(0).setCellValue(detail.getInboundNo());
+                    row.createCell(1).setCellValue(detail.getItem().getCode());
+                    row.createCell(2).setCellValue(detail.getItem().getName());
+                    row.createCell(3).setCellValue(detail.getItem().getUnitName());
+                    row.createCell(4).setCellValue(String.valueOf(detail.getItemAmount()));
+                    row.createCell(5).setCellValue(String.valueOf(detail.getItem().getUnitPriceExcludingTax().setScale(2, RoundingMode.HALF_UP)));
+                    row.createCell(6).setCellValue(String.valueOf(detail.getInboundDetailTax().setScale(2, RoundingMode.HALF_UP)));
+                    row.createCell(7).setCellValue(String.valueOf(detail.getInboundDetailPriceExcludingTax().setScale(2, RoundingMode.HALF_UP)));
+                    row.createCell(8).setCellValue(String.valueOf(detail.getItem().getUnitPriceIncludingTax().setScale(2, RoundingMode.HALF_UP)));
+                    row.createCell(9).setCellValue(String.valueOf(detail.getInboundDetailPriceIncludingTax().setScale(2, RoundingMode.HALF_UP)));
+                    row.createCell(10).setCellValue("13%");
+                    row.createCell(11).setCellValue(detail.getRemark());
+                }
+                totalInboundTax=totalInboundTax.add(inbound.getInboundTax());
+                totalInboundPriceExcludingTax=totalInboundPriceExcludingTax.add(inbound.getInboundPriceExcludingTax());
+                totalInboundPriceIncludingTax=totalInboundPriceIncludingTax.add(inbound.getInboundPriceIncludingTax());
+
+            }
+        }
+
+        Row nextRow = sheet.createRow(rowNum++);
+        nextRow.createCell(0).setCellValue(String.valueOf("合计"));
+        nextRow.createCell(6).setCellValue(String.valueOf(totalInboundTax.setScale(2, RoundingMode.HALF_UP)));
+        nextRow.createCell(7).setCellValue(String.valueOf(totalInboundPriceExcludingTax.setScale(2, RoundingMode.HALF_UP)));
+        nextRow.createCell(9).setCellValue(String.valueOf(totalInboundPriceIncludingTax.setScale(2, RoundingMode.HALF_UP)));
+
+
+//        // Auto size columns
+        for (int i = 0; i < headers.length; i++) {
+            sheet.autoSizeColumn(i);
+        }
+
+        // Define the file path for saving the Excel file locally
+        String filePath = beginDate + "至" + endDate + "入库汇总表.xlsx";  // Update with your desired file path
+
+        // Write the workbook to a file
+        try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
+            workbook.write(fileOut);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                workbook.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        try {
+            FileInputStream fileInputStream = new FileInputStream(filePath);
+            byte[] bytes = IOUtils.toByteArray(fileInputStream);
+            String base64 = Base64.getEncoder().encodeToString(bytes);
+            FileData fileData = new FileData();
+            fileData.setFileName(filePath);
+            fileData.setFileContent(base64);
+            Result result = new Result();
+            result.setCode(200); // Success code
+            result.setMessage("导出成功！");
+            result.setData(fileData);
+
+            return result;
+        } catch (Exception e) {
+            // Handle exceptions
+            return new Result(400, "生成失败！", null);
+        }
+
+    }
+
+    @RequestMapping(value = "/outboundSummaryStatement", method = RequestMethod.GET)
+    public Result outboundSummaryStatement
+            (@RequestParam(value = "beginDate", required = false) LocalDate beginDate,
+             @RequestParam(value = "endDate", required = false) LocalDate endDate,
+             @RequestParam(value = "mainUnitName", required = false) String mainUnitName
+            ) {
+        if (beginDate == null || endDate == null) {
+            return new Result(400, "日期不能为空！", null);
+        }
+        if (mainUnitName == null) {
+            return new Result(400, "合计单位不能为空！", null);
+        }
+        if (beginDate.isAfter(endDate)) {
+            return new Result(400, "开始日期不能晚于结束日期！", null);
+        }
+        List<CheckOut> checkOutOutboundList = checkOutMapper.queryCheckOutList("outbound",0, Integer.MAX_VALUE);
+
+        boolean isNotInsideAnyOutboundCheckOut = checkOutOutboundList.stream()
+                .noneMatch(checkOut ->
+                        !beginDate.isBefore(checkOut.getCheckOutBeginDate()) &&
+                                !endDate.isAfter(checkOut.getCheckOutEndDate())
+                );
+
+
+        if (isNotInsideAnyOutboundCheckOut ) {
+            return new Result(400, "该时间区间内有未结算的账单！", null);
+        }
+
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("收发存汇总");
+
+
+        String[] headers = {"入库单号","产品编码", "产品名称", "单位", "数量", "单价", "税额", "金额", "含税单价", "价税合计", "税率","备注"};
+        Row headerRow = sheet.createRow(0);
+        for (int i = 0; i < headers.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(headers[i]);
+        }
+        List<Outbound> outboundList = outboundMapper.queryOutboundList(0, Integer.MAX_VALUE);
+
+        int rowNum = 1;
+        BigDecimal totalOutboundTax = new BigDecimal(0);
+        BigDecimal totalOutboundPriceExcludingTax = new BigDecimal(0);
+        BigDecimal totalOutboundPriceIncludingTax = new BigDecimal(0);
+
+
+        for(Outbound outbound : outboundList){
+            if((outbound.getOutboundDate().isAfter(beginDate) || outbound.getOutboundDate().isEqual(beginDate))
+                    && (outbound.getOutboundDate().isBefore(endDate) || outbound.getOutboundDate().isEqual(endDate))){
+                for (OutboundDetail detail : outbound.getOutboundDetailList()) {
+                    Row row = sheet.createRow(rowNum++);
+                    row.createCell(0).setCellValue(detail.getOutboundNo());
+                    row.createCell(1).setCellValue(detail.getItem().getCode());
+                    row.createCell(2).setCellValue(detail.getItem().getName());
+                    row.createCell(3).setCellValue(detail.getItem().getUnitName());
+                    row.createCell(4).setCellValue(String.valueOf(detail.getItemAmount()));
+                    row.createCell(5).setCellValue(String.valueOf(detail.getItem().getUnitPriceExcludingTax().setScale(2, RoundingMode.HALF_UP)));
+                    row.createCell(6).setCellValue(String.valueOf(detail.getOutboundDetailTax().setScale(2, RoundingMode.HALF_UP)));
+                    row.createCell(7).setCellValue(String.valueOf(detail.getOutboundDetailPriceExcludingTax().setScale(2, RoundingMode.HALF_UP)));
+                    row.createCell(8).setCellValue(String.valueOf(detail.getItem().getUnitPriceIncludingTax().setScale(2, RoundingMode.HALF_UP)));
+                    row.createCell(9).setCellValue(String.valueOf(detail.getOutboundDetailPriceIncludingTax().setScale(2, RoundingMode.HALF_UP)));
+                    row.createCell(10).setCellValue("13%");
+                    row.createCell(11).setCellValue(detail.getRemark());
+                }
+                totalOutboundTax=totalOutboundTax.add(outbound.getOutboundTax());
+                totalOutboundPriceExcludingTax=totalOutboundPriceExcludingTax.add(outbound.getOutboundPriceExcludingTax());
+                totalOutboundPriceIncludingTax=totalOutboundPriceIncludingTax.add(outbound.getOutboundPriceIncludingTax());
+
+            }
+        }
+
+        Row nextRow = sheet.createRow(rowNum++);
+        nextRow.createCell(0).setCellValue(String.valueOf("合计"));
+        nextRow.createCell(6).setCellValue(String.valueOf(totalOutboundTax.setScale(2, RoundingMode.HALF_UP)));
+        nextRow.createCell(7).setCellValue(String.valueOf(totalOutboundPriceExcludingTax.setScale(2, RoundingMode.HALF_UP)));
+        nextRow.createCell(9).setCellValue(String.valueOf(totalOutboundPriceIncludingTax.setScale(2, RoundingMode.HALF_UP)));
+
+
+//        // Auto size columns
+        for (int i = 0; i < headers.length; i++) {
+            sheet.autoSizeColumn(i);
+        }
+
+        // Define the file path for saving the Excel file locally
+        String filePath = beginDate + "至" + endDate + "入库汇总表.xlsx";  // Update with your desired file path
 
         // Write the workbook to a file
         try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
