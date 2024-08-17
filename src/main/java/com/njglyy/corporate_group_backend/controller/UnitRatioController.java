@@ -57,8 +57,6 @@ public class UnitRatioController {
     public Result queryInboundDetailMachineNoCount
             (@RequestParam(value = "currentPage", required = false) int currentPage,
              @RequestParam(value = "pageSize", required = false) int pageSize) {
-        System.out.println(currentPage);
-        System.out.println(pageSize);
         int offset = (currentPage - 1) * pageSize;
         List<UnitRatio> unitRatioList = unitRatioMapper.queryUnitRatioList( offset, pageSize);
 

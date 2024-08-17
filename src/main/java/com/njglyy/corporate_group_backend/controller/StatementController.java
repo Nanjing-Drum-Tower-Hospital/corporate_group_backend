@@ -103,7 +103,6 @@ public class StatementController {
                 e.printStackTrace();
             }
         }
-
         try {
             FileInputStream fileInputStream = new FileInputStream(filePath);
             byte[] bytes = IOUtils.toByteArray(fileInputStream);

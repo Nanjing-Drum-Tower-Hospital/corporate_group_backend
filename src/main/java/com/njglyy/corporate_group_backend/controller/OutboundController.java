@@ -137,8 +137,6 @@ public class OutboundController {
 
             ) {
         try {
-            System.out.println(dialogOutboundDetail);
-
             OutboundDetail dialogOutboundDetailOld = dialogOutboundDetail.get(0);
             OutboundDetail dialogOutboundDetailNew = dialogOutboundDetail.get(1);
             if (dialogOutboundDetailNew.getItemAmount().equals(0))

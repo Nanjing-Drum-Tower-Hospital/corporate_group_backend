@@ -24,7 +24,6 @@ public class ItemController {
     public Result queryItemByCodeOrName
             (@RequestParam(value = "input", required = false) String input
             ) {
-        System.out.println(input);
         String inputStr = "%"+input+"%";
 
         List<Item> itemDetailList = itemMapper.queryItemByCodeOrName(inputStr);
@@ -65,19 +64,7 @@ public class ItemController {
     }
 
 
-//    @RequestMapping(value = "/queryItemByCode", method = RequestMethod.GET)
-//    public Result queryItemByCode
-//            (@RequestParam(value = "code", required = false) String code
-//            ) {
-//
-//
-//        ItemDetail itemDetail = itemMapper.queryItemByCode(code);
-//        System.out.println("code");
-//        System.out.println(itemDetail);
-//        System.out.println("code");
-//
-//        return new Result(200,null,itemDetail);
-//    }
+
 
     @RequestMapping(value = "/queryItemListCount", method = RequestMethod.GET)
     public Result queryItemListCountByCondition
@@ -117,7 +104,6 @@ public class ItemController {
             (@RequestBody Item item
             ) {
         try {
-            System.out.println(item);
             LocalDate today = LocalDate.now();
             if(item.getId()!=0){
                 itemMapper.updateItem( item.getCode(),item.getName(), item.getModel(), item.getUnitName(), item.getUnitPriceExcludingTax(),

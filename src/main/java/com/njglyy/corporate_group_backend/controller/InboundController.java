@@ -138,8 +138,6 @@ public class InboundController {
 
             ) {
         try {
-            System.out.println(dialogInboundDetail);
-
             InboundDetail dialogInboundDetailOld = dialogInboundDetail.get(0);
             InboundDetail dialogInboundDetailNew = dialogInboundDetail.get(1);
             if (dialogInboundDetailNew.getItemAmount().equals(0))
