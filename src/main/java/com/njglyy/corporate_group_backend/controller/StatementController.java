@@ -50,7 +50,7 @@ public class StatementController {
         Sheet sheet = workbook.createSheet("采购入库单");
 
         // Create headers
-        String[] headers = {"产品编码", "产品名称", "单位", "数量", "单价", "税额", "金额", "含税单价", "价税合计", "税率"};
+        String[] headers = {"产品编码", "产品名称", "单位", "数量", "单价", "税额", "金额", "含税单价", "价税合计", "税率","备注"};
         Row headerRow = sheet.createRow(0);
         for (int i = 0; i < headers.length; i++) {
             Cell cell = headerRow.createCell(i);
@@ -71,6 +71,7 @@ public class StatementController {
             row.createCell(7).setCellValue(String.valueOf(detail.getItem().getUnitPriceIncludingTax().setScale(2, RoundingMode.HALF_UP)));
             row.createCell(8).setCellValue(String.valueOf(detail.getInboundDetailPriceIncludingTax().setScale(2, RoundingMode.HALF_UP)));
             row.createCell(9).setCellValue("13%");
+            row.createCell(10).setCellValue(detail.getRemark());
         }
 
 // Insert blank row
@@ -135,7 +136,7 @@ public class StatementController {
         Sheet sheet = workbook.createSheet("销售出库单");
 
         // Create headers
-        String[] headers = {"产品编码", "产品名称", "单位", "数量", "单价", "税额", "金额", "含税单价", "价税合计", "税率"};
+        String[] headers = {"产品编码", "产品名称", "单位", "数量", "单价", "税额", "金额", "含税单价", "价税合计", "税率","备注"};
         Row headerRow = sheet.createRow(0);
         for (int i = 0; i < headers.length; i++) {
             Cell cell = headerRow.createCell(i);
@@ -156,6 +157,7 @@ public class StatementController {
             row.createCell(7).setCellValue(String.valueOf(detail.getItem().getUnitPriceIncludingTax().setScale(2, RoundingMode.HALF_UP)));
             row.createCell(8).setCellValue(String.valueOf(detail.getOutboundDetailPriceIncludingTax().setScale(2, RoundingMode.HALF_UP)));
             row.createCell(9).setCellValue("13%");
+            row.createCell(10).setCellValue(detail.getRemark());
         }
 
 // Insert blank row
