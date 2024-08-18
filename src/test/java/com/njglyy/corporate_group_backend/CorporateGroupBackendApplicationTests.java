@@ -3,7 +3,7 @@ package com.njglyy.corporate_group_backend;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+
 class CorporateGroupBackendApplicationTests {
 
     @Test
