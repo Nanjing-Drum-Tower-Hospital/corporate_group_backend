@@ -18,6 +18,7 @@ public class Inbound implements Cloneable{
     private String remark;
     private String accountingReversalInboundNo;
     private String entryType;
+    private String fapiaoNo;
     private Supplier supplier;
     private List<InboundDetail> inboundDetailList;
     private CheckOut checkOut;

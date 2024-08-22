@@ -15,17 +15,17 @@ public interface InboundMapper {
 
 
     @Insert("INSERT INTO dbo.inbound_list " +
-            " values(#{inboundNo}, #{inboundDate}, #{supplierId}, #{remark},#{accountingReversalInboundNo},#{entryType})")
-    void addInbound(String inboundNo, LocalDate inboundDate, int supplierId, String remark, String accountingReversalInboundNo, String entryType);
+            " values(#{inboundNo}, #{inboundDate}, #{supplierId}, #{remark},#{accountingReversalInboundNo},#{entryType},#{fapiaoNo})")
+    void addInbound(String inboundNo, LocalDate inboundDate, int supplierId, String remark, String accountingReversalInboundNo, String entryType,String fapiaoNo);
 
         @Delete("DELETE FROM inbound_list " +
             "WHERE inbound_no = #{inboundNo} ")
     void deleteInboundByInboundNo(@Param("inboundNo") String inboundNo);
 
     @Update("UPDATE dbo.inbound_list " +
-            " set supplier_id = #{supplierId},remark = #{remark}, accounting_reversal_inbound_no=#{accountingReversalInboundNo},entry_type = #{entryType} " +
+            " set supplier_id = #{supplierId},remark = #{remark}, accounting_reversal_inbound_no=#{accountingReversalInboundNo},entry_type = #{entryType}, fapiao_no=#{fapiaoNo} " +
             "where inbound_no= #{inboundNo}")
-    void updateInbound(String inboundNo, int supplierId, String remark,String accountingReversalInboundNo,String entryType);
+    void updateInbound(String inboundNo, int supplierId, String remark,String accountingReversalInboundNo,String entryType,String fapiaoNo);
 
 
 
@@ -39,6 +39,7 @@ public interface InboundMapper {
             @Result(property = "remark", column = "remark"),
             @Result(property = "accountingReversalInboundNo", column = "accounting_reversal_inbound_no"),
             @Result(property = "entryType", column = "entry_type"),
+            @Result(property = "fapiaoNo", column = "fapiao_no"),
             @Result(property = "supplier", column = "supplier_id",
                     one = @One(select = "com.njglyy.corporate_group_backend.mapper.SupplierMapper.querySupplierById")),
             @Result(property = "inboundDetailList", column = "inbound_no",
@@ -61,6 +62,7 @@ public interface InboundMapper {
             @Result(property = "remark", column = "remark"),
             @Result(property = "accountingReversalInboundNo", column = "accounting_reversal_inbound_no"),
             @Result(property = "entryType", column = "entry_type"),
+            @Result(property = "fapiaoNo", column = "fapiao_no"),
             @Result(property = "supplier", column = "supplier_id",
                     one = @One(select = "com.njglyy.corporate_group_backend.mapper.SupplierMapper.querySupplierById")),
             @Result(property = "inboundDetailList", column = "inbound_no",

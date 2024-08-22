@@ -33,7 +33,7 @@ public class InboundController {
         inbound = inboundMapper.queryInboundByInboundNo(inboundNo);
 
         inboundMapper.updateInbound(inbound.getInboundNo(),
-                inbound.getSupplierId(), inbound.getRemark(), newInboundNoString,"original");
+                inbound.getSupplierId(), inbound.getRemark(), newInboundNoString,"original",inbound.getFapiaoNo());
         for(InboundDetail inboundDetail:inbound.getInboundDetailList()){
 
 
@@ -55,7 +55,7 @@ public class InboundController {
 
         if (inbound.getInboundNo() != null) {
             inboundMapper.updateInbound(inbound.getInboundNo(),
-                    inbound.getSupplierId(), inbound.getRemark(), inbound.getAccountingReversalInboundNo(),inbound.getEntryType());
+                    inbound.getSupplierId(), inbound.getRemark(), inbound.getAccountingReversalInboundNo(),inbound.getEntryType(),inbound.getFapiaoNo());
             return new Result(200, "修改成功！", null);
         } else {
             String newLeftInboundNoString = "";
@@ -83,7 +83,7 @@ public class InboundController {
 
             String newInboundNoString = newLeftInboundNoString + newRightInboundNoString;
             inboundMapper.addInbound(newInboundNoString, LocalDate.parse(newInboundDate), inbound.getSupplierId(),
-                    inbound.getRemark(), inbound.getAccountingReversalInboundNo(),inbound.getEntryType());
+                    inbound.getRemark(), inbound.getAccountingReversalInboundNo(),inbound.getEntryType(),inbound.getFapiaoNo());
             return new Result(200, "添加成功！", newInboundNoString);
         }
 
@@ -98,7 +98,7 @@ public class InboundController {
         Inbound inboundReversal = inboundMapper.queryInboundByInboundNo(inbound.getAccountingReversalInboundNo());
         if(inboundReversal!=null){
             inboundMapper.updateInbound(inboundReversal.getInboundNo(),
-                    inboundReversal.getSupplierId(), inboundReversal.getRemark(), null,null);
+                    inboundReversal.getSupplierId(), inboundReversal.getRemark(), null,null,null);
         }
         inboundMapper.deleteInboundDetailListByInboundNo(inboundNo);
         inboundMapper.deleteInboundByInboundNo(inboundNo);
