@@ -2,16 +2,16 @@ package com.njglyy.corporate_group_backend.controller;
 
 import com.njglyy.corporate_group_backend.entity.*;
 import com.njglyy.corporate_group_backend.mapper.*;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.io.IOUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -38,58 +38,118 @@ public class StatementController {
     private CheckOutMapper checkOutMapper;
     @Autowired
     private UnitRatioMapper unitRatioMapper;
+    @Autowired
+    private UserMapper userMapper;
+
 
     @RequestMapping(value = "/inboundStatement", method = RequestMethod.POST)
     public Result inboundStatement
-            (@RequestBody Inbound inbound
+            (@RequestBody Inbound inbound,
+             HttpServletRequest request
             ) {
         Inbound inboundDB = inboundMapper.queryInboundByInboundNo(inbound.getInboundNo());
-
-        // Create a workbook and sheet
-        Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("采购入库单");
-
-        // Create headers
-        String[] headers = {"产品编码", "产品名称", "单位", "数量", "单价", "税额", "金额", "含税单价", "价税合计", "税率","备注"};
-        Row headerRow = sheet.createRow(0);
-        for (int i = 0; i < headers.length; i++) {
-            Cell cell = headerRow.createCell(i);
-            cell.setCellValue(headers[i]);
+        if(inboundDB.getInboundDetailList().size()==0){
+            return new Result(400, "入库单无明细！", null);
         }
+        User user=userMapper.queryUserByUsername(request.getHeader("username"));
+        System.out.println(user);
 
-        // Populate details
-        int rowNum = 1;
-        for (InboundDetail detail : inboundDB.getInboundDetailList()) {
-            Row row = sheet.createRow(rowNum++);
-            row.createCell(0).setCellValue(detail.getItem().getCode());
-            row.createCell(1).setCellValue(detail.getItem().getName());
-            row.createCell(2).setCellValue(detail.getItem().getUnitName());
-            row.createCell(3).setCellValue(String.valueOf(detail.getItemAmount()));
-            row.createCell(4).setCellValue(String.valueOf(detail.getItem().getUnitPriceExcludingTax().setScale(2, RoundingMode.HALF_UP)));
-            row.createCell(5).setCellValue(String.valueOf(detail.getInboundDetailTax().setScale(2, RoundingMode.HALF_UP)));
-            row.createCell(6).setCellValue(String.valueOf(detail.getInboundDetailPriceExcludingTax().setScale(2, RoundingMode.HALF_UP)));
-            row.createCell(7).setCellValue(String.valueOf(detail.getItem().getUnitPriceIncludingTax().setScale(2, RoundingMode.HALF_UP)));
-            row.createCell(8).setCellValue(String.valueOf(detail.getInboundDetailPriceIncludingTax().setScale(2, RoundingMode.HALF_UP)));
-            row.createCell(9).setCellValue("13%");
-            row.createCell(10).setCellValue(detail.getRemark());
-        }
+
+        String inputFile = "采购入库单模板.xlsx";
+        String outputFile = "采购入库单.xlsx";
+
+        try (FileInputStream fileIn = new FileInputStream(inputFile);
+             XSSFWorkbook workbook = new XSSFWorkbook(fileIn)) {
+            // Define border style
+            CellStyle borderedStyle = workbook.createCellStyle();
+            borderedStyle.setBorderBottom(BorderStyle.THIN);
+            borderedStyle.setBorderTop(BorderStyle.THIN);
+            borderedStyle.setBorderLeft(BorderStyle.THIN);
+            borderedStyle.setBorderRight(BorderStyle.THIN);
+            // Access the first sheet
+            Sheet sheet = workbook.getSheetAt(0);
+
+            // Check for merged regions that might contain the cell A2/B2
+            for (int i = 0; i < sheet.getNumMergedRegions(); i++) {
+                CellRangeAddress region = sheet.getMergedRegion(i);
+                if (region.isInRange(1, 0)) {  // Row 2, Column A (index is 0-based)
+                    // Get the first cell of the merged region
+                    Row row = sheet.getRow(region.getFirstRow());
+                    Cell cell = row.getCell(region.getFirstColumn(), Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                    cell.setCellValue("业务类型：普通采购");  // Change the value
+                }
+                if (region.isInRange(1, 3)) {  // Row 2, Column A (index is 0-based)
+                    // Get the first cell of the merged region
+                    Row row = sheet.getRow(region.getFirstRow());
+                    Cell cell = row.getCell(region.getFirstColumn(), Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                    cell.setCellValue("发票号："+inboundDB.getFapiaoNo());  // Change the value
+                }
+                if (region.isInRange(1, 6)) {  // Row 2, Column A (index is 0-based)
+                    // Get the first cell of the merged region
+                    Row row = sheet.getRow(region.getFirstRow());
+                    Cell cell = row.getCell(region.getFirstColumn(), Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                    cell.setCellValue("入库日期："+inboundDB.getInboundDate());  // Change the value
+                }
+                if (region.isInRange(2, 0)) {  // Row 2, Column A (index is 0-based)
+                    // Get the first cell of the merged region
+                    Row row = sheet.getRow(region.getFirstRow());
+                    Cell cell = row.getCell(region.getFirstColumn(), Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                    cell.setCellValue("入库日期："+inboundDB.getSupplier().getSupplierName());  // Change the value
+                }
+                if (region.isInRange(2, 3)) {  // Row 2, Column A (index is 0-based)
+                    // Get the first cell of the merged region
+                    Row row = sheet.getRow(region.getFirstRow());
+                    Cell cell = row.getCell(region.getFirstColumn(), Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                    cell.setCellValue("入库单号："+inboundDB.getInboundNo());  // Change the value
+                }
+                if (region.isInRange(2, 6)) {  // Row 2, Column A (index is 0-based)
+                    // Get the first cell of the merged region
+                    Row row = sheet.getRow(region.getFirstRow());
+                    Cell cell = row.getCell(region.getFirstColumn(), Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                    cell.setCellValue("           制单："+user.getFullName());  // Change the value
+                }
+            }
+            int rowNum = 4;
+            BigDecimal totalCount = new BigDecimal(0);
+            for (InboundDetail detail : inboundDB.getInboundDetailList()) {
+                Row row = sheet.getRow(rowNum++);
+                row.getCell(0, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(detail.getItem().getCode());
+                row.getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(detail.getItem().getName());
+                row.getCell(2, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(detail.getItem().getUnitName());
+                row.getCell(3, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(String.valueOf(detail.getItemAmount()));
+                row.getCell(4, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(String.valueOf(detail.getItem().getUnitPriceExcludingTax().setScale(10, RoundingMode.HALF_UP)));
+                row.getCell(5, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(String.valueOf(detail.getInboundDetailTax().setScale(2, RoundingMode.HALF_UP)));
+                row.getCell(6, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(String.valueOf(detail.getInboundDetailPriceExcludingTax().setScale(2, RoundingMode.HALF_UP)));
+                row.getCell(7, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(String.valueOf(detail.getItem().getUnitPriceIncludingTax().setScale(2, RoundingMode.HALF_UP)));
+                row.getCell(8, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(String.valueOf(detail.getInboundDetailPriceIncludingTax().setScale(2, RoundingMode.HALF_UP)));
+                row.getCell(9, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue("13%");
+                row.getCell(10, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(detail.getRemark());
+                totalCount=totalCount.add(detail.getItemAmount());
+            }
 
 // Insert blank row
-        sheet.createRow(rowNum++);
+            rowNum++;
 
 // Continue with more data after the blank row
-        Row nextRow = sheet.createRow(rowNum++);
-        nextRow.createCell(0).setCellValue(String.valueOf("合计"));
-        nextRow.createCell(5).setCellValue(String.valueOf(inboundDB.getInboundTax().setScale(2, RoundingMode.HALF_UP)));
-        nextRow.createCell(6).setCellValue(String.valueOf(inboundDB.getInboundPriceExcludingTax().setScale(2, RoundingMode.HALF_UP)));
-        nextRow.createCell(8).setCellValue(String.valueOf(inboundDB.getInboundPriceIncludingTax().setScale(2, RoundingMode.HALF_UP)));
-        // Auto size columns
-        for (int i = 0; i < headers.length; i++) {
-            sheet.autoSizeColumn(i);
-        }
+            Row row = sheet.getRow(rowNum++);
+            row.getCell(0, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(String.valueOf("合计"));
+            row.getCell(3, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(String.valueOf(totalCount));
+            row.getCell(5, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(String.valueOf(inboundDB.getInboundTax().setScale(2, RoundingMode.HALF_UP)));
+            row.getCell(6, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(String.valueOf(inboundDB.getInboundPriceExcludingTax().setScale(2, RoundingMode.HALF_UP)));
+            row.getCell(8, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(String.valueOf(inboundDB.getInboundPriceIncludingTax().setScale(2, RoundingMode.HALF_UP)));
+            // Auto size columns
+            for (int rowIndex = 4; rowIndex < rowNum; rowIndex++) {
+                row = sheet.getRow(rowIndex);
+                if (row == null) continue;  // Skip if the row does not exist
 
+                for (int colIndex = 0; colIndex < 11; colIndex++) {
+                    Cell cell = row.getCell(colIndex, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                    cell.setCellStyle(borderedStyle);
+                }
+            }
+            // Save the workbook as a new file
         // Define the file path for saving the Excel file locally
-        String filePath = inboundDB.getInboundNo() + "采购入库单.xlsx";  // Update with your desired file path
+        String filePath = inboundDB.getInboundNo() + "-采购入库单.xlsx";  // Update with your desired file path
 
         // Write the workbook to a file
         try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
@@ -122,92 +182,143 @@ public class StatementController {
         }
 
 
+    } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
+
 
     @RequestMapping(value = "/outboundStatement", method = RequestMethod.POST)
     public Result outboundStatement
-            (@RequestBody Outbound outbound
+            (@RequestBody Outbound outbound,
+             HttpServletRequest request
             ) {
         Outbound outboundDB = outboundMapper.queryOutboundByOutboundNo(outbound.getOutboundNo());
-
-        // Create a workbook and sheet
-        Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("销售出库单");
-
-        // Create headers
-        String[] headers = {"产品编码", "产品名称", "单位", "数量", "单价", "税额", "金额", "含税单价", "价税合计", "税率","备注"};
-        Row headerRow = sheet.createRow(0);
-        for (int i = 0; i < headers.length; i++) {
-            Cell cell = headerRow.createCell(i);
-            cell.setCellValue(headers[i]);
+        if(outboundDB.getOutboundDetailList().size()==0){
+            return new Result(400, "出库单无明细！", null);
         }
+        User user=userMapper.queryUserByUsername(request.getHeader("username"));
+        System.out.println(user);
 
-        // Populate details
-        int rowNum = 1;
-        for (OutboundDetail detail : outboundDB.getOutboundDetailList()) {
-            Row row = sheet.createRow(rowNum++);
-            row.createCell(0).setCellValue(detail.getItem().getCode());
-            row.createCell(1).setCellValue(detail.getItem().getName());
-            row.createCell(2).setCellValue(detail.getItem().getUnitName());
-            row.createCell(3).setCellValue(String.valueOf(detail.getItemAmount()));
-            row.createCell(4).setCellValue(String.valueOf(detail.getItem().getUnitPriceExcludingTax().setScale(2, RoundingMode.HALF_UP)));
-            row.createCell(5).setCellValue(String.valueOf(detail.getOutboundDetailTax().setScale(2, RoundingMode.HALF_UP)));
-            row.createCell(6).setCellValue(String.valueOf(detail.getOutboundDetailPriceExcludingTax().setScale(2, RoundingMode.HALF_UP)));
-            row.createCell(7).setCellValue(String.valueOf(detail.getItem().getUnitPriceIncludingTax().setScale(2, RoundingMode.HALF_UP)));
-            row.createCell(8).setCellValue(String.valueOf(detail.getOutboundDetailPriceIncludingTax().setScale(2, RoundingMode.HALF_UP)));
-            row.createCell(9).setCellValue("13%");
-            row.createCell(10).setCellValue(detail.getRemark());
-        }
 
-// Insert blank row
-        sheet.createRow(rowNum++);
+        String inputFile = "销售出库单模板.xlsx";
 
-// Continue with more data after the blank row
-        Row nextRow = sheet.createRow(rowNum++);
-        nextRow.createCell(0).setCellValue(String.valueOf("合计"));
-        nextRow.createCell(5).setCellValue(String.valueOf(outboundDB.getOutboundTax().setScale(2, RoundingMode.HALF_UP)));
-        nextRow.createCell(6).setCellValue(String.valueOf(outboundDB.getOutboundPriceExcludingTax().setScale(2, RoundingMode.HALF_UP)));
-        nextRow.createCell(8).setCellValue(String.valueOf(outboundDB.getOutboundPriceIncludingTax().setScale(2, RoundingMode.HALF_UP)));
-        // Auto size columns
-        for (int i = 0; i < headers.length; i++) {
-            sheet.autoSizeColumn(i);
-        }
+        try (FileInputStream fileIn = new FileInputStream(inputFile);
+             XSSFWorkbook workbook = new XSSFWorkbook(fileIn)) {
+            // Define border style
+            CellStyle borderedStyle = workbook.createCellStyle();
+            borderedStyle.setBorderBottom(BorderStyle.THIN);
+            borderedStyle.setBorderTop(BorderStyle.THIN);
+            borderedStyle.setBorderLeft(BorderStyle.THIN);
+            borderedStyle.setBorderRight(BorderStyle.THIN);
+            // Access the first sheet
+            Sheet sheet = workbook.getSheetAt(0);
 
-        // Define the file path for saving the Excel file locally
-        String filePath = outboundDB.getOutboundNo() + "销售出库单.xlsx";  // Update with your desired file path
+            // Check for merged regions that might contain the cell A2/B2
+            for (int i = 0; i < sheet.getNumMergedRegions(); i++) {
+                CellRangeAddress region = sheet.getMergedRegion(i);
+                if (region.isInRange(1, 0)) {  // Row 2, Column A (index is 0-based)
+                    // Get the first cell of the merged region
+                    Row row = sheet.getRow(region.getFirstRow());
+                    Cell cell = row.getCell(region.getFirstColumn(), Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                    cell.setCellValue("业务类型：销售出库");  // Change the value
+                }
+                if (region.isInRange(1, 2)) {  // Row 2, Column A (index is 0-based)
+                    // Get the first cell of the merged region
+                    Row row = sheet.getRow(region.getFirstRow());
+                    Cell cell = row.getCell(region.getFirstColumn(), Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                    cell.setCellValue("客户：");  // Change the value
+                }
+                if (region.isInRange(1, 5)) {  // Row 2, Column A (index is 0-based)
+                    // Get the first cell of the merged region
+                    Row row = sheet.getRow(region.getFirstRow());
+                    Cell cell = row.getCell(region.getFirstColumn(), Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                    cell.setCellValue("出库日期："+outboundDB.getOutboundDate());  // Change the value
+                }
+                if (region.isInRange(2, 0)) {  // Row 2, Column A (index is 0-based)
+                    // Get the first cell of the merged region
+                    Row row = sheet.getRow(region.getFirstRow());
+                    Cell cell = row.getCell(region.getFirstColumn(), Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                    cell.setCellValue("供货单位："+outboundDB.getOutboundDetailList().get(0).getItem().getManufacturer().getManufacturerName());  // Change the value
+                }
+                if (region.isInRange(2, 2)) {  // Row 2, Column A (index is 0-based)
+                    // Get the first cell of the merged region
+                    Row row = sheet.getRow(region.getFirstRow());
+                    Cell cell = row.getCell(region.getFirstColumn(), Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                    cell.setCellValue("出库单号："+outboundDB.getOutboundNo());  // Change the value
+                }
+                if (region.isInRange(2, 5)) {  // Row 2, Column A (index is 0-based)
+                    // Get the first cell of the merged region
+                    Row row = sheet.getRow(region.getFirstRow());
+                    Cell cell = row.getCell(region.getFirstColumn(), Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                    cell.setCellValue("           制单："+user.getFullName());  // Change the value
+                }
+            }
+            int rowNum = 4;
+            for (OutboundDetail detail : outboundDB.getOutboundDetailList()) {
+                Row row = sheet.getRow(rowNum++);
+                row.getCell(0, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(detail.getItem().getCode());
+                row.getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(detail.getItem().getName());
+                row.getCell(2, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(detail.getItem().getUnitName());
+                row.getCell(3, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(String.valueOf(detail.getItemAmount()));
+                row.getCell(5, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(detail.getRemark());
+            }
 
-        // Write the workbook to a file
-        try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
-            workbook.write(fileOut);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                workbook.close();
+
+            Row row = sheet.getRow(rowNum);
+
+            // Auto size columns
+            for (int rowIndex = 4; rowIndex < rowNum; rowIndex++) {
+                row = sheet.getRow(rowIndex);
+                if (row == null) continue;  // Skip if the row does not exist
+
+                for (int colIndex = 0; colIndex < 8; colIndex++) {
+                    Cell cell = row.getCell(colIndex, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+                    cell.setCellStyle(borderedStyle);
+                }
+            }
+            // Save the workbook as a new file
+            // Define the file path for saving the Excel file locally
+            String filePath = outboundDB.getOutboundNo() + "-销售出库单.xlsx";  // Update with your desired file path
+
+            // Write the workbook to a file
+            try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
+                workbook.write(fileOut);
             } catch (IOException e) {
                 e.printStackTrace();
+            } finally {
+                try {
+                    workbook.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+            try {
+                FileInputStream fileInputStream = new FileInputStream(filePath);
+                byte[] bytes = IOUtils.toByteArray(fileInputStream);
+                String base64 = Base64.getEncoder().encodeToString(bytes);
+                FileData fileData = new FileData();
+                fileData.setFileName(filePath);
+                fileData.setFileContent(base64);
+                Result result = new Result();
+                result.setCode(200); // Success code
+                result.setMessage("导出成功！");
+                result.setData(fileData);
+
+                return result;
+            } catch (Exception e) {
+                // Handle exceptions
+                return new Result(400, "生成失败！", null);
+            }
+
+
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-
-        try {
-            FileInputStream fileInputStream = new FileInputStream(filePath);
-            byte[] bytes = IOUtils.toByteArray(fileInputStream);
-            String base64 = Base64.getEncoder().encodeToString(bytes);
-            FileData fileData = new FileData();
-            fileData.setFileName(filePath);
-            fileData.setFileContent(base64);
-            Result result = new Result();
-            result.setCode(200); // Success code
-            result.setMessage("导出成功！");
-            result.setData(fileData);
-
-            return result;
-        } catch (Exception e) {
-            // Handle exceptions
-            return new Result(400, "生成失败！", null);
-        }
-
-
     }
     // Method to format value with replacement if zero
     private String getFormattedValue(BigDecimal value) {
