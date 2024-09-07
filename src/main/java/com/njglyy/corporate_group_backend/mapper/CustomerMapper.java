@@ -16,7 +16,7 @@ public interface CustomerMapper {
 
 
     @Insert("INSERT INTO dbo.customer_list " +
-            " values(#{name}, {gender}, #{phoneNumber}, #{emailAddress})")
+            " values(#{name}, #{gender}, #{phoneNumber}, #{emailAddress})")
     void addCustomer(String name,String gender, String phoneNumber, String emailAddress);
 
     @Delete("DELETE FROM customer_list " +
@@ -24,7 +24,7 @@ public interface CustomerMapper {
     void deleteCustomerById(@Param("id") int id);
 
     @Update("UPDATE dbo.customer_list " +
-            " set name = #{name},gender = #{gender}, phoneNumber=#{phoneNumber},emailAddress = #{emailAddress} " +
+            " set name = #{name},gender = #{gender}, phone_number=#{phoneNumber},email_address = #{emailAddress} " +
             "where id= #{id}")
     void updateCustomer(int id, String name, String gender, String phoneNumber, String emailAddress);
 
