@@ -1,6 +1,7 @@
 package com.njglyy.corporate_group_backend.controller;
 
 import com.njglyy.corporate_group_backend.entity.Customer;
+import com.njglyy.corporate_group_backend.entity.Item;
 import com.njglyy.corporate_group_backend.entity.Result;
 import com.njglyy.corporate_group_backend.entity.Supplier;
 import com.njglyy.corporate_group_backend.mapper.CheckOutMapper;
@@ -24,10 +25,10 @@ public class CustomerController {
         }
         else{
             if(customer.getId()!=0){
-                customerMapper.updateCustomer(customer.getId(),customer.getName(),customer.getGender(),customer.getPhoneNumber(),customer.getEmailAddress());
+                customerMapper.updateCustomer(customer.getId(),customer.getName(),customer.getGender(),customer.getPhoneNumber(),customer.getEmailAddress(),customer.getRemark());
             }
             else{
-                customerMapper.addCustomer(customer.getName(), customer.getGender(), customer.getPhoneNumber(), customer.getEmailAddress());
+                customerMapper.addCustomer(customer.getName(), customer.getGender(), customer.getPhoneNumber(), customer.getEmailAddress(), customer.getRemark());
             }
 
         }
@@ -58,5 +59,20 @@ public class CustomerController {
              @RequestParam(value = "pageSize", required = false) int pageSize) {
         int customerListCount = customerMapper.queryCustomerListCount();
         return new Result(200, null, customerListCount);
+    }
+
+    @RequestMapping(value = "/queryCustomerByIdOrName", method = RequestMethod.GET)
+    public Result queryCustomerByIdOrName
+            (@RequestParam(value = "input", required = false) String input
+            ) {
+        String inputStr = "%"+input+"%";
+        int inputInt = 0;
+        try {
+            inputInt = Integer.parseInt(input);
+        } catch (NumberFormatException e) {
+            inputInt = 0; // Set to 0 if conversion fails
+        }
+        List<Customer> customerList = customerMapper.queryCustomerByIdOrName(inputInt,inputStr);
+        return new Result(200,null,customerList);
     }
 }

@@ -14,6 +14,5 @@ public class Customer {
     private String gender;
     private String phoneNumber;
     private String emailAddress;
-
-
+    private String remark;
 }

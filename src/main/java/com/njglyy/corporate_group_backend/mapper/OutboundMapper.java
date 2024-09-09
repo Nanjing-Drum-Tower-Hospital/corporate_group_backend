@@ -38,11 +38,15 @@ public interface OutboundMapper {
             @Result(property = "remark", column = "remark"),
             @Result(property = "accountingReversalOutboundNo", column = "accounting_reversal_outbound_no"),
             @Result(property = "entryType", column = "entry_type"),
+            @Result(property = "purchaseRecordId", column = "purchase_record_id"),
             @Result(property = "outboundDetailList", column = "outbound_no",
                     many = @Many(select = "queryOutboundDetailListByOutboundNo")),
             @Result(property = "checkOut", column = "outbound_date",
                     one = @One(select = "com.njglyy.corporate_group_backend.mapper.CheckOutMapper.queryOutboundValidCheckOutByDate")
             ),
+            @Result(property = "purchaseRecord", column = "purchase_record_id",
+                    one = @One(select = "com.njglyy.corporate_group_backend.mapper.PurchaseRecordMapper.queryPurchaseRecordById")
+            )
     })
     List<Outbound> queryOutboundList(int offset, int pageSize);
 
@@ -57,8 +61,12 @@ public interface OutboundMapper {
             @Result(property = "remark", column = "remark"),
             @Result(property = "accountingReversalOutboundNo", column = "accounting_reversal_outbound_no"),
             @Result(property = "entryType", column = "entry_type"),
+            @Result(property = "purchaseRecordId", column = "purchase_record_id"),
             @Result(property = "outboundDetailList", column = "outbound_no",
-                    many = @Many(select = "queryOutboundDetailListByOutboundNo"))
+                    many = @Many(select = "queryOutboundDetailListByOutboundNo")),
+            @Result(property = "purchaseRecord", column = "purchase_record_id",
+                    one = @One(select = "com.njglyy.corporate_group_backend.mapper.PurchaseRecordMapper.queryPurchaseRecordById")
+            )
     })
     Outbound queryOutboundByOutboundNo(String outboundNo);
 
