@@ -33,7 +33,7 @@ public class OutboundController {
         outbound = outboundMapper.queryOutboundByOutboundNo(outboundNo);
 
         outboundMapper.updateOutbound(outbound.getOutboundNo(),
-                 outbound.getRemark(), newOutboundNoString,"original");
+                 outbound.getRemark(), newOutboundNoString,"original",outbound.getPurchaseRecordId());
         for(OutboundDetail outboundDetail:outbound.getOutboundDetailList()){
 
 
@@ -54,7 +54,7 @@ public class OutboundController {
 
         if (outbound.getOutboundNo() != null) {
             outboundMapper.updateOutbound(outbound.getOutboundNo(),
-                     outbound.getRemark(), outbound.getAccountingReversalOutboundNo(),outbound.getEntryType());
+                     outbound.getRemark(), outbound.getAccountingReversalOutboundNo(),outbound.getEntryType(),outbound.getPurchaseRecordId());
             return new Result(200, "修改成功！", null);
         } else {
             String newLeftOutboundNoString = "";
@@ -82,7 +82,7 @@ public class OutboundController {
 
             String newOutboundNoString = newLeftOutboundNoString + newRightOutboundNoString;
             outboundMapper.addOutbound(newOutboundNoString, LocalDate.parse(newOutboundDate),
-                    outbound.getRemark(), outbound.getAccountingReversalOutboundNo(),outbound.getEntryType());
+                    outbound.getRemark(), outbound.getAccountingReversalOutboundNo(),outbound.getEntryType(),outbound.getPurchaseRecordId());
             return new Result(200, "添加成功！", newOutboundNoString);
         }
 
@@ -97,7 +97,7 @@ public class OutboundController {
         Outbound outboundReversal = outboundMapper.queryOutboundByOutboundNo(outbound.getAccountingReversalOutboundNo());
         if(outboundReversal!=null){
             outboundMapper.updateOutbound(outboundReversal.getOutboundNo(),
-                     outboundReversal.getRemark(), null,null);
+                     outboundReversal.getRemark(), null,null,outboundReversal.getPurchaseRecordId());
         }
         outboundMapper.deleteOutboundDetailListByOutboundNo(outboundNo);
         outboundMapper.deleteOutboundByOutboundNo(outboundNo);
@@ -206,5 +206,14 @@ public class OutboundController {
         int existingInventoryAmount = outboundMapper.queryExistingInventoryAmount(itemId);
         return new Result(200, null, existingInventoryAmount);
     }
+
+    @RequestMapping(value = "/queryOutboundListByOutboundNoAndPurchaseRecordId", method = RequestMethod.GET)
+    public Result queryOutboundListByOutboundNoAndPurchaseRecordId
+            (@RequestParam(value = "outboundNo", required = false) String outboundNo,
+             @RequestParam(value = "purchaseRecordId", required = false) int purchaseRecordId) {
+        Outbound outboundList = outboundMapper.queryOutboundListByOutboundNoAndPurchaseRecordId(outboundNo, purchaseRecordId);
+        return new Result(200, null, outboundList);
+    }
+
 
 }

@@ -229,7 +229,7 @@ public class StatementController {
                     // Get the first cell of the merged region
                     Row row = sheet.getRow(region.getFirstRow());
                     Cell cell = row.getCell(region.getFirstColumn(), Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-                    cell.setCellValue("客户：");  // Change the value
+                    cell.setCellValue("客户："+outboundDB.getPurchaseRecord().getCustomer().getName());  // Change the value
                 }
                 if (region.isInRange(1, 5)) {  // Row 2, Column A (index is 0-based)
                     // Get the first cell of the merged region

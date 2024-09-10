@@ -15,17 +15,18 @@ public interface OutboundMapper {
 
 
     @Insert("INSERT INTO dbo.outbound_list " +
-            " values(#{outboundNo}, #{outboundDate},  #{remark},#{accountingReversalOutboundNo},#{entryType})")
-    void addOutbound(String outboundNo, LocalDate outboundDate,  String remark, String accountingReversalOutboundNo, String entryType);
+            " values(#{outboundNo}, #{outboundDate},  #{remark},#{accountingReversalOutboundNo},#{entryType}, #{purchaseRecordId})")
+    void addOutbound(String outboundNo, LocalDate outboundDate,  String remark, String accountingReversalOutboundNo, String entryType, int purchaseRecordId);
 
     @Delete("DELETE FROM outbound_list " +
             "WHERE outbound_no = #{outboundNo} ")
     void deleteOutboundByOutboundNo(@Param("outboundNo") String outboundNo);
 
     @Update("UPDATE dbo.outbound_list " +
-            " set remark = #{remark}, accounting_reversal_outbound_no=#{accountingReversalOutboundNo},entry_type = #{entryType} " +
+            " set remark = #{remark}, accounting_reversal_outbound_no=#{accountingReversalOutboundNo},entry_type = #{entryType}," +
+            "  purchase_record_id=#{purchaseRecordId} " +
             "where outbound_no= #{outboundNo}")
-    void updateOutbound(String outboundNo,  String remark,String accountingReversalOutboundNo,String entryType);
+    void updateOutbound(String outboundNo,  String remark,String accountingReversalOutboundNo,String entryType, int purchaseRecordId);
 
 
 
@@ -72,7 +73,22 @@ public interface OutboundMapper {
 
 
 
-
+    @Select("select * from outbound_list " +
+            "where outbound_no=#{outboundNo} and purchase_record_id=#{purchaseRecordId} " )
+    @Results({
+            @Result(property = "outboundNo", column = "outbound_no", id = true),
+            @Result(property = "outboundDate", column = "outbound_date"),
+            @Result(property = "remark", column = "remark"),
+            @Result(property = "accountingReversalOutboundNo", column = "accounting_reversal_outbound_no"),
+            @Result(property = "entryType", column = "entry_type"),
+            @Result(property = "purchaseRecordId", column = "purchase_record_id"),
+            @Result(property = "outboundDetailList", column = "outbound_no",
+                    many = @Many(select = "queryOutboundDetailListByOutboundNo")),
+            @Result(property = "purchaseRecord", column = "purchase_record_id",
+                    one = @One(select = "com.njglyy.corporate_group_backend.mapper.PurchaseRecordMapper.queryPurchaseRecordById")
+            )
+    })
+    Outbound queryOutboundListByOutboundNoAndPurchaseRecordId(String outboundNo, int purchaseRecordId);
 
 
 

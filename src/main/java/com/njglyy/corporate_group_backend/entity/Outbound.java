@@ -17,7 +17,7 @@ public class Outbound implements Cloneable{
     private String remark;
     private String accountingReversalOutboundNo;
     private String entryType;
-    private String purchaseRecordId;
+    private int purchaseRecordId;
     private List<OutboundDetail> outboundDetailList;
     private CheckOut checkOut;
     private PurchaseRecord purchaseRecord;
