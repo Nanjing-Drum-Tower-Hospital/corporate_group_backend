@@ -4,12 +4,19 @@ import com.njglyy.corporate_group_backend.entity.*;
 import com.njglyy.corporate_group_backend.mapper.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.io.IOUtils;
+import org.apache.poi.poifs.crypt.HashAlgorithm;
 import org.apache.poi.ss.usermodel.*;
+
+import java.awt.Color;
+import java.awt.Font;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -21,6 +28,14 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.List;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.*;
+import javax.imageio.ImageIO;
+import org.apache.poi.openxml4j.opc.*;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTWorksheet;
+
+
+
 
 
 
@@ -390,7 +405,7 @@ public class StatementController {
             borderedStyle.setBorderLeft(BorderStyle.THIN);
             borderedStyle.setBorderRight(BorderStyle.THIN);
             // Access the first sheet
-            Sheet sheet = workbook.getSheetAt(0);
+            XSSFSheet  sheet = workbook.getSheetAt(0);
 
             for (int i = 0; i < sheet.getNumMergedRegions(); i++) {
                 CellRangeAddress region = sheet.getMergedRegion(i);
@@ -670,6 +685,19 @@ public class StatementController {
             // Save the workbook as a new file
             // Define the file path for saving the Excel file locally
             String filePath = beginDate + "至" + endDate + "收发存汇总表.xlsx";  // Update with your desired file path
+            // Protect the sheet with a password
+            String sheetPassword = "Glyy123!"; // Replace with your desired password
+            sheet.protectSheet(sheetPassword);
+            String workbookPassword = "Glyy123!";
+            workbook.lockStructure();
+            workbook.setWorkbookPassword(workbookPassword, HashAlgorithm.sha512);
+
+
+
+
+
+
+
 
 
             // Write the workbook to a file
@@ -684,10 +712,11 @@ public class StatementController {
                     e.printStackTrace();
                 }
             }
-//            Path path = Paths.get(filePath);
-//            Files.setPosixFilePermissions(path, PosixFilePermissions.fromString("r--------")); // Unix/Linux
-            File file = new File(filePath);
-            file.setReadOnly();
+
+
+
+//            File file = new File(filePath);
+//            boolean success = file.setReadOnly();
             try {
                 FileInputStream fileInputStream = new FileInputStream(filePath);
                 byte[] bytes = IOUtils.toByteArray(fileInputStream);
