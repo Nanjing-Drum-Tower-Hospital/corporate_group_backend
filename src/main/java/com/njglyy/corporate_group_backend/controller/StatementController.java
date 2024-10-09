@@ -11,11 +11,13 @@ import java.awt.Color;
 import java.awt.Font;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.BigDecimal;
@@ -33,10 +35,10 @@ import org.apache.poi.xssf.usermodel.*;
 import javax.imageio.ImageIO;
 import org.apache.poi.openxml4j.opc.*;
 import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTWorksheet;
+import org.apache.poi.xssf.usermodel.XSSFSimpleShape;
 
-
-
-
+import static com.njglyy.corporate_group_backend.utils.WaterMark.addWatermarkToSheet;
+import static com.njglyy.corporate_group_backend.utils.WaterMark.generateImageWithText;
 
 
 @RestController
@@ -685,13 +687,43 @@ public class StatementController {
             // Save the workbook as a new file
             // Define the file path for saving the Excel file locally
             String filePath = beginDate + "至" + endDate + "收发存汇总表.xlsx";  // Update with your desired file path
+
+
+
+
+
+            // Generate the image with the text "G375"
+            byte[] imageBytes = generateImageWithText("G375");
+
+            // Add the image to the workbook
+            int pictureIdx = workbook.addPicture(imageBytes, Workbook.PICTURE_TYPE_PNG);
+            addWatermarkToSheet(sheet, pictureIdx);
+
+
+
+
+
+
             // Protect the sheet with a password
             String sheetPassword = "Glyy123!"; // Replace with your desired password
             sheet.protectSheet(sheetPassword);
+            sheet.lockSelectLockedCells(true);
+            sheet.lockSelectUnlockedCells(false);
+            sheet.lockObjects(true);
+            sheet.lockScenarios(true);
+            sheet.lockFormatCells(true);
+            sheet.lockFormatColumns(true);
+            sheet.lockFormatRows(true);
+            sheet.lockInsertColumns(true);
+            sheet.lockInsertRows(true);
+            sheet.lockDeleteColumns(true);
+            sheet.lockDeleteRows(true);
+            sheet.lockSort(true);
+            sheet.lockAutoFilter(true);
+            sheet.lockPivotTables(true);
             String workbookPassword = "Glyy123!";
             workbook.lockStructure();
             workbook.setWorkbookPassword(workbookPassword, HashAlgorithm.sha512);
-
 
 
 
@@ -740,10 +772,14 @@ public class StatementController {
             throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
 
     }
+
+
     @RequestMapping(value = "/inboundSummaryStatement", method = RequestMethod.GET)
     public Result inboundSummaryStatement
             (@RequestParam(value = "beginDate", required = false) LocalDate beginDate,
