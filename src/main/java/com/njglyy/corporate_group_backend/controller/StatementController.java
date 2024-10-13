@@ -662,7 +662,8 @@ public class StatementController {
             CellStyle style10 = workbook.createCellStyle();
             style10.cloneStyleFrom(borderedStyle); // Cloning borderedStyle
             style10.setFont(font10);
-
+            style10.setAlignment(HorizontalAlignment.CENTER); // Horizontal alignment
+            style10.setVerticalAlignment(VerticalAlignment.CENTER); // Vertical alignment
 // Original style8 setup
             XSSFFont font8 = workbook.createFont();
             font8.setFontHeightInPoints((short) 8);
@@ -670,11 +671,21 @@ public class StatementController {
             CellStyle style8 = workbook.createCellStyle();
             style8.cloneStyleFrom(borderedStyle); // Cloning borderedStyle
             style8.setFont(font8);
+            style8.setVerticalAlignment(VerticalAlignment.CENTER); // Vertical alignment
 
 
+            CellStyle style8Left = workbook.createCellStyle();
+            style8Left.cloneStyleFrom(style8); // Cloning borderedStyle
+            style8Left.setAlignment(HorizontalAlignment.LEFT); // Horizontal alignment
+
+            CellStyle style8Center = workbook.createCellStyle();
+            style8Center.cloneStyleFrom(style8); // Cloning borderedStyle
+            style8Center.setAlignment(HorizontalAlignment.CENTER); // Horizontal alignment
 
 
-
+            CellStyle style8Right = workbook.createCellStyle();
+            style8Right.cloneStyleFrom(style8); // Cloning borderedStyle
+            style8Right.setAlignment(HorizontalAlignment.RIGHT); // Horizontal alignment
 
 
             // Auto size columns
@@ -684,16 +695,24 @@ public class StatementController {
 
                 if (row == null) continue;  // Skip if the row does not exist
                 CellStyle selectedStyle=workbook.createCellStyle();
-                if(rowIndex==1){
-                    selectedStyle.cloneStyleFrom(style10);
-                }
-                else{
-                    selectedStyle.cloneStyleFrom(style8);
-                    System.out.println("rowIndex:"+rowIndex);
 
-                }
 
                 for (int colIndex = 0; colIndex < 15; colIndex++) {
+                    if(rowIndex==1){
+                        selectedStyle=style10;
+                    }
+                    else{
+                       if(colIndex==0||colIndex==1||colIndex==2){
+                           selectedStyle=style8Left;
+                       }
+                       else if (colIndex==3||colIndex==6||colIndex==9||colIndex==12){
+                           selectedStyle=style8Center;
+                       }
+                       else{
+                           selectedStyle=style8Right;
+                       }
+
+                    }
                     Cell cell = row.getCell(colIndex, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
                     cell.setCellStyle(selectedStyle);
 
