@@ -82,6 +82,7 @@ public class StatementController {
             borderedStyle.setBorderTop(BorderStyle.THIN);
             borderedStyle.setBorderLeft(BorderStyle.THIN);
             borderedStyle.setBorderRight(BorderStyle.THIN);
+            borderedStyle.setWrapText(true);
             // Access the first sheet
             Sheet sheet = workbook.getSheetAt(0);
 
@@ -232,6 +233,7 @@ public class StatementController {
             borderedStyle.setBorderTop(BorderStyle.THIN);
             borderedStyle.setBorderLeft(BorderStyle.THIN);
             borderedStyle.setBorderRight(BorderStyle.THIN);
+            borderedStyle.setWrapText(true);
             // Access the first sheet
             Sheet sheet = workbook.getSheetAt(0);
 
@@ -406,6 +408,7 @@ public class StatementController {
             borderedStyle.setBorderTop(BorderStyle.THIN);
             borderedStyle.setBorderLeft(BorderStyle.THIN);
             borderedStyle.setBorderRight(BorderStyle.THIN);
+            borderedStyle.setWrapText(true);
             // Access the first sheet
             XSSFSheet  sheet = workbook.getSheetAt(0);
 
@@ -652,25 +655,58 @@ public class StatementController {
 
             Row row = sheet.getRow(rowNum);
 
+// Original style10 setup
+            XSSFFont font10 = workbook.createFont();
+            font10.setFontHeightInPoints((short) 10);
+            font10.setFontName("华文楷体"); // Setting font to STKaiti
+            CellStyle style10 = workbook.createCellStyle();
+            style10.cloneStyleFrom(borderedStyle); // Cloning borderedStyle
+            style10.setFont(font10);
+
+// Original style8 setup
+            XSSFFont font8 = workbook.createFont();
+            font8.setFontHeightInPoints((short) 8);
+            font8.setFontName("宋体"); // Setting font to SimSun
+            CellStyle style8 = workbook.createCellStyle();
+            style8.cloneStyleFrom(borderedStyle); // Cloning borderedStyle
+            style8.setFont(font8);
+
+
+
+
+
+
 
             // Auto size columns
             for (int rowIndex = 1; rowIndex < rowNum; rowIndex++) {
                 row = sheet.getRow(rowIndex);
+
+
                 if (row == null) continue;  // Skip if the row does not exist
+                CellStyle selectedStyle=workbook.createCellStyle();
+                if(rowIndex==1){
+                    selectedStyle.cloneStyleFrom(style10);
+                }
+                else{
+                    selectedStyle.cloneStyleFrom(style8);
+                    System.out.println("rowIndex:"+rowIndex);
+
+                }
 
                 for (int colIndex = 0; colIndex < 15; colIndex++) {
                     Cell cell = row.getCell(colIndex, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-                    cell.setCellStyle(borderedStyle);
+                    cell.setCellStyle(selectedStyle);
+
                 }
             }
 
             // Create a new row
             nextRow = sheet.createRow(rowNum++);
 // Get the row index
-            int rowIndex = nextRow.getRowNum();
+            int nextRowIndex = nextRow.getRowNum();
 
 // Define the range to merge (columns N and O are indices 13 and 14)
-            CellRangeAddress cellRangeAddress = new CellRangeAddress(rowIndex, rowIndex, 13, 14);
+            CellRangeAddress cellRangeAddress = new CellRangeAddress(nextRowIndex, nextRowIndex, 13, 14);
 
 // Merge the cells in the specified range
             sheet.addMergedRegion(cellRangeAddress);
@@ -679,10 +715,14 @@ public class StatementController {
             Cell mergeCell = nextRow.createCell(13); // Column N (index 13)
             mergeCell.setCellValue("制表：  "+user.getFullName());
 
+
+
+
+
             // Auto-size columns after populating data and styles
-            for (int colIndex = 0; colIndex < 15; colIndex++) {
-                sheet.autoSizeColumn(colIndex);
-            }
+//            for (int colIndex = 0; colIndex < 15; colIndex++) {
+//                sheet.autoSizeColumn(colIndex);
+//            }
 
             // Save the workbook as a new file
             // Define the file path for saving the Excel file locally
