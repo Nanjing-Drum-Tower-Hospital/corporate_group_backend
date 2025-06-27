@@ -484,10 +484,12 @@ public class StatementController {
                                 }
                             }
                         }
-                        row.createCell(3).setCellValue(String.valueOf(initialItemAmount));
-
-
                         BigDecimal totalInitialItemPrice = item.getUnitPriceExcludingTax().multiply(initialItemAmount);
+                        //todo 如果是尾差调整，则数量mock为0
+                        if (manufacturer.getManufacturerName().contains("尾差调整")) {
+                            initialItemAmount = BigDecimal.ZERO;
+                        }
+                        row.createCell(3).setCellValue(String.valueOf(initialItemAmount));
                         row.createCell(4).setCellValue(getFormattedValue(item.getUnitPriceExcludingTax()));
                         row.createCell(5).setCellValue(getFormattedValue(totalInitialItemPrice));
                         totalInitialManufacturerPrice=totalInitialManufacturerPrice.add(totalInitialItemPrice);
@@ -506,8 +508,12 @@ public class StatementController {
                                 }
                             }
                         }
-                        row.createCell(6).setCellValue(String.valueOf(inboundItemAmount));
                         BigDecimal totalInboundItemPrice = item.getUnitPriceExcludingTax().multiply(inboundItemAmount);
+                        //todo 如果是尾差调整，则数量mock为0
+                        if (manufacturer.getManufacturerName().contains("尾差调整")) {
+                            inboundItemAmount = BigDecimal.ZERO;
+                        }
+                        row.createCell(6).setCellValue(String.valueOf(inboundItemAmount));
                         row.createCell(7).setCellValue(getFormattedValue(item.getUnitPriceExcludingTax()));
                         row.createCell(8).setCellValue(getFormattedValue(totalInboundItemPrice));
                         totalInboundManufacturerPrice=totalInboundManufacturerPrice.add(totalInboundItemPrice);
@@ -526,8 +532,12 @@ public class StatementController {
                                 }
                             }
                         }
-                        row.createCell(9).setCellValue(String.valueOf(outboundItemAmount));
                         BigDecimal totalOutboundItemPrice = item.getUnitPriceExcludingTax().multiply(outboundItemAmount);
+                        //todo 如果是尾差调整，则数量mock为0
+                        if (manufacturer.getManufacturerName().contains("尾差调整")) {
+                            outboundItemAmount = BigDecimal.ZERO;
+                        }
+                        row.createCell(9).setCellValue(String.valueOf(outboundItemAmount));
                         row.createCell(10).setCellValue(getFormattedValue(item.getUnitPriceExcludingTax()));
                         row.createCell(11).setCellValue(getFormattedValue(totalOutboundItemPrice));
                         totalOutboundManufacturerPrice=totalOutboundManufacturerPrice.add(totalOutboundItemPrice);
