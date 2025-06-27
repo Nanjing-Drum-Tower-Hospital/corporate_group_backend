@@ -553,8 +553,12 @@ public class StatementController {
                                 }
                             }
                         }
-                        row.createCell(12).setCellValue(String.valueOf(finalItemAmount));
                         BigDecimal totalFinalItemPrice = item.getUnitPriceExcludingTax().multiply(finalItemAmount);
+                        //todo 如果是尾差调整，则数量mock为0
+                        if (manufacturer.getManufacturerName().contains("尾差调整")) {
+                            finalItemAmount = BigDecimal.ZERO;
+                        }
+                        row.createCell(12).setCellValue(String.valueOf(finalItemAmount));
                         row.createCell(13).setCellValue(getFormattedValue(item.getUnitPriceExcludingTax()));
                         row.createCell(14).setCellValue(getFormattedValue(totalFinalItemPrice));
                         totalFinalManufacturerPrice=totalFinalManufacturerPrice.add(totalFinalItemPrice);
@@ -637,19 +641,22 @@ public class StatementController {
             nextRow.createCell(12).setCellValue(totalFinalCount.toString());
             nextRow.createCell(14).setCellValue(totalFinalPrice.setScale(2, RoundingMode.HALF_UP).toString());
 
-            nextRow = sheet.createRow(rowNum++);
-            nextRow.createCell(0).setCellValue("尾差调整");
-            nextRow.createCell(5).setCellValue(new BigDecimal(0.00).setScale(2, RoundingMode.HALF_UP).toString());
-            nextRow.createCell(8).setCellValue(adjustmentAmount.setScale(2, RoundingMode.HALF_UP).toString());
-            nextRow.createCell(11).setCellValue(adjustmentAmount.setScale(2, RoundingMode.HALF_UP).toString());
-            nextRow.createCell(14).setCellValue(new BigDecimal(0.00).setScale(2, RoundingMode.HALF_UP).toString());
+//            nextRow = sheet.createRow(rowNum++);
+//            nextRow.createCell(0).setCellValue("尾差调整");
+//            nextRow.createCell(5).setCellValue(new BigDecimal(0.00).setScale(2, RoundingMode.HALF_UP).toString());
+//            nextRow.createCell(8).setCellValue(adjustmentAmount.setScale(2, RoundingMode.HALF_UP).toString());
+//            nextRow.createCell(11).setCellValue(adjustmentAmount.setScale(2, RoundingMode.HALF_UP).toString());
+//            nextRow.createCell(14).setCellValue(new BigDecimal(0.00).setScale(2, RoundingMode.HALF_UP).toString());
 
-            nextRow = sheet.createRow(rowNum++);
-            nextRow.createCell(0).setCellValue("合计");
-            nextRow.createCell(5).setCellValue(totalInitialPrice.setScale(2, RoundingMode.HALF_UP).toString());
-            nextRow.createCell(8).setCellValue(totalInboundPrice.add(adjustmentAmount).setScale(2, RoundingMode.HALF_UP).toString());
-            nextRow.createCell(11).setCellValue(totalOutboundPrice.add(adjustmentAmount).setScale(2, RoundingMode.HALF_UP).toString());
-            nextRow.createCell(14).setCellValue(totalFinalPrice.setScale(2, RoundingMode.HALF_UP).toString());
+//            nextRow = sheet.createRow(rowNum++);
+//            nextRow.createCell(0).setCellValue("合计");
+//            nextRow.createCell(5).setCellValue(totalInitialPrice.setScale(2, RoundingMode.HALF_UP).toString());
+//            nextRow.createCell(8).setCellValue(totalInboundPrice.add(adjustmentAmount).setScale(2, RoundingMode.HALF_UP).toString());
+//            nextRow.createCell(11).setCellValue(totalOutboundPrice.add(adjustmentAmount).setScale(2, RoundingMode.HALF_UP).toString());
+
+//            nextRow.createCell(8).setCellValue(totalInboundPrice.setScale(2, RoundingMode.HALF_UP).toString());
+//            nextRow.createCell(11).setCellValue(totalOutboundPrice.setScale(2, RoundingMode.HALF_UP).toString());
+//            nextRow.createCell(14).setCellValue(totalFinalPrice.setScale(2, RoundingMode.HALF_UP).toString());
 
 
 
