@@ -28,13 +28,16 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-
-        //添加拦截器
-        registry.addInterceptor(loginInterceptor).addPathPatterns("/**")
-                //放行路径，可以添加多个
-                .excludePathPatterns("/login","/addOrUpdateInbound", "/addOrUpdateInboundDetail","/addOrUpdateOutbound","/addOrUpdateOutboundDetail");
-//        registry.addInterceptor(userStaffAdminInterceptor).addPathPatterns("/queryUserStaffAdmin");
-
+        registry.addInterceptor(loginInterceptor)
+                .addPathPatterns("/**")
+                .excludePathPatterns(
+                        "/login/**",
+                        "/addOrUpdateInbound/**",
+                        "/addOrUpdateInboundDetail/**",
+                        "/addOrUpdateOutbound/**",
+                        "/addOrUpdateOutboundDetail/**"
+//                        "/error/**"
+                );
     }
 
 }

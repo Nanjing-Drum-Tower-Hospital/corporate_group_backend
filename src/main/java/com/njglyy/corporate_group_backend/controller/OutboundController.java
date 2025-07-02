@@ -46,6 +46,9 @@ public class OutboundController {
         return new Result(200, "冲红成功！", null);
     }
 
+
+
+
     @RequestMapping(value = "/addOrUpdateOutbound", method = RequestMethod.POST)
     public Result addOrUpdateOutbound
             (@RequestBody Outbound outbound

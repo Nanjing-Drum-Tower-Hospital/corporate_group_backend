@@ -24,6 +24,9 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        String uri = request.getRequestURI();
+        System.out.println("【请求路径】" + uri); // 打印实际请求路径
+
         String tokenString = request.getHeader("token");
         String username = request.getHeader("username");
         LocalDateTime expirationTime = LocalDateTime.now();
