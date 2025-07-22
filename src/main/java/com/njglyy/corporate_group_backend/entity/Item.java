@@ -28,6 +28,8 @@ public class Item {
     private String certificationUrl;
     private String pinyinCode;
     private Manufacturer manufacturer;
+    private BigDecimal retailPrice; //零售价格
+    private BigDecimal retailEmployeePrice; //员工优惠价格
 
     public BigDecimal getUnitPriceIncludingTax() {
         BigDecimal sellingPriceBD = unitPriceExcludingTax;

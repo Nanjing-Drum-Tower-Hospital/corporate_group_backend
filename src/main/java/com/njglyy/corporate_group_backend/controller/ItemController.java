@@ -111,7 +111,7 @@ public class ItemController {
                         item.getApprovalNo(), item.getType(), item.getExpireDate(), today,
                         null, null, null, null, null, null,
                         null, null, null, null,
-                        item.getCertificationUrl(),pinyinService.getPinyinInitials(item.getName()),item.getId());
+                        item.getCertificationUrl(),pinyinService.getPinyinInitials(item.getName()),item.getId(), item.getRetailPrice(), item.getRetailEmployeePrice());
                 return new Result(200, "修改成功！", null);
             }
 
@@ -121,7 +121,7 @@ public class ItemController {
                     item.getApprovalNo(), item.getType(), item.getExpireDate(), today,
                     null, null, null, null, null, null,
                     null, null, null, null,
-                    item.getCertificationUrl(),pinyinService.getPinyinInitials(item.getName()));
+                    item.getCertificationUrl(),pinyinService.getPinyinInitials(item.getName()), item.getRetailPrice(), item.getRetailEmployeePrice());
 
             return new Result(200, "添加成功！", null);
         } catch (Exception e) {

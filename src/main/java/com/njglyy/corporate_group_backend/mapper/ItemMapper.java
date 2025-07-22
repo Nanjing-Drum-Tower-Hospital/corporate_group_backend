@@ -48,6 +48,8 @@ public interface ItemMapper {
             @Result(property = "manufacturer.id", column = "manufacturer_dictionary_id"),
             @Result(property = "manufacturer.manufacturerName", column = "manufacturer_name"),
             @Result(property = "manufacturer.pinyinCode", column = "manufacturer_dictionary_pinyin_code"),
+            @Result(property = "retailPrice", column = "retail_price"),
+            @Result(property = "retailEmployeePrice", column = "retail_employee_price"),
             @Result(property = "manufacturer", column = "manufacturer_id",
                     one = @One(select = "com.njglyy.corporate_group_backend.mapper.ManufacturerMapper.queryManufacturerById"))
     })
@@ -118,7 +120,9 @@ public interface ItemMapper {
             @Result(property = "comment4", column = "comment4"),
             @Result(property = "comment5", column = "comment5"),
             @Result(property = "certificationUrl", column = "certification_url"),
-            @Result(property = "pinyinCode", column = "pinyin_code")
+            @Result(property = "pinyinCode", column = "pinyin_code"),
+            @Result(property = "retailPrice", column = "retail_price"),
+            @Result(property = "retailEmployeePrice", column = "retail_employee_price")
 
     })
     List<Item> queryItemByCodeOrName(String input);
@@ -135,13 +139,13 @@ public interface ItemMapper {
             " values(#{code},#{name},#{model},#{unitName},#{unitPriceExcludingTax},#{manufacturerId}," +
             "#{billItem},#{standards},#{approvalNo},#{type},#{expireDate},#{createDate},#{extendCode1}," +
             "#{extendCode2},#{extendCode3},#{extendCode4},#{extendCode5},#{comment1},#{comment2},#{comment3}," +
-            "#{comment4},#{comment5},#{certificationUrl},#{pinyinCode}) ")
+            "#{comment4},#{comment5},#{certificationUrl},#{pinyinCode}, #{retailPrice}, #{retailEmployeePrice}) ")
     void addItem(String code, String name, String model, String unitName, BigDecimal unitPriceExcludingTax,
                  int manufacturerId, String billItem, String standards,
                  String approvalNo, String type, LocalDate expireDate, LocalDate createDate,
                  String extendCode1, String extendCode2, String extendCode3, String extendCode4,
                  String extendCode5, String comment1, String comment2, String comment3,
-                 String comment4, String comment5, String certificationUrl, String pinyinCode);
+                 String comment4, String comment5, String certificationUrl, String pinyinCode, BigDecimal retailPrice, BigDecimal retailEmployeePrice);
 
     @Update("update dbo.item_dictionary " +
             " set name = #{name}, model = #{model}, unit_name = #{unitName}, unit_price_excluding_tax = #{unitPriceExcludingTax}, " +
@@ -149,14 +153,14 @@ public interface ItemMapper {
             " approval_no = #{approvalNo}, type = #{type}, expire_date = #{expireDate}, create_date = #{createDate}, " +
             " extend_code1 = #{extendCode1}, extend_code2 = #{extendCode2}, extend_code3 = #{extendCode3}, extend_code4 = #{extendCode4}, " +
             " extend_code5 = #{extendCode5}, comment1 = #{comment1}, comment2 = #{comment2}, comment3 = #{comment3}, " +
-            " comment4 = #{comment4}, comment5 = #{comment5}, certification_url = #{certificationUrl},pinyin_code = #{pinyinCode} " +
+            " comment4 = #{comment4}, comment5 = #{comment5}, certification_url = #{certificationUrl},pinyin_code = #{pinyinCode}, retail_price = #{retailPrice}, retail_employee_price = #{retailEmployeePrice} " +
             " where id = #{id}")
     void updateItem(String code, String name, String model, String unitName, BigDecimal unitPriceExcludingTax,
                     int manufacturerId, String billItem, String standards,
                     String approvalNo, String type, LocalDate expireDate, LocalDate createDate,
                     String extendCode1, String extendCode2, String extendCode3, String extendCode4,
                     String extendCode5, String comment1, String comment2, String comment3,
-                    String comment4, String comment5, String certificationUrl, String pinyinCode, int id);
+                    String comment4, String comment5, String certificationUrl, String pinyinCode, int id, BigDecimal retailPrice, BigDecimal retailEmployeePrice);
 
 
 
