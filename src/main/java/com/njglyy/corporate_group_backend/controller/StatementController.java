@@ -567,6 +567,7 @@ public class StatementController {
                         //todo 如果是尾差调整，则数量mock为0
                         if (manufacturer.getManufacturerName().contains("尾差调整")) {
                             finalItemAmount = BigDecimal.ZERO;
+                            totalFinalItemPrice = BigDecimal.ZERO;
                         }
                         row.createCell(12).setCellValue(String.valueOf(finalItemAmount));
                         row.createCell(13).setCellValue(getFormattedValue(item.getUnitPriceExcludingTax()));
