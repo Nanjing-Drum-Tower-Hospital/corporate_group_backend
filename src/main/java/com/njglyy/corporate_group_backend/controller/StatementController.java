@@ -516,6 +516,9 @@ public class StatementController {
                         row.createCell(6).setCellValue(String.valueOf(inboundItemAmount));
                         row.createCell(7).setCellValue(getFormattedValue(item.getUnitPriceExcludingTax()));
                         row.createCell(8).setCellValue(getFormattedValue(totalInboundItemPrice));
+                        if (manufacturer.getManufacturerName().contains("尾差调整")) {
+                            totalInboundItemPrice = BigDecimal.ZERO;
+                        }
                         totalInboundManufacturerPrice=totalInboundManufacturerPrice.add(totalInboundItemPrice);
 
 
@@ -540,6 +543,9 @@ public class StatementController {
                         row.createCell(9).setCellValue(String.valueOf(outboundItemAmount));
                         row.createCell(10).setCellValue(getFormattedValue(item.getUnitPriceExcludingTax()));
                         row.createCell(11).setCellValue(getFormattedValue(totalOutboundItemPrice));
+                        if (manufacturer.getManufacturerName().contains("尾差调整")) {
+                            totalOutboundItemPrice = BigDecimal.ZERO;
+                        }
                         totalOutboundManufacturerPrice=totalOutboundManufacturerPrice.add(totalOutboundItemPrice);
 
 
@@ -567,7 +573,6 @@ public class StatementController {
                         //todo 如果是尾差调整，则数量mock为0
                         if (manufacturer.getManufacturerName().contains("尾差调整")) {
                             finalItemAmount = BigDecimal.ZERO;
-                            totalFinalItemPrice = BigDecimal.ZERO;
                         }
                         row.createCell(12).setCellValue(String.valueOf(finalItemAmount));
                         row.createCell(13).setCellValue(getFormattedValue(item.getUnitPriceExcludingTax()));
