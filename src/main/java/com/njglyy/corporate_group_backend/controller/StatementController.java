@@ -283,24 +283,47 @@ public class StatementController {
                 }
             }
             int rowNum = 4;
+            BigDecimal totalCount = new BigDecimal(0);
+            BigDecimal totalTax = new BigDecimal(0);
+            BigDecimal totalPriceExcludingTax = new BigDecimal(0);
+            BigDecimal totalPriceIncludingTax = new BigDecimal(0);
             for (OutboundDetail detail : outboundDB.getOutboundDetailList()) {
                 Row row = sheet.getRow(rowNum++);
                 row.getCell(0, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(detail.getItem().getCode());
                 row.getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(detail.getItem().getName());
                 row.getCell(2, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(detail.getItem().getUnitName());
                 row.getCell(3, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(String.valueOf(detail.getItemAmount()));
-                row.getCell(5, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(detail.getRemark());
+                row.getCell(4, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(String.valueOf(detail.getItem().getUnitPriceExcludingTax().setScale(10, RoundingMode.HALF_UP)));
+                row.getCell(5, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(String.valueOf(detail.getOutboundDetailTax().setScale(2, RoundingMode.HALF_UP)));
+                row.getCell(6, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(String.valueOf(detail.getOutboundDetailPriceExcludingTax().setScale(2, RoundingMode.HALF_UP)));
+                row.getCell(7, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(String.valueOf(detail.getItem().getUnitPriceIncludingTax().setScale(2, RoundingMode.HALF_UP)));
+                row.getCell(8, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(String.valueOf(detail.getOutboundDetailPriceIncludingTax().setScale(2, RoundingMode.HALF_UP)));
+                row.getCell(9, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue("13%");
+                row.getCell(10, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(detail.getRemark());
+                
+                totalCount = totalCount.add(detail.getItemAmount());
+                totalTax = totalTax.add(detail.getOutboundDetailTax());
+                totalPriceExcludingTax = totalPriceExcludingTax.add(detail.getOutboundDetailPriceExcludingTax());
+                totalPriceIncludingTax = totalPriceIncludingTax.add(detail.getOutboundDetailPriceIncludingTax());
             }
 
+            // Insert blank row
+            rowNum++;
 
-            Row row = sheet.getRow(rowNum);
+            // Continue with more data after the blank row
+            Row row = sheet.getRow(rowNum++);
+            row.getCell(0, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(String.valueOf("合计"));
+            row.getCell(3, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(String.valueOf(totalCount));
+            row.getCell(5, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(String.valueOf(totalTax.setScale(2, RoundingMode.HALF_UP)));
+            row.getCell(6, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(String.valueOf(totalPriceExcludingTax.setScale(2, RoundingMode.HALF_UP)));
+            row.getCell(8, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(String.valueOf(totalPriceIncludingTax.setScale(2, RoundingMode.HALF_UP)));
 
             // Auto size columns
             for (int rowIndex = 4; rowIndex < rowNum; rowIndex++) {
                 row = sheet.getRow(rowIndex);
                 if (row == null) continue;  // Skip if the row does not exist
 
-                for (int colIndex = 0; colIndex < 8; colIndex++) {
+                for (int colIndex = 0; colIndex < 11; colIndex++) {
                     Cell cell = row.getCell(colIndex, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
                     cell.setCellStyle(borderedStyle);
                 }
