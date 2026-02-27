@@ -148,7 +148,7 @@ public interface ItemMapper {
                  String comment4, String comment5, String certificationUrl, String pinyinCode, BigDecimal retailPrice, BigDecimal retailEmployeePrice);
 
     @Update("update dbo.item_dictionary " +
-            " set name = #{name}, model = #{model}, unit_name = #{unitName}, unit_price_excluding_tax = #{unitPriceExcludingTax}, " +
+            " set code = #{code}, name = #{name}, model = #{model}, unit_name = #{unitName}, unit_price_excluding_tax = #{unitPriceExcludingTax}, " +
             " manufacturer_id = #{manufacturerId},  bill_item = #{billItem}, standards = #{standards}, " +
             " approval_no = #{approvalNo}, type = #{type}, expire_date = #{expireDate}, create_date = #{createDate}, " +
             " extend_code1 = #{extendCode1}, extend_code2 = #{extendCode2}, extend_code3 = #{extendCode3}, extend_code4 = #{extendCode4}, " +
