@@ -31,6 +31,7 @@ public interface ItemMapper {
             @Result(property = "standards", column = "standards"),
             @Result(property = "approvalNo", column = "approval_no"),
             @Result(property = "type", column = "type"),
+            @Result(property = "category", column = "category"),
             @Result(property = "expireDate", column = "expire_date"),
             @Result(property = "createDate", column = "create_date"),
             @Result(property = "extendCode1", column = "extend_code1"),
@@ -72,6 +73,7 @@ public interface ItemMapper {
             @Result(property = "standards", column = "standards"),
             @Result(property = "approvalNo", column = "approval_no"),
             @Result(property = "type", column = "type"),
+            @Result(property = "category", column = "category"),
             @Result(property = "expireDate", column = "expire_date"),
             @Result(property = "createDate", column = "create_date"),
             @Result(property = "extendCode1", column = "extend_code1"),
@@ -107,6 +109,7 @@ public interface ItemMapper {
             @Result(property = "standards", column = "standards"),
             @Result(property = "approvalNo", column = "approval_no"),
             @Result(property = "type", column = "type"),
+            @Result(property = "category", column = "category"),
             @Result(property = "expireDate", column = "expire_date"),
             @Result(property = "createDate", column = "create_date"),
             @Result(property = "extendCode1", column = "extend_code1"),
@@ -137,12 +140,12 @@ public interface ItemMapper {
 
     @Insert("INSERT INTO dbo.item_dictionary " +
             " values(#{code},#{name},#{model},#{unitName},#{unitPriceExcludingTax},#{manufacturerId}," +
-            "#{billItem},#{standards},#{approvalNo},#{type},#{expireDate},#{createDate},#{extendCode1}," +
+            "#{billItem},#{standards},#{approvalNo},#{type},#{category},#{expireDate},#{createDate},#{extendCode1}," +
             "#{extendCode2},#{extendCode3},#{extendCode4},#{extendCode5},#{comment1},#{comment2},#{comment3}," +
             "#{comment4},#{comment5},#{certificationUrl},#{pinyinCode}, #{retailPrice}, #{retailEmployeePrice}) ")
     void addItem(String code, String name, String model, String unitName, BigDecimal unitPriceExcludingTax,
                  int manufacturerId, String billItem, String standards,
-                 String approvalNo, String type, LocalDate expireDate, LocalDate createDate,
+                 String approvalNo, String type, int category, LocalDate expireDate, LocalDate createDate,
                  String extendCode1, String extendCode2, String extendCode3, String extendCode4,
                  String extendCode5, String comment1, String comment2, String comment3,
                  String comment4, String comment5, String certificationUrl, String pinyinCode, BigDecimal retailPrice, BigDecimal retailEmployeePrice);
@@ -150,14 +153,14 @@ public interface ItemMapper {
     @Update("update dbo.item_dictionary " +
             " set code = #{code}, name = #{name}, model = #{model}, unit_name = #{unitName}, unit_price_excluding_tax = #{unitPriceExcludingTax}, " +
             " manufacturer_id = #{manufacturerId},  bill_item = #{billItem}, standards = #{standards}, " +
-            " approval_no = #{approvalNo}, type = #{type}, expire_date = #{expireDate}, create_date = #{createDate}, " +
+            " approval_no = #{approvalNo}, type = #{type}, category = #{category}, expire_date = #{expireDate}, create_date = #{createDate}, " +
             " extend_code1 = #{extendCode1}, extend_code2 = #{extendCode2}, extend_code3 = #{extendCode3}, extend_code4 = #{extendCode4}, " +
             " extend_code5 = #{extendCode5}, comment1 = #{comment1}, comment2 = #{comment2}, comment3 = #{comment3}, " +
             " comment4 = #{comment4}, comment5 = #{comment5}, certification_url = #{certificationUrl},pinyin_code = #{pinyinCode}, retail_price = #{retailPrice}, retail_employee_price = #{retailEmployeePrice} " +
             " where id = #{id}")
     void updateItem(String code, String name, String model, String unitName, BigDecimal unitPriceExcludingTax,
                     int manufacturerId, String billItem, String standards,
-                    String approvalNo, String type, LocalDate expireDate, LocalDate createDate,
+                    String approvalNo, String type, int category, LocalDate expireDate, LocalDate createDate,
                     String extendCode1, String extendCode2, String extendCode3, String extendCode4,
                     String extendCode5, String comment1, String comment2, String comment3,
                     String comment4, String comment5, String certificationUrl, String pinyinCode, int id, BigDecimal retailPrice, BigDecimal retailEmployeePrice);
@@ -186,6 +189,7 @@ public interface ItemMapper {
             @Result(property = "standards", column = "standards"),
             @Result(property = "approvalNo", column = "approval_no"),
             @Result(property = "type", column = "type"),
+            @Result(property = "category", column = "category"),
             @Result(property = "expireDate", column = "expire_date"),
             @Result(property = "createDate", column = "create_date"),
             @Result(property = "extendCode1", column = "extend_code1"),

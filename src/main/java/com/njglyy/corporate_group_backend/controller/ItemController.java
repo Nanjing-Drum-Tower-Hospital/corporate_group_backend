@@ -108,7 +108,7 @@ public class ItemController {
             if(item.getId()!=0){
                 itemMapper.updateItem( item.getCode(),item.getName(), item.getModel(), item.getUnitName(), item.getUnitPriceExcludingTax(),
                         item.getManufacturerId(),  item.getBillItem(), item.getStandards(),
-                        item.getApprovalNo(), item.getType(), item.getExpireDate(), today,
+                        item.getApprovalNo(), item.getType(), item.getCategory(), item.getExpireDate(), today,
                         null, null, null, null, null, null,
                         null, null, null, null,
                         item.getCertificationUrl(),pinyinService.getPinyinInitials(item.getName()),item.getId(), item.getRetailPrice(), item.getRetailEmployeePrice());
@@ -118,7 +118,7 @@ public class ItemController {
 
             itemMapper.addItem(item.getCode(), item.getName(), item.getModel(), item.getUnitName(), item.getUnitPriceExcludingTax(),
                     item.getManufacturerId(),  item.getBillItem(), item.getStandards(),
-                    item.getApprovalNo(), item.getType(), item.getExpireDate(), today,
+                    item.getApprovalNo(), item.getType(), item.getCategory(), item.getExpireDate(), today,
                     null, null, null, null, null, null,
                     null, null, null, null,
                     item.getCertificationUrl(),pinyinService.getPinyinInitials(item.getName()), item.getRetailPrice(), item.getRetailEmployeePrice());

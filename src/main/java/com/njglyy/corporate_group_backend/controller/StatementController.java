@@ -30,6 +30,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
 import javax.imageio.ImageIO;
@@ -383,6 +384,7 @@ public class StatementController {
              @RequestParam(value = "endDate", required = false) LocalDate endDate,
              @RequestParam(value = "mainUnitName", required = false) String mainUnitName,
              @RequestParam(value = "adjustmentAmount", required = false) BigDecimal adjustmentAmount,
+             @RequestParam(value = "category", required = false) Integer category,
              HttpServletRequest request
             ) {
         if (beginDate == null || endDate == null) {
@@ -441,7 +443,13 @@ public class StatementController {
 
                     Row row = sheet.getRow(region.getFirstRow());
                     Cell cell = row.getCell(region.getFirstColumn(), Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-                    cell.setCellValue("管理公司助听器收发存汇总表（"+beginDateDot +" - "+ endDateDot+"）");  // Change the value
+                    String categorySuffix = "";
+                    if (category != null && category == 1) {
+                        categorySuffix = "（耳蜗）";
+                    } else if (category != null && category == 2) {
+                        categorySuffix = "（耳膜）";
+                    }
+                    cell.setCellValue("管理公司助听器收发存汇总表" + categorySuffix + "（"+beginDateDot +" - "+ endDateDot+"）");  // Change the value
 
                     // Create or get the existing cell style
                     CellStyle style = cell.getCellStyle();
@@ -461,6 +469,12 @@ public class StatementController {
             List<Outbound> outboundList = outboundMapper.queryOutboundList(0, Integer.MAX_VALUE);
             List<Manufacturer> manufacturerList = manufacturerMapper.queryManufacturerList(0, Integer.MAX_VALUE);
             List<Item> itemList = itemMapper.queryItemListByCondition(null,null,null,0, Integer.MAX_VALUE);
+            // 按商品分类过滤：category > 0 表示只导出指定分类；null/0/-1 表示导出全部（含尾差调整）
+            if (category != null && category > 0) {
+                itemList = itemList.stream()
+                        .filter(item -> item.getCategory() == category)
+                        .collect(Collectors.toList());
+            }
             int rowNum = 2;
             BigDecimal totalInitialPrice = new BigDecimal(0);
             BigDecimal totalInboundPrice = new BigDecimal(0);
@@ -480,8 +494,10 @@ public class StatementController {
                 BigDecimal totalInboundManufacturerCount = new BigDecimal(0);
                 BigDecimal totalOutboundManufacturerCount = new BigDecimal(0);
                 BigDecimal totalFinalManufacturerCount = new BigDecimal(0);
+                boolean hasItemInManufacturer = false;
                 for (Item item : itemList){
                     if(item.getManufacturerId() == manufacturer.getId()){
+                        hasItemInManufacturer = true;
                         Row row = sheet.createRow(rowNum++);
                         row.createCell(0).setCellValue(item.getName());
                         row.createCell(1).setCellValue(item.getType());
@@ -509,7 +525,7 @@ public class StatementController {
                         }
                         BigDecimal totalInitialItemPrice = item.getUnitPriceExcludingTax().multiply(initialItemAmount);
                         //todo 如果是尾差调整，则数量mock为0
-                        if (manufacturer.getManufacturerName().contains("尾差调整")) {
+                        if (manufacturer.getManufacturerName().contains("尾差调整") || item.getName().contains("尾差调整")) {
                             initialItemAmount = BigDecimal.ZERO;
                         }
                         row.createCell(3).setCellValue(String.valueOf(initialItemAmount));
@@ -533,7 +549,7 @@ public class StatementController {
                         }
                         BigDecimal totalInboundItemPrice = item.getUnitPriceExcludingTax().multiply(inboundItemAmount);
                         //todo 如果是尾差调整，则数量mock为0
-                        if (manufacturer.getManufacturerName().contains("尾差调整")) {
+                        if (manufacturer.getManufacturerName().contains("尾差调整") || item.getName().contains("尾差调整")) {
                             inboundItemAmount = BigDecimal.ZERO;
                         }
                         row.createCell(6).setCellValue(String.valueOf(inboundItemAmount));
@@ -560,7 +576,7 @@ public class StatementController {
                         }
                         BigDecimal totalOutboundItemPrice = item.getUnitPriceExcludingTax().multiply(outboundItemAmount);
                         //todo 如果是尾差调整，则数量mock为0
-                        if (manufacturer.getManufacturerName().contains("尾差调整")) {
+                        if (manufacturer.getManufacturerName().contains("尾差调整") || item.getName().contains("尾差调整")) {
                             outboundItemAmount = BigDecimal.ZERO;
                         }
                         row.createCell(9).setCellValue(String.valueOf(outboundItemAmount));
@@ -594,7 +610,7 @@ public class StatementController {
                         }
                         BigDecimal totalFinalItemPrice = item.getUnitPriceExcludingTax().multiply(finalItemAmount);
                         //todo 如果是尾差调整，则数量mock为0
-                        if (manufacturer.getManufacturerName().contains("尾差调整")) {
+                        if (manufacturer.getManufacturerName().contains("尾差调整") || item.getName().contains("尾差调整")) {
                             finalItemAmount = BigDecimal.ZERO;
                         }
                         row.createCell(12).setCellValue(String.valueOf(finalItemAmount));
@@ -634,6 +650,9 @@ public class StatementController {
 
                     }
 
+                }
+                if (!hasItemInManufacturer) {
+                    continue;
                 }
                 totalInitialPrice=totalInitialPrice.add(totalInitialManufacturerPrice);
                 totalInboundPrice=totalInboundPrice.add(totalInboundManufacturerPrice);
@@ -791,7 +810,13 @@ public class StatementController {
 
             // Save the workbook as a new file
             // Define the file path for saving the Excel file locally
-            String filePath = beginDate + "至" + endDate + "收发存汇总表.xlsx";  // Update with your desired file path
+            String categorySuffix = "";
+            if (category != null && category == 1) {
+                categorySuffix = "耳蜗";
+            } else if (category != null && category == 2) {
+                categorySuffix = "耳膜";
+            }
+            String filePath = beginDate + "至" + endDate + categorySuffix + "收发存汇总表.xlsx";  // Update with your desired file path
 
 
 
@@ -889,7 +914,8 @@ public class StatementController {
     public Result inboundSummaryStatement
             (@RequestParam(value = "beginDate", required = false) LocalDate beginDate,
              @RequestParam(value = "endDate", required = false) LocalDate endDate,
-             @RequestParam(value = "mainUnitName", required = false) String mainUnitName
+             @RequestParam(value = "mainUnitName", required = false) String mainUnitName,
+             @RequestParam(value = "category", required = false) Integer category
             ) {
         if (beginDate == null || endDate == null) {
             return new Result(400, "日期不能为空！", null);
@@ -935,6 +961,9 @@ public class StatementController {
             if((inbound.getInboundDate().isAfter(beginDate) || inbound.getInboundDate().isEqual(beginDate))
                     && (inbound.getInboundDate().isBefore(endDate) || inbound.getInboundDate().isEqual(endDate))){
                 for (InboundDetail detail : inbound.getInboundDetailList()) {
+                    if (category != null && category > 0 && detail.getItem().getCategory() != category) {
+                        continue;
+                    }
                     Row row = sheet.createRow(rowNum++);
                     row.createCell(0).setCellValue(detail.getInboundNo());
                     row.createCell(1).setCellValue(detail.getItem().getCode());
@@ -948,10 +977,10 @@ public class StatementController {
                     row.createCell(9).setCellValue(String.valueOf(detail.getInboundDetailPriceIncludingTax().setScale(2, RoundingMode.HALF_UP)));
                     row.createCell(10).setCellValue("13%");
                     row.createCell(11).setCellValue(detail.getRemark());
+                    totalInboundTax=totalInboundTax.add(detail.getInboundDetailTax());
+                    totalInboundPriceExcludingTax=totalInboundPriceExcludingTax.add(detail.getInboundDetailPriceExcludingTax());
+                    totalInboundPriceIncludingTax=totalInboundPriceIncludingTax.add(detail.getInboundDetailPriceIncludingTax());
                 }
-                totalInboundTax=totalInboundTax.add(inbound.getInboundTax());
-                totalInboundPriceExcludingTax=totalInboundPriceExcludingTax.add(inbound.getInboundPriceExcludingTax());
-                totalInboundPriceIncludingTax=totalInboundPriceIncludingTax.add(inbound.getInboundPriceIncludingTax());
 
             }
         }
@@ -969,7 +998,13 @@ public class StatementController {
         }
 
         // Define the file path for saving the Excel file locally
-        String filePath = beginDate + "至" + endDate + "入库汇总表.xlsx";  // Update with your desired file path
+        String categorySuffix = "";
+        if (category != null && category == 1) {
+            categorySuffix = "耳蜗";
+        } else if (category != null && category == 2) {
+            categorySuffix = "耳膜";
+        }
+        String filePath = beginDate + "至" + endDate + categorySuffix + "入库汇总表.xlsx";  // Update with your desired file path
 
         // Write the workbook to a file
         try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
@@ -1008,7 +1043,8 @@ public class StatementController {
     public Result outboundSummaryStatement
             (@RequestParam(value = "beginDate", required = false) LocalDate beginDate,
              @RequestParam(value = "endDate", required = false) LocalDate endDate,
-             @RequestParam(value = "mainUnitName", required = false) String mainUnitName
+             @RequestParam(value = "mainUnitName", required = false) String mainUnitName,
+             @RequestParam(value = "category", required = false) Integer category
             ) {
         if (beginDate == null || endDate == null) {
             return new Result(400, "日期不能为空！", null);
@@ -1054,6 +1090,9 @@ public class StatementController {
             if((outbound.getOutboundDate().isAfter(beginDate) || outbound.getOutboundDate().isEqual(beginDate))
                     && (outbound.getOutboundDate().isBefore(endDate) || outbound.getOutboundDate().isEqual(endDate))){
                 for (OutboundDetail detail : outbound.getOutboundDetailList()) {
+                    if (category != null && category > 0 && detail.getItem().getCategory() != category) {
+                        continue;
+                    }
                     Row row = sheet.createRow(rowNum++);
                     row.createCell(0).setCellValue(detail.getOutboundNo());
                     row.createCell(1).setCellValue(detail.getItem().getCode());
@@ -1067,10 +1106,10 @@ public class StatementController {
                     row.createCell(9).setCellValue(String.valueOf(detail.getOutboundDetailPriceIncludingTax().setScale(2, RoundingMode.HALF_UP)));
                     row.createCell(10).setCellValue("13%");
                     row.createCell(11).setCellValue(detail.getRemark());
+                    totalOutboundTax=totalOutboundTax.add(detail.getOutboundDetailTax());
+                    totalOutboundPriceExcludingTax=totalOutboundPriceExcludingTax.add(detail.getOutboundDetailPriceExcludingTax());
+                    totalOutboundPriceIncludingTax=totalOutboundPriceIncludingTax.add(detail.getOutboundDetailPriceIncludingTax());
                 }
-                totalOutboundTax=totalOutboundTax.add(outbound.getOutboundTax());
-                totalOutboundPriceExcludingTax=totalOutboundPriceExcludingTax.add(outbound.getOutboundPriceExcludingTax());
-                totalOutboundPriceIncludingTax=totalOutboundPriceIncludingTax.add(outbound.getOutboundPriceIncludingTax());
 
             }
         }
@@ -1088,7 +1127,13 @@ public class StatementController {
         }
 
         // Define the file path for saving the Excel file locally
-        String filePath = beginDate + "至" + endDate + "出库汇总表.xlsx";  // Update with your desired file path
+        String categorySuffix = "";
+        if (category != null && category == 1) {
+            categorySuffix = "耳蜗";
+        } else if (category != null && category == 2) {
+            categorySuffix = "耳膜";
+        }
+        String filePath = beginDate + "至" + endDate + categorySuffix + "出库汇总表.xlsx";  // Update with your desired file path
 
         // Write the workbook to a file
         try (FileOutputStream fileOut = new FileOutputStream(filePath)) {

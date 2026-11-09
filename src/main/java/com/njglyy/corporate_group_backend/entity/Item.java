@@ -23,6 +23,7 @@ public class Item {
     private String standards;
     private String approvalNo;
     private String type;
+    private int category; // 商品分类：1=耳蜗，2=耳膜，0=其他/尾差调整
     private LocalDate expireDate;
     private LocalDate createDate;
     private String certificationUrl;
