@@ -138,11 +138,18 @@ public interface ItemMapper {
             "${endDateSQL}")
     int queryItemListCountByCondition(String codeSQL, String beginDateSQL, String endDateSQL);
 
-    @Insert("INSERT INTO dbo.item_dictionary " +
-            " values(#{code},#{name},#{model},#{unitName},#{unitPriceExcludingTax},#{manufacturerId}," +
-            "#{billItem},#{standards},#{approvalNo},#{type},#{category},#{expireDate},#{createDate},#{extendCode1}," +
-            "#{extendCode2},#{extendCode3},#{extendCode4},#{extendCode5},#{comment1},#{comment2},#{comment3}," +
-            "#{comment4},#{comment5},#{certificationUrl},#{pinyinCode}, #{retailPrice}, #{retailEmployeePrice}) ")
+    @Insert("INSERT INTO dbo.item_dictionary (" +
+            "code, name, model, unit_name, unit_price_excluding_tax, manufacturer_id, " +
+            "bill_item, standards, approval_no, type, category, expire_date, create_date, " +
+            "extend_code1, extend_code2, extend_code3, extend_code4, extend_code5, " +
+            "comment1, comment2, comment3, comment4, comment5, " +
+            "certification_url, pinyin_code, retail_price, retail_employee_price) " +
+            "VALUES (" +
+            "#{code}, #{name}, #{model}, #{unitName}, #{unitPriceExcludingTax}, #{manufacturerId}, " +
+            "#{billItem}, #{standards}, #{approvalNo}, #{type}, #{category}, #{expireDate}, #{createDate}, " +
+            "#{extendCode1}, #{extendCode2}, #{extendCode3}, #{extendCode4}, #{extendCode5}, " +
+            "#{comment1}, #{comment2}, #{comment3}, #{comment4}, #{comment5}, " +
+            "#{certificationUrl}, #{pinyinCode}, #{retailPrice}, #{retailEmployeePrice}) ")
     void addItem(String code, String name, String model, String unitName, BigDecimal unitPriceExcludingTax,
                  int manufacturerId, String billItem, String standards,
                  String approvalNo, String type, int category, LocalDate expireDate, LocalDate createDate,
@@ -151,7 +158,7 @@ public interface ItemMapper {
                  String comment4, String comment5, String certificationUrl, String pinyinCode, BigDecimal retailPrice, BigDecimal retailEmployeePrice);
 
     @Update("update dbo.item_dictionary " +
-            " set code = #{code}, name = #{name}, model = #{model}, unit_name = #{unitName}, unit_price_excluding_tax = #{unitPriceExcludingTax}, " +
+            " set name = #{name}, model = #{model}, unit_name = #{unitName}, unit_price_excluding_tax = #{unitPriceExcludingTax}, " +
             " manufacturer_id = #{manufacturerId},  bill_item = #{billItem}, standards = #{standards}, " +
             " approval_no = #{approvalNo}, type = #{type}, category = #{category}, expire_date = #{expireDate}, create_date = #{createDate}, " +
             " extend_code1 = #{extendCode1}, extend_code2 = #{extendCode2}, extend_code3 = #{extendCode3}, extend_code4 = #{extendCode4}, " +
