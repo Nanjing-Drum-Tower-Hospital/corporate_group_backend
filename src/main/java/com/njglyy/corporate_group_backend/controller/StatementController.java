@@ -445,7 +445,7 @@ public class StatementController {
                     Cell cell = row.getCell(region.getFirstColumn(), Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
                     String categorySuffix = "";
                     if (category != null && category == 1) {
-                        categorySuffix = "（耳蜗）";
+                        categorySuffix = "（助听器）";
                     } else if (category != null && category == 2) {
                         categorySuffix = "（耳膜）";
                     }
@@ -812,7 +812,7 @@ public class StatementController {
             // Define the file path for saving the Excel file locally
             String categorySuffix = "";
             if (category != null && category == 1) {
-                categorySuffix = "耳蜗";
+                categorySuffix = "助听器";
             } else if (category != null && category == 2) {
                 categorySuffix = "耳膜";
             }
@@ -1000,7 +1000,7 @@ public class StatementController {
         // Define the file path for saving the Excel file locally
         String categorySuffix = "";
         if (category != null && category == 1) {
-            categorySuffix = "耳蜗";
+            categorySuffix = "助听器";
         } else if (category != null && category == 2) {
             categorySuffix = "耳膜";
         }
@@ -1129,7 +1129,7 @@ public class StatementController {
         // Define the file path for saving the Excel file locally
         String categorySuffix = "";
         if (category != null && category == 1) {
-            categorySuffix = "耳蜗";
+            categorySuffix = "助听器";
         } else if (category != null && category == 2) {
             categorySuffix = "耳膜";
         }
